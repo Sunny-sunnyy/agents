@@ -1,0 +1,6 @@
+And that's a wrap on week two.
+Day one understanding OpenAI agents SDK concepts.
+Not that there was all that much to understand.
+And tomorrow in day two, we're going to build our first project, an SDR, a sales development rep,
+and it's going to be great.
+I will see you there.

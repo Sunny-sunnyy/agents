@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4 - Deep Research Agents, Structured Outputs, and Parallel Tasks - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "EB Garamond", Garamond, "Times New Roman", serif;
+      font-weight: 400;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 70ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      font-family: "EB Garamond", serif;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+
+    .tag {
+      background: var(--surface-strong);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.4);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "EB Garamond", Garamond, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-top: 32px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 20px;
+    }
+
+    .toc h2 {
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      padding-left: 16px;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: Inter, sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 28px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 24px;
+    }
+
+    .card h3,
+    details summary {
+      font-family: Inter, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 18px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    /* Tabs Styling */
+    .tabs-container {
+      margin-top: 16px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      overflow: hidden;
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--hairline);
+      color: var(--muted);
+      padding: 14px 16px;
+      cursor: pointer;
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:last-child {
+      border-right: none;
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+      background: rgba(20, 20, 19, 0.02);
+    }
+
+    .tab-btn.active {
+      color: var(--primary-active);
+      background: var(--canvas);
+      position: relative;
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      background: var(--surface-soft);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+    }
+
+    /* Flashcards & Quiz */
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      background: var(--canvas);
+      border-color: var(--hairline);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline-soft);
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-card {
+      background: var(--canvas);
+      border-color: var(--hairline);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      padding: 12px 16px;
+      font-weight: 500;
+    }
+
+    .quiz-option:hover {
+      background: var(--surface-soft);
+      border-color: var(--muted);
+    }
+
+    .quiz-option.correct-choice {
+      border-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.08);
+      color: #3b8a7b;
+    }
+
+    .quiz-option.wrong-choice {
+      border-color: var(--primary);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: none;
+    }
+
+    .quiz-result.show {
+      display: block;
+    }
+
+    .quiz-result.correct {
+      background: rgba(93, 184, 166, 0.08);
+      color: #3b8a7b;
+      border: 1px solid var(--accent-teal);
+    }
+
+    .quiz-result.wrong {
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+      border: 1px solid var(--primary);
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>Day 4 - Deep Research Agents, Structured Outputs, and Parallel Tasks in Agent SDK</h1>
+        <p class="lead">
+          Bài học tập trung vào việc thiết kế hệ thống Agent nghiên cứu sâu (Deep Research Agent) thông qua việc phân rã tác vụ (Task Decomposition), lập kế hoạch nghiên cứu bằng đầu ra có cấu trúc (Structured Outputs với Pydantic), tích hợp hosted tools tìm kiếm web và tối ưu hóa hiệu năng bằng các tác vụ song song thông qua lập trình bất đồng bộ AsyncIO.
+        </p>
+        <div class="tag-row">
+          <span class="tag">OpenAI Agents SDK</span>
+          <span class="tag">Deep Research</span>
+          <span class="tag">Module 4</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day4_summary.md)</span>
+          <span class="source">Code (4_lab4.ipynb)</span>
+          <span class="source extended">Knowledge Extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm ôn tập</h2>
+        <ul class="list">
+          <li><strong>Hosted Web Search Tool:</strong> Công cụ cào và duyệt web do OpenAI lưu trữ trên Bing Search engine, tốn chi phí 2.5 cents ($0.025) cho mỗi lượt gọi mặc định.</li>
+          <li><strong>Structured Outputs:</strong> Ràng buộc tuyệt đối định dạng JSON đầu ra của Agent khớp 100% với lược đồ Pydantic Model.</li>
+          <li><strong>Chain of Thought in Schema:</strong> Đặt trường lý giải (`reason`) trước trường từ khóa (`query`) để ép mô hình suy luận trước khi gợi ý từ khóa tìm kiếm.</li>
+          <li><strong>Parallel Execution:</strong> Sử dụng `asyncio.gather` chạy đồng thời nhiều truy vấn tìm kiếm giúp giảm thiểu tối đa thời gian chờ đợi I/O.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-size: 0.9rem; font-weight: 500;">Reading progress - Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1 -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Đã dùng file <a href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day4_summary.md">day4_summary.md</a> chứa tóm tắt lý thuyết bài học do mô hình sinh ra.</li>
+                <li><strong>Slide:</strong> Không có (không được cung cấp trong học liệu).</li>
+                <li><strong>Code:</strong> Đã sử dụng mã nguồn trong Jupyter Notebook <a href="file:///G:/Agent2026Win/agents/2_openai/4_lab4.ipynb">4_lab4.ipynb</a> cho phần phân tích thực hành.</li>
+                <li><strong>Transcript:</strong> Đã được tham chiếu trực tiếp thông qua các phân tích trong file summary của ngày 4.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Tài liệu này tổng hợp toàn bộ các kỹ thuật thực tế từ Lab 4. Kỹ thuật cào web được thực hiện thông qua công cụ tìm kiếm được lưu trữ sẵn (Hosted Web Search Tool) của OpenAI. Cần lưu ý rằng công cụ này tính phí trực tiếp trên tài khoản API của người dùng và đôi khi thực hiện nhiều cuộc gọi cào dữ liệu cho một truy vấn đơn lẻ, khiến chi phí tăng cao hơn dự kiến.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ kỹ thuật được biểu diễn dưới dạng <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết kèm nghĩa trong dấu ngoặc đơn, ví dụ: <code>cost (chi phí)</code>, <code>model (mô hình)</code>.
+          </div>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Xây dựng hệ thống Agent nghiên cứu sâu (Deep Research Agent) thông qua việc phân chia các nhiệm vụ chuyên biệt cho nhiều Agent (lập kế hoạch, tìm kiếm, viết báo cáo, gửi email), ép buộc cấu trúc dữ liệu đầu ra qua Pydantic để đảm bảo tính ổn định và lập trình bất đồng bộ AsyncIO để chạy song song các cuộc gọi tìm kiếm nhằm tối ưu hóa thời gian chạy.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><code>WebSearchTool</code> là hosted tool tính phí của OpenAI ($0.025/lượt gọi), nên đặt <code>search_context_size="low"</code> trong phát triển để tiết kiệm chi phí.</li>
+                <li>Ép buộc Agent gọi công cụ tìm kiếm ở lượt đầu bằng thuộc tính <code>tool_choice="required"</code> trong <code>ModelSettings</code>.</li>
+                <li>Cấu hình <code>output_type</code> trong Agent để xuất kết quả cấu trúc, áp dụng Chain of Thought bằng cách xếp trường <code>reason</code> trước trường <code>query</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Áp dụng khi cần xây dựng hệ thống tự động hóa thu thập và tổng hợp thông tin phức tạp từ internet, tự động tạo báo cáo nghiên cứu chi tiết theo cấu trúc Markdown định sẵn và tự động soạn thảo, định dạng HTML để gửi báo cáo trực tiếp đến hòm thư người dùng.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            <p>
+              Bài học Day 4 là sự kết hợp và nâng cấp toàn diện của các ngày học trước trong chuỗi bài về OpenAI Agents SDK:
+            </p>
+            <ul class="list" style="margin-top: 10px;">
+              <li><strong>Từ Day 1 (Async Python & Agent Fundamentals):</strong> Khái niệm về lập trình bất đồng bộ với <code>asyncio</code> và vòng lặp sự kiện được ứng dụng trực tiếp để giải quyết bài toán nghẽn I/O khi thực hiện cào web song song cho nhiều truy vấn.</li>
+              <li><strong>Từ Day 2 (Tools & Collaboration):</strong> Công cụ gửi thư <code>send_email</code> thông qua dịch vụ SendGrid sử dụng decorator <code>@function_tool</code> được tái sử dụng để hoàn thiện bước cuối cùng của pipeline nghiên cứu. Đồng thời áp dụng mô hình phân tách tác vụ (Task Decomposition) để điều phối giữa Planner Agent, Search Agent, Writer Agent và Email Agent, tránh lỗi lặp vô hạn (infinite loops).</li>
+              <li><strong>Từ Day 3 (Structured Outputs & Guardrails):</strong> Kỹ thuật Structured Outputs được nâng cấp từ cấu trúc phẳng đơn giản lên cấu trúc danh sách lồng nhau phức tạp (nested structures) như <code>list[WebSearchItem]</code> để lập kế hoạch nghiên cứu.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day4_summary.md</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Hosted Tools - Công cụ được lưu trữ:</strong> Các công cụ do chính OpenAI xây dựng, triển khai và duy trì trực tiếp trên hạ tầng đám mây của họ (gồm Web Search, File Search và Computer Use). Lập trình viên có thể gọi ngay mà không cần viết code cào web hay dựng vector store.</li>
+                <li><strong>Structured Outputs - Đầu ra có cấu trúc:</strong> Tính năng của OpenAI API (sử dụng constrained grammar ở tầng sinh token) giúp đảm bảo phản hồi từ mô hình ngôn ngữ lớn khớp chính xác 100% với lược đồ JSON Schema định nghĩa bởi các lớp Pydantic.</li>
+                <li><strong>Task Decomposition - Phân rã tác vụ:</strong> Triết lý thiết kế hệ thống Agent bằng cách chia nhỏ một nhiệm vụ nghiên cứu khổng lồ thành các phần độc lập (Lập kế hoạch -> Tìm kiếm -> Viết báo cáo -> Soạn email), giúp giảm tải ngữ cảnh (context window) và tăng độ tin cậy.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Chain of Thought in Schema - Chuỗi suy nghĩ trong cấu trúc dữ liệu</h3>
+              <p>
+                Đây là một kỹ thuật cực kỳ tinh tế trong kỹ nghệ prompt (prompt engineering) và thiết kế schema dữ liệu. Bằng cách cố ý khai báo trường lập luận <code>reason</code> trước trường kết quả cuối cùng <code>query</code> trong class Pydantic <code>WebSearchItem</code>, chúng ta ép buộc mô hình ngôn ngữ lớn phải viết ra lý giải vì sao tìm kiếm từ khóa này là cần thiết trước khi viết ra chính xác từ khóa tìm kiếm đó.
+              </p>
+              <p style="margin-top: 10px;">
+                Do mô hình ngôn ngữ lớn hoạt động theo cơ chế dự đoán từ tiếp theo (next-token prediction), việc tạo ra các token suy luận logic trước đó làm "bản nháp" đóng vai trò là ngữ cảnh dẫn dắt giúp mô hình đưa ra từ khóa tìm kiếm phía sau có độ chính xác và chiều sâu chất lượng hơn hẳn.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về Hosted Tools & Chi phí</summary>
+            <p>
+              Hosted Tools mang lại sự tiện ích to lớn vì giảm bớt gánh nặng thiết lập hạ tầng cào web hay RAG (Vector Store). Tuy nhiên, nhà phát triển cần hiểu rõ cơ chế tính phí:
+            </p>
+            <ul class="list" style="margin-top: 10px;">
+              <li><code>WebSearchTool</code> thực hiện duyệt web qua công cụ tìm kiếm Bing của Microsoft. Chi phí mặc định khoảng 2.5 cents ($0.025) cho mỗi lượt gọi, có thể tăng lên nếu mô hình tự động phát sinh thêm các lượt tìm kiếm phụ trong một phiên.</li>
+              <li><code>FileSearchTool</code> tự động hóa các bước chunking tài liệu, nhúng vector (embedding) và tìm kiếm ngữ nghĩa (semantic retrieval). Chi phí được tính theo dung lượng lưu trữ vector store và số lượng token truy xuất dữ liệu.</li>
+              <li>Trong giai đoạn phát triển và kiểm thử (development/testing), việc liên tục gọi Web Search Tool với số lượng tìm kiếm lớn (ví dụ 20 truy vấn song song) sẽ nhanh chóng làm cạn kiệt số dư tài khoản API. Do đó, việc cấu hình tham số <code>search_context_size="low"</code> và sử dụng mô hình rẻ <code>gpt-4o-mini</code> là bắt buộc để tối ưu hóa ngân sách.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình và luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">4_lab4.ipynb</span>
+              <span class="source">day4_summary.md</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level flow - Quy trình tổng quát</h3>
+              <ol class="list">
+                <li><strong>Lập kế hoạch (Plan):</strong> Nhận yêu cầu nghiên cứu của người dùng, <code>planner_agent</code> hoạt động và trả về đối tượng <code>WebSearchPlan</code> chứa danh sách N từ khóa tìm kiếm kèm theo lý do cụ thể.</li>
+                <li><strong>Tìm kiếm song song (Search):</strong> Hệ thống đóng gói danh sách thành các tác vụ Python bất đồng bộ, sử dụng <code>asyncio.gather</code> gọi song song <code>search_agent</code> tích hợp <code>WebSearchTool</code> để cào dữ liệu từ internet.</li>
+                <li><strong>Tổng hợp báo cáo (Write):</strong> Tập hợp toàn bộ kết quả tìm kiếm thô gửi sang <code>writer_agent</code> để tổng hợp, xuất ra đối tượng cấu trúc <code>ReportData</code> chứa tóm tắt và nội dung báo cáo dạng Markdown.</li>
+                <li><strong>Gửi email (Email):</strong> Gửi nội dung Markdown sang <code>email_agent</code> để biên dịch sang mã nguồn HTML định dạng đẹp mắt, soạn tiêu đề và kích hoạt công cụ <code>send_email</code> để gửi qua API SendGrid.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data / Control flow - Luồng điều phối & Dữ liệu</h3>
+              <p>
+                Hệ thống kết hợp cả mô hình thực thi tuần tự (sequential) và thực thi song song (parallel):
+              </p>
+              <pre style="margin-top: 10px; font-size: 12px; line-height: 1.4;">
+[User Query] -> (Planner Agent) -> [WebSearchPlan (list of keywords)]
+                                           |
+                                 (asyncio.gather parallel)
+                                           |
+                               +-----------+-----------+
+                               |                       |
+                        (Search Agent 1)        (Search Agent N)
+                               |                       |
+                               +-----------+-----------+
+                                           |
+                                 [Raw Search Results]
+                                           |
+                                    (Writer Agent)
+                                           |
+                                    [ReportData JSON]
+                                           |
+                                    (Email Agent)
+                                           |
+                                   [HTML Email Body]
+                                           |
+                                   (SendGrid Tool) -> [Recipient Inbox]</pre>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Tool Choice Required</h3>
+              <p><strong>Purpose:</strong> Bắt buộc mô hình phải sử dụng một công cụ cụ thể ở bước đầu tiên, không cho phép tự ý sinh câu trả lời tự do.</p>
+              <p><strong>When to use:</strong> Khi Agent đóng vai trò là một bộ bọc (wrapper) chuyên biệt cho một công cụ (như Search Agent chuyên cào web).</p>
+              <p><strong>Trade-off:</strong> Làm mất tính linh hoạt tự nhiên của Agent; nếu công cụ gặp lỗi, Agent không thể phản hồi thay thế.</p>
+            </article>
+            <article class="card">
+              <h3>Field Description via Annotations</h3>
+              <p><strong>Purpose:</strong> Định nghĩa thông tin mô tả chi tiết của từng trường trong class Pydantic bằng <code>Field(description="...")</code>.</p>
+              <p><strong>When to use:</strong> Bất cứ khi nào cấu hình Structured Outputs (đầu ra cấu trúc) thông qua tham số <code>output_type</code> của Agent.</p>
+              <p><strong>Trade-off:</strong> Làm tăng nhẹ kích thước của lời nhắc hệ thống (system prompt), gây tốn thêm token bối cảnh.</p>
+            </article>
+            <article class="card">
+              <h3>Parallel asyncio.gather</h3>
+              <p><strong>Purpose:</strong> Thực thi đồng thời nhiều tác vụ gọi API cào web độc lập thay vì chạy tuần tự chờ đợi nhau.</p>
+              <p><strong>When to use:</strong> Khi cần thực hiện nhiều yêu cầu I/O độc lập không có sự phụ thuộc dữ liệu qua lại.</p>
+              <p><strong>Trade-off:</strong> Dễ chạm giới hạn tần suất gọi API (Rate Limit) nếu số lượng tác vụ song song đồng thời quá lớn.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn Lab 4</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">4_lab4.ipynb</span>
+            </div>
+          </div>
+          
+          <div class="tabs-container">
+            <div class="tabs-nav">
+              <button class="tab-btn active" type="button" onclick="switchTab(event, 'tab-agents')">1. Agent & Schema Setup</button>
+              <button class="tab-btn" type="button" onclick="switchTab(event, 'tab-functions')">2. Async Orchestration</button>
+              <button class="tab-btn" type="button" onclick="switchTab(event, 'tab-showtime')">3. Showtime Execution</button>
+            </div>
+
+            <!-- Tab 1 -->
+            <div id="tab-agents" class="tab-content active">
+              <div class="code-meta">
+                <span>File: 4_lab4.ipynb</span>
+                <span>Framework: OpenAI Agents SDK</span>
+                <span>Models: gpt-4o-mini</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Định nghĩa các cấu trúc dữ liệu bằng Pydantic Model để áp dụng Structured Outputs, kích hoạt Chain of Thought bằng thứ tự các trường, và cấu hình các Agent chuyên trách.
+              </p>
+              <pre><code class="language-python">from agents import Agent, WebSearchTool, trace, Runner, function_tool
+from agents.model_settings import ModelSettings
+from pydantic import BaseModel, Field
+
+# 1. Định nghĩa cấu trúc từng mục tìm kiếm lẻ
+class WebSearchItem(BaseModel):
+    # Khai báo reason trước query để ép LLM lập luận lý do trước khi đưa ra từ khóa tìm kiếm
+    reason: str = Field(description="Your reasoning for why this search is important to the query.")
+    query: str = Field(description="The search term to use for the web search.")
+
+# 2. Định nghĩa cấu trúc bản kế hoạch tìm kiếm chứa danh sách các mục tìm kiếm
+class WebSearchPlan(BaseModel):
+    searches: list[WebSearchItem] = Field(description="A list of web searches to perform to best answer the query.")
+
+# 3. Định nghĩa cấu trúc báo cáo nghiên cứu chi tiết đầu ra
+class ReportData(BaseModel):
+    short_summary: str = Field(description="A short 2-3 sentence summary of the findings.")
+    markdown_report: str = Field(description="The final report")
+    follow_up_questions: list[str] = Field(description="Suggested topics to research further")
+
+# 4. Khởi tạo Search Agent chuyên trách cào dữ liệu từ internet
+search_agent = Agent(
+    name="Search agent",
+    instructions="You are a research assistant. Given a search term, search the web and produce a summary.",
+    tools=[WebSearchTool(search_context_size="low")], # Dùng bối cảnh thấp để tiết kiệm token
+    model="gpt-4o-mini",
+    model_settings=ModelSettings(tool_choice="required"), # Bắt buộc phải chạy WebSearchTool ở lượt đầu
+)
+
+# 5. Khởi tạo Planner Agent có nhiệm vụ phân rã tác vụ và lên kế hoạch
+planner_agent = Agent(
+    name="PlannerAgent",
+    instructions="Given a query, come up with a set of web searches to perform.",
+    model="gpt-4o-mini",
+    output_type=WebSearchPlan, # Ép đầu ra khớp cấu trúc WebSearchPlan
+)
+
+# 6. Khởi tạo Writer Agent tổng hợp thông tin viết báo cáo dài
+writer_agent = Agent(
+    name="WriterAgent",
+    instructions="You are a senior researcher. Write a cohesive report based on search results.",
+    model="gpt-4o-mini",
+    output_type=ReportData, # Ép đầu ra khớp cấu trúc ReportData
+)</code></pre>
+            </div>
+
+            <!-- Tab 2 -->
+            <div id="tab-functions" class="tab-content">
+              <div class="code-meta">
+                <span>File: 4_lab4.ipynb</span>
+                <span>Features: Asyncio, @function_tool, SendGrid Integration</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Định nghĩa công cụ gửi mail bằng dịch vụ SendGrid thông qua decorator <code>@function_tool</code> và viết các hàm bất đồng bộ để điều phối dữ liệu tuần tự và song song giữa các Agent.
+              </p>
+              <pre><code class="language-python">import sendgrid
+import os
+from sendgrid.helpers.mail import Mail, Email, To, Content
+from typing import Dict
+import asyncio
+
+# 1. Đóng gói hàm Python thông thường thành một công cụ gửi email
+@function_tool
+def send_email(subject: str, html_body: str) -> Dict[str, str]:
+    """ Send out an email with the given subject and HTML body """
+    # Lấy API Key SendGrid từ biến môi trường
+    sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("sender@example.com") # Cần thay bằng email người gửi đã xác thực trên SendGrid
+    to_email = To("recipient@example.com")   # Địa chỉ email người nhận báo cáo
+    content = Content("text/html", html_body)
+    mail = Mail(from_email, to_email, subject, content).get()
+    sg.client.mail.send.post(request_body=mail)
+    return "success"
+
+# 2. Định nghĩa Email Agent sử dụng công cụ gửi email
+email_agent = Agent(
+    name="Email agent",
+    instructions="Convert report into clean HTML and use your send_email tool to send it.",
+    tools=[send_email],
+    model="gpt-4o-mini",
+)
+
+# 3. Hàm bất đồng bộ chạy Planner Agent lập kế hoạch tìm kiếm
+async def plan_searches(query: str) -> WebSearchPlan:
+    print("Planning searches...")
+    result = await Runner.run(planner_agent, f"Query: {query}")
+    print(f"Will perform {len(result.final_output.searches)} searches")
+    return result.final_output
+
+# 4. Hàm bất đồng bộ điều phối tìm kiếm song song sử dụng asyncio.gather
+async def perform_searches(search_plan: WebSearchPlan) -> list[str]:
+    print("Searching...")
+    # Tạo danh sách các tác vụ (tasks) bất đồng bộ chạy hàm search
+    tasks = [asyncio.create_task(search(item)) for item in search_plan.searches]
+    # Chạy song song toàn bộ tác vụ và thu thập kết quả trả về
+    results = await asyncio.gather(*tasks)
+    print("Finished searching")
+    return results
+
+# 5. Hàm bất đồng bộ chạy Search Agent cào dữ liệu cho từng từ khóa cụ thể
+async def search(item: WebSearchItem) -> str:
+    input_text = f"Search term: {item.query}\nReason for searching: {item.reason}"
+    result = await Runner.run(search_agent, input_text)
+    return result.final_output</code></pre>
+            </div>
+
+            <!-- Tab 3 -->
+            <div id="tab-showtime" class="tab-content">
+              <div class="code-meta">
+                <span>File: 4_lab4.ipynb</span>
+                <span>Concept: Showtime & Tracing</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Phần thực thi đầu cuối (Showtime) của toàn bộ đường ống nghiên cứu sâu. Tiến trình được bọc trong block <code>trace</code> để giám sát chi tiết vết chạy trên OpenAI Traces portal.
+              </p>
+              <pre><code class="language-python"># 1. Hàm viết báo cáo tổng hợp từ các kết quả cào web thô
+async def write_report(query: str, search_results: list[str]) -> ReportData:
+    print("Thinking about report...")
+    input_text = f"Original query: {query}\nSummarized search results: {search_results}"
+    result = await Runner.run(writer_agent, input_text)
+    print("Finished writing report")
+    return result.final_output
+
+# 2. Hàm gửi email chứa báo cáo nghiên cứu dạng HTML
+async def send_report_email(report: ReportData):
+    print("Writing email...")
+    # Chuyển nội dung Markdown của báo cáo sang Email Agent để định dạng HTML và gửi đi
+    await Runner.run(email_agent, report.markdown_report)
+    print("Email sent")
+    return report
+
+# 3. Showtime - Thực thi toàn bộ pipeline nghiên cứu
+query = "Latest AI Agent frameworks in 2025"
+
+# Bọc tiến trình trong trace để trực quan hóa sơ đồ Gantt của thời gian chạy trên OpenAI Traces
+with trace("Research trace"):
+    print("Starting research...")
+    # Bước 1 (Tuần tự): Lên kế hoạch tìm kiếm
+    search_plan = await plan_searches(query)
+    # Bước 2 (Song song): Tìm kiếm đồng thời các truy vấn trên internet
+    search_results = await perform_searches(search_plan)
+    # Bước 3 (Tuần tự): Viết báo cáo tổng hợp
+    report = await write_report(query, search_results)
+    # Bước 4 (Tuần tự): Biên dịch HTML và gửi email
+    await send_report_email(report)  
+    print("Hooray! Toàn bộ pipeline đã hoàn thành thành công!")</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>search_context_size="low"</strong></td>
+                <td>Giai đoạn phát triển (development), viết và kiểm thử code (debugging).</td>
+                <td>Báo cáo thu được ít chi tiết hơn, có khả năng bỏ lỡ một số thông tin phụ.</td>
+                <td>Thông tin tóm tắt có thể bị nông, thiếu chiều sâu.</td>
+              </tr>
+              <tr>
+                <td><strong>search_context_size="high"</strong></td>
+                <td>Giai đoạn chạy thực tế (production) cần báo cáo nghiên cứu chất lượng cao.</td>
+                <td>Tốn lượng token đầu vào (input tokens) cực kỳ lớn, đẩy chi phí API tăng nhanh.</td>
+                <td>Hóa đơn API tăng đột biến nếu thực hiện nhiều truy vấn.</td>
+              </tr>
+              <tr>
+                <td><strong>Số lượng 3 searches (quy mô nhỏ)</strong></td>
+                <td>Thực nghiệm nhanh logic hoạt động của pipeline nghiên cứu.</td>
+                <td>Dữ liệu đầu vào cho Writer Agent ít đa dạng, báo cáo ngắn.</td>
+                <td>Báo cáo nghiên cứu không bao quát hết các khía cạnh của chủ đề rộng.</td>
+              </tr>
+              <tr>
+                <td><strong>Số lượng 20 searches (quy mô lớn)</strong></td>
+                <td>Cần tạo ra các báo cáo nghiên cứu chi tiết, chuyên sâu và đa chiều.</td>
+                <td>Thời gian chạy lâu hơn, chi phí API lớn hơn đáng kể (~$0.50 cho mỗi lượt).</td>
+                <td>Dễ chạm ngưỡng Rate Limit của nhà cung cấp dịch vụ cào web nếu không giới hạn luồng.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp và cách phòng tránh</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Gặp lỗi Rate Limit (giới hạn tần suất gọi API):</strong> Xảy ra khi tăng số lượng tìm kiếm song song lên mức cao (như 20 searches) khiến hàng loạt request được gửi đồng loạt cùng một giây.</li>
+                <li><strong>Chi phí API tăng vọt ngoài tầm kiểm soát:</strong> Do thiết lập nhầm mô hình <code>gpt-4o</code> (thay vì <code>gpt-4o-mini</code>) hoặc sử dụng <code>search_context_size="high"</code> trong quá trình thử nghiệm lặp đi lặp lại.</li>
+                <li><strong>Lỗi API gửi thư SendGrid:</strong> Gửi email thất bại hoàn toàn khiến tiến trình điều phối bị dừng chạy giữa chừng ở bước cuối.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh & Sửa</h3>
+              <ul class="list">
+                <li><strong>Sử dụng asyncio.Semaphore:</strong> Khai báo một bộ đếm luồng (ví dụ: <code>sem = asyncio.Semaphore(5)</code>) để giới hạn tối đa chỉ cho phép 5 tác vụ tìm kiếm chạy song song tại một thời điểm, tránh bị nhà cung cấp khóa API tạm thời.</li>
+                <li><strong>Ràng buộc quy định sử dụng model:</strong> Luôn mặc định sử dụng <code>gpt-4o-mini</code> và cấu hình bối cảnh thấp <code>low</code> trong quá trình phát triển. Chỉ nâng cấp lên model mạnh hơn và bối cảnh cao hơn khi triển khai thực tế.</li>
+                <li><strong>Cấu hình an toàn cho SendGrid:</strong> Đảm bảo đã khai báo đầy đủ biến môi trường <code>SENDGRID_API_KEY</code> trong file <code>.env</code> và địa chỉ <code>from_email</code> bắt buộc phải là địa chỉ email đã được xác minh (Single Sender Verification) trên SendGrid dashboard.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10 -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards & Q&A - Thẻ ôn tập và câu hỏi nhanh</h2>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <!-- Flashcards -->
+            <div style="display: grid; gap: 14px;">
+              <article class="card flashcard">
+                <h3>Q: Hosted Tools là gì và OpenAI Agents SDK hiện hỗ trợ các hosted tools nào?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Là các công cụ được lưu trữ và vận hành trực tiếp bởi OpenAI trên hạ tầng của họ. Hiện hỗ trợ 3 công cụ:
+                  <ul class="list" style="margin-top: 6px;">
+                    <li><code>WebSearchTool</code>: cào và duyệt thông tin từ Bing Search.</li>
+                    <li><code>FileSearchTool</code>: truy xuất ngữ nghĩa (RAG) trên Vector Stores.</li>
+                    <li><code>ComputerTool</code>: tương tác máy tính (chụp ảnh màn hình, click chuột).</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: Tại sao thứ tự các trường trong class Pydantic (ví dụ: lý do trước, từ khóa sau) lại ảnh hưởng đến chất lượng đầu ra?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Vì LLM hoạt động theo cơ chế dự đoán từ tiếp theo (next-token prediction). Khi trường lý luận (<code>reason</code>) được sinh ra trước, các token lập luận này sẽ bổ sung ngữ cảnh chất lượng cao giúp dẫn dắt việc dự đoán từ khóa tìm kiếm (<code>query</code>) phía sau trở nên logic và bám sát yêu cầu hơn (áp dụng Chain of Thought vào Schema).
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: Tác dụng của tham số tool_choice="required" trong ModelSettings là gì?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Ép buộc mô hình ngôn ngữ lớn phải thực hiện cuộc gọi công cụ được chỉ định ở lượt chạy đầu tiên, không cho phép mô hình bỏ qua công cụ để tự sinh văn bản phản hồi thông thường. Phù hợp khi xây dựng Agent chuyên biệt cho một công cụ.
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: Cơ chế hoạt động của decorator @function_tool trong OpenAI Agents SDK là gì?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Sử dụng tính năng phản chiếu mã nguồn (reflection) của Python để phân tích tên hàm, các tham số đầu vào (cùng gợi ý kiểu dữ liệu - type hints) và chuỗi tài liệu (docstring). Từ đó tự động biên dịch thành JSON Schema tiêu chuẩn truyền vào tham số <code>tools</code> của cuộc gọi API OpenAI.
+                </div>
+              </article>
+            </div>
+
+            <!-- Quick Quiz -->
+            <div style="display: grid; gap: 14px;">
+              <article class="quiz-card">
+                <h3>Quick quiz 1 - Câu hỏi nhanh 1</h3>
+                <p style="margin-bottom: 12px; font-weight: 500;">
+                  Khi phát triển hệ thống Agent cào dữ liệu web, cấu hình nào giúp tối ưu hóa chi phí token đầu vào nhất?
+                </p>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">A. Cấu hình search_context_size="high" và sử dụng model gpt-4o</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">B. Cấu hình search_context_size="medium" và sử dụng model gpt-4o-mini</button>
+                <button class="button quiz-option" type="button" data-correct="true" data-quiz="q1">C. Cấu hình search_context_size="low" và sử dụng model gpt-4o-mini</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">D. Sử dụng công cụ Custom Tool tự viết gọi API bên thứ ba</button>
+                <div class="quiz-result" id="q1-result" aria-live="polite"></div>
+              </article>
+
+              <article class="quiz-card">
+                <h3>Quick quiz 2 - Câu hỏi nhanh 2</h3>
+                <p style="margin-bottom: 12px; font-weight: 500;">
+                  Trong hàm perform_searches, tại sao chúng ta sử dụng cơ chế asyncio.gather(*tasks)?
+                </p>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">A. Để đồng bộ dữ liệu và ép các Agent chạy tuần tự xếp hàng nhau.</button>
+                <button class="button quiz-option" type="button" data-correct="true" data-quiz="q2">B. Để thực thi đồng thời (song song) các truy vấn cào web, tối ưu thời gian chờ I/O.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">C. Để tự động bắt lỗi cú pháp định dạng JSON Schema của mô hình.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">D. Để nén dung lượng báo cáo nghiên cứu trước khi gửi email.</button>
+                <div class="quiz-result" id="q2-result" aria-live="polite"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 11 -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Hosted Web Search Tool duyệt internet qua Bing Search, tính phí 2.5 cents ($0.025) mỗi lượt gọi.</li>
+                <li>Chain of Thought in Schema giúp nâng cao chất lượng từ khóa sinh ra bằng cách bắt LLM lập luận lý do trước.</li>
+                <li>Lập trình bất đồng bộ với <code>asyncio.gather</code> giúp tối ưu hóa thời gian chạy thông qua tìm kiếm song song.</li>
+                <li>Dùng <code>output_type</code> trong Agent để xuất kết quả cấu trúc khớp Pydantic.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích cách thức hoạt động và cơ chế tính phí của Hosted Web Search Tool không?</li>
+                <li>Bạn có thể so sánh sự khác biệt về hiệu năng giữa tìm kiếm tuần tự và tìm kiếm song song không?</li>
+                <li>Cách định nghĩa Pydantic Model để hướng dẫn mô hình ngôn ngữ lớn lập luận trước khi đưa ra kết quả?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Day 4 Study Note:</strong> Nội dung đã được chọn lọc và kiểm tra chất lượng kỹ lưỡng. Không còn placeholder và sẵn sàng cho việc ôn tập độc lập trong trình duyệt.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // 1. Navigation Active Link & Reading Progress Bar
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // 2. Expand / Collapse Details Buttons
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    // 3. Tab Switching for Code Walkthrough
+    window.switchTab = function(evt, tabId) {
+      const container = evt.currentTarget.closest('.tabs-container');
+      
+      // Hide all content blocks in this tab container
+      container.querySelectorAll('.tab-content').forEach((content) => {
+        content.classList.remove('active');
+      });
+      
+      // Remove active class from all buttons in this tab navigation
+      container.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+      
+      // Show targeted tab content and set button active
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    };
+
+    // 4. Flashcard Answer Reveal
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    // 5. Quiz Choice Checking
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const quizId = button.dataset.quiz;
+        const resultDiv = document.getElementById(`${quizId}-result`);
+        const card = button.parentElement;
+        
+        // Remove style class from all options in this quiz card
+        card.querySelectorAll(".quiz-option").forEach((btn) => {
+          btn.classList.remove("correct-choice", "wrong-choice");
+        });
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          button.classList.add("correct-choice");
+          resultDiv.className = "quiz-result show correct";
+          resultDiv.innerHTML = quizId === "q1" 
+            ? "<strong>Chính xác!</strong> Lựa chọn cấu hình bối cảnh thấp <code>low</code> cùng mô hình <code>gpt-4o-mini</code> giúp hạn chế tối đa số lượng token tiêu thụ từ tài khoản API khi lập trình thử nghiệm."
+            : "<strong>Chính xác!</strong> Hàm <code>asyncio.gather</code> tập hợp các coroutine tìm kiếm bất đồng bộ và kích hoạt chúng thực thi đồng thời, giúp tối ưu hóa đáng kể thời gian nghẽn I/O khi gọi API cào web.";
+        } else {
+          button.classList.add("wrong-choice");
+          resultDiv.className = "quiz-result show wrong";
+          resultDiv.innerHTML = "<strong>Chưa chính xác.</strong> Bạn vui lòng xem lại lý thuyết kỹ thuật cào web hoặc lập trình bất đồng bộ phía trên và thử chọn lại.";
+        }
+      });
+    });
+
+    // 6. Scroll Events Binding
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    // Initial Calls
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

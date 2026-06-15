@@ -1,0 +1,159 @@
+Welcome back to cursor, where we are ready to go with OpenAI agents SDK.
+So you'll see that we have the folders on the left here, the directories.
+And we are now going into number two OpenAI and into lab number one.
+Here it is.
+First look at OpenAI agents SDK.
+I've included a link to the docs for OpenAI.
+And I will say that it does almost concern me showing you these docs because they're so clearly written
+and so easy that I rather wonder what my job is in all this.
+I will say that for the next few weeks, I think I definitely have a job.
+It gets a lot harder, but for this one you'd be doing well just to read the docs and it'll be very
+clear to you.
+So anyway, I'll keep going regardless.
+So let's do some imports to get us started.
+So we will say from dot env import load env.
+We know we got to do that.
+And now we're going to to do some imports from OpenAI's package.
+And that package is called agents.
+And from that package we are going to import agent.
+We're going to import this thing called runner.
+And we're going to import this thing called trace.
+These are the three things I told you about that we were going to use today.
+And the OpenAI package is called agents.
+That's that's the one I do.
+I do sometimes think that it's a bit strange that they use such a generic name for it, because I imagine
+a lot of people use the name agents for, for their own packages.
+I often do, and so you have to then start messing around with, with different kinds of imports.
+But still they did.
+Its called agents.
+And this is, this is how we import these three key things agent runner and Trace.
+All right.
+So the usual starting point.
+Hopefully this is second nature to you.
+We need to run load dot env with override is true to bring in our environment variables they are in
+okay.
+We are now going to make an agent.
+We're going to create our first agent, our first agent from a framework of this course.
+And so we're going to have an agent and say agent equals it's going to be an instance of the class agent.
+So we're creating an instance of agent OpenAI's class.
+Now it has some parameters.
+We need to use some arguments.
+And one of them is name.
+We give it a name and we're going to call it the jokester.
+And then we give it something called instructions.
+I like the way this is just filled in.
+I'll just press tab.
+Put me out of my misery.
+So we pass in some instructions.
+The instructions are basically the system prompt for this call to LM.
+So each of these agents you can think of as being an LM with one particular system prompt designed to
+organize it around one particular task.
+And so our system prompt called the instructions.
+In this case you are a joke teller.
+And you also pass in a model which in this case is GPT four mini.
+And you might be thinking in your mind a very good question, which is I.
+Does this mean that OpenAI agents SDK always uses OpenAI's models?
+You might, you know, that might sound like it's a sensible conclusion, but no, definitely not.
+The agents SDK is very much able to work with many models, as we will later in this week.
+Explore using different models with the OpenAI Agent Agents SDK.
+It's not opinionated.
+You can use different models with this same framework, but by default, if you just pass in a model
+name, it assumes you mean OpenAI.
+Okay, so now we're going to execute this.
+And now we have our first agent.
+Let's just look at what it looks like.
+It is an agent with name jokester instructions.
+You're a joke teller.
+And it's got some things here.
+Hand offs.
+You remember that was the concept that relates to the interactions between agents.
+It's got a model and it's got a bunch of settings and other things that you can, you can look at in
+your own time to be worth looking at.
+It has guardrails, input guardrails and output guardrails that we will look at later.
+Okay.
+So I mentioned that runner run is the way to run one of these things.
+So we can say perhaps results equals runner dot run.
+And when you run an agent you pass in two things.
+You pass in the agent itself to be run by the runner.
+And you pass in what is essentially the user prompt.
+It is the message that you are sending the agent, let's say tell a joke about autonomous agents.
+Autonomous AI agents.
+Okay, so now we are going to run this.
+It seems pretty simple.
+What do you think is going to happen?
+What's going to be in result?
+I will print result.
+Let's see what we get.
+If we do this and we print result.
+Let you have any ideas.
+Here it is.
+We get a code routine object because Runner Run is an async method, which means an async function,
+which means that it returns a Co-routine object.
+It's not it's not a function, it's a coroutine.
+And so hopefully you're expecting that.
+Or you guessed the what that.
+What does that mean?
+That means that we can't just call, run and run and expect that to work.
+We have to call await.
+And I'm going to I'm going to restart this kernel and start again from the top so that we don't have
+one hanging out there.
+Not not scheduled.
+We will come through.
+We will do this.
+We will create our agent.
+And there it is.
+And now we're going to say await.
+We're going to say results equals await.
+Runner dot run like that.
+And so now what we know is that runner dot run, that coroutine is going to be queued by the event loop.
+And when we call await it's going to execute it.
+And it will hold until it's completed execution.
+And the results will go into the variable result.
+And then we are going to print results dot final output.
+And this is now hopefully going to work and tell us a joke.
+See what happens.
+Why don't autonomous agents ever get lost.
+Because they are always following their own self driving instructions.
+Okay, so OpenAI is rather better at dealing with lightweight agents frameworks than it is at telling
+jokes.
+But but we'll accept it so it works.
+Now you can be forgiven for saying, all right, we haven't done anything particularly special here
+to do with agents.
+All we've done is have a system prompt and a user prompt.
+But never fear, there'll be plenty of time for that later in the week.
+What we're doing right now is just showing you the basic construct.
+And for my final part of this, I'm going to wrap this in a trace.
+So for trace you wrap this in a context manager.
+So I say with trace telling a joke.
+And then I just need to put that like that.
+If you're not familiar with context managers then then look in the guides.
+But but I imagine that you are.
+And what this does is it's telling OpenAI that we would like it to record these agent interactions,
+which is only one, and record it under the kind of heading telling a joke.
+And this allows you to have sophisticated agent interactions with many different agent calls involved,
+and have it all packaged up and available in their monitoring tools under one kind of heading.
+So let's run this.
+We'll get another joke.
+Why did the autonomous agent break up with its human partner?
+It just couldn't handle the emotional bandwidth.
+Okay.
+I guess it's not got a whole lot to do with agents, except it's.
+Put it in there with the human partner.
+That's all right.
+I'll let you be the judge of it.
+But now we can go and look at this trace.
+If we go to platform two.
+Here it comes.
+Traces.
+It's actually you can just go to platform openai.com and then just click on traces in the left, and
+you'll see that telling a joke is the top trace up here.
+And if I go into this trace we will see.
+What happened is that there was one endpoint called the system instructions was you were a joke teller.
+That's the system message that was just called instructions.
+The user prompt was tell a joke about autonomous AI agents.
+And then this was what the assistant responded.
+So true to its word, it's giving us a clear trace of the single call to an LLM that happened as part
+of this gigantic workflow, but it's packaged it up under the heading Telling a Joke.
+And this has allowed us to come into traces and see this.
+And as you can imagine, it's not particularly profound with this very simple example.
+But there will come cases in the future when this is going to be invaluable.

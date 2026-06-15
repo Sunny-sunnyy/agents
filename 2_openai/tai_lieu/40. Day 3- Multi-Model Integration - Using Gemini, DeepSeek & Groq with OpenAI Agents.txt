@@ -1,0 +1,118 @@
+And welcome to week two, day three.
+We have lots to cover today.
+Continuing our exploration of OpenAI agents SDK and with our SDR project.
+So I want to quickly take a moment to recap what we did last time.
+We looked at tools by just using that simple decorator as as a way to allow us to wrap a function into
+a tool and to be able to call that tool so easily without the boilerplate JSON that we'd needed to use
+in week one.
+We then looked at the way that agents can also be turned into tools.
+By using the as tool function, we can simply change an agent into being a tool.
+And that turned out to be very easy indeed.
+And then slightly confusingly, we saw that there is another way that agents can collaborate with each
+other, which is using handoffs.
+When you're creating a new agent, you can give it any number of tools and you can give it handoffs.
+And I explained that the key difference between them is that when you're using tools, you can think
+of that as a call to the other agent, which will then return back.
+But when you're doing handoffs, you can really think of that as a transfer of control.
+The next step on the workflow is giving over control to that agent that is on the receiving end of the
+handoff.
+We're now going to go and extend what we did last time in three different ways.
+Three things that will allow us just to learn a bit more about the framework.
+First of all, we're going to do what I promised we'd do and look at models other than OpenAI.
+So using OpenAI agents SDK to drive things like Gemini and Deep Seek.
+We're also going to look at structured outputs.
+The way that we can require an agent not to respond just with text, but to populate some kind of an
+object where we can specify the fields that are going to get populated.
+And then we're going to look importantly at guardrails, which are an approach to making sure that we
+have some controls over the information that comes in to our agent setup and what comes out.
+All right.
+With that intro, let's go back to cursor, back to the lab.
+And here we are back in cursor.
+And we are looking at the second week.
+And we're looking at day three.
+Here we are lab three week two day three.
+And we're going to start by doing a sort of quick recap of what we did last time.
+We're going to do some imports.
+We're going to load the env.
+We're actually going to bring in a bunch more environment variables than usual.
+I'm looking at a bunch of different keys here.
+Google deep sea grok.
+Now you don't have to do this.
+You can just stick with OpenAI if you don't have these other keys.
+But if you'd like to experiment with others, then this is the way to do it.
+And of course, if you have other things, perhaps you use Open Router as your way to connect to different
+models.
+You can be using any of these here.
+All right.
+Now we have the three instructions for our three different sales agents.
+You'll remember one is more professional, one is more witty and engaging, and one is more concise.
+So income are three instructions.
+We're now going to remember that we can use OpenAI's endpoints.
+We can use that compatible OpenAI endpoints to talk to other models like Gemini, Deep Seek and Grok.
+And any time that we have this approach, we will be able to easily use the OpenAI agents SDK.
+So here we're setting the base URL for Gemini endpoint, the base URL for the deep seek endpoint, and
+for the grok.
+These are the OpenAI compatible endpoints.
+So for Gemini you can see it's got OpenAI in there.
+And the same for grok for deep sea kit is the only one.
+It's already OpenAI compatible.
+Then we create a new instance of the client by instantiating an async OpenAI object.
+As you can see here, passing in the base URL and passing in the key.
+And finally we create three model objects.
+These are called OpenAI chat completions model passing in the name of the model and the client that
+we just defined in the group above.
+So this is a little bit boilerplate.
+And if you're using GPT four or mini, if you're using any of OpenAI's models, you don't need to do
+any of this because it assumes by default that this is the case.
+So what I mean is that when we actually create our agents, we're going to give them a name instructions,
+and we're going to pass in one of these models.
+Now if for this model you pass in a string you just pass in text, which is what we did before we just
+passed in GPT four mini right there.
+If it's text, then it assumes that you're talking directly to OpenAI.
+But if, by contrast, you pass in a model object an instance of OpenAI chat completions Model, then
+it will connect to this model using this endpoint.
+And so as you can see we have three agents sales agents one, two and three.
+The first one is connecting to deep seek.
+The second one is connecting to Gemini.
+And the third one is connecting to llama 3.3.
+The massive llama model through grok the fast inference platform.
+So there they are.
+This is how it all connects together.
+And we'll run that.
+And we now have these three agents connecting to these three different models.
+We will now do exactly what we did before our description, write a cold sales email.
+And we're now going to repackage each of those three sales agents into tools called tool one, tool
+two, tool three, and passing in this description as the description of the tool.
+And that is done.
+And we will now have a normal function tool.
+We use this decorator to reconstitute wrap this function in the the the boilerplate JSON that describes
+this tool.
+And it's almost a wrap.
+We're zooming through everything we did last time.
+We've now got some instructions.
+You can write a subject for a cold email.
+We've got some HTML instructions.
+You can convert a text email to HTML.
+We then make a subject writer an agent, which is going to do this.
+And as I say, I'm just passing in the string GPT four mini.
+So this is an agent that can write the subject of an email.
+This is turning that into a tool, a tool that can write the subject of an email.
+This is an agent that can convert an email to HTML format.
+And here it is as a tool, a tool that could convert a text email body to HTML email.
+I know I'm going through this very fast, but we just did it yesterday, so hopefully this is just immediate
+revision.
+So we run that and we collect together those three tools.
+This is our emailer agent the agent which is able to take some instructions the email tools.
+And it has a handoff description if you remember that.
+And now we're almost done.
+We now put these three sales tools into one group of tools.
+The handoff is now this one handoff agent.
+This emailer agent.
+We run that.
+And finally here we are the same arrival as before.
+The sales manager's instructions.
+We pass in the instructions we pass in the tools.
+We pass in the handoffs.
+And we then write the cold sales email.
+And with that I kick this off.
+It takes about a minute and I will see you in a second when it completes.

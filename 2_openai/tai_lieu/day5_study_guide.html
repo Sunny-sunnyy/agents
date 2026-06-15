@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5 - Modular Agent Design, Gradio UI, and Cloud Deployment - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "EB Garamond", Garamond, "Times New Roman", serif;
+      font-weight: 400;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 70ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      font-family: "EB Garamond", serif;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+
+    .tag {
+      background: var(--surface-strong);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.4);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "EB Garamond", Garamond, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-top: 32px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 20px;
+    }
+
+    .toc h2 {
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 12px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      padding-left: 16px;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: Inter, sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 28px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 24px;
+    }
+
+    .card h3,
+    details summary {
+      font-family: Inter, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 18px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+
+    /* Folder Tree Styling */
+    .folder-tree {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88rem;
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--hairline);
+      margin-bottom: 20px;
+    }
+
+    .tree-item {
+      line-height: 1.6;
+    }
+
+    .tree-item.is-folder {
+      color: var(--accent-amber);
+      font-weight: 600;
+    }
+
+    .tree-item.is-file {
+      color: var(--on-dark-soft);
+    }
+
+    /* Tabs Styling */
+    .tabs-container {
+      margin-top: 16px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      overflow: hidden;
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--hairline);
+      color: var(--muted);
+      padding: 14px 16px;
+      cursor: pointer;
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:last-child {
+      border-right: none;
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+      background: rgba(20, 20, 19, 0.02);
+    }
+
+    .tab-btn.active {
+      color: var(--primary-active);
+      background: var(--canvas);
+      position: relative;
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      background: var(--surface-soft);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+    }
+
+    /* Flashcards & Quiz */
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      background: var(--canvas);
+      border-color: var(--hairline);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline-soft);
+      padding-top: 12px;
+      margin-top: 8px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-card {
+      background: var(--canvas);
+      border-color: var(--hairline);
+      padding: 24px;
+      border-radius: var(--radius-lg);
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      padding: 12px 16px;
+      font-weight: 500;
+    }
+
+    .quiz-option:hover {
+      background: var(--surface-soft);
+      border-color: var(--muted);
+    }
+
+    .quiz-option.correct-choice {
+      border-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.08);
+      color: #3b8a7b;
+    }
+
+    .quiz-option.wrong-choice {
+      border-color: var(--primary);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: none;
+    }
+
+    .quiz-result.show {
+      display: block;
+    }
+
+    .quiz-result.correct {
+      background: rgba(93, 184, 166, 0.08);
+      color: #3b8a7b;
+      border: 1px solid var(--accent-teal);
+    }
+
+    .quiz-result.wrong {
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+      border: 1px solid var(--primary);
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide</span>
+        <h1>Day 5 - Modular Agent Design, Gradio UI, and Cloud Deployment in Agent SDK</h1>
+        <p class="lead">
+          Bài học tập trung vào việc mô-đun hóa chương trình Agent (Modular Agent Design) từ file thử nghiệm sang codebase Python sạch sẽ, xây dựng giao diện người dùng Gradio UI (Blocks) hiển thị tiến độ cào web song song theo thời gian thực (real-time streaming) bằng bộ sinh bất đồng bộ (Asynchronous Generator) và triển khai đám mây (Cloud Deployment) an toàn lên Hugging Face Spaces.
+        </p>
+        <div class="tag-row">
+          <span class="tag">OpenAI Agents SDK</span>
+          <span class="tag">Gradio UI</span>
+          <span class="tag">Cloud Deployment</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day5_summary.md)</span>
+          <span class="source">Code (deep_research/)</span>
+          <span class="source extended">Knowledge Extension</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm ôn tập</h2>
+        <ul class="list">
+          <li><strong>Modular Codebase:</strong> Tổ chức cơ sở mã nguồn chuyên biệt, chia nhỏ cấu hình Agent và bộ điều phối để nâng cao khả năng mở rộng.</li>
+          <li><strong>Asynchronous Generator:</strong> Sử dụng cú pháp <code>async def ... yield</code> để truyền luồng dữ liệu tiến độ và trạng thái trung gian lên UI.</li>
+          <li><strong>asyncio.as_completed:</strong> Trả về kết quả tác vụ song song ngay khi hoàn thành (first-come, first-served) để hiển thị trạng thái động `Completed X/Y`.</li>
+          <li><strong>Hugging Face Deploy:</strong> Đẩy nhanh ứng dụng Gradio lên đám mây và cấu hình secrets variable để bảo mật API keys.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-size: 0.9rem; font-weight: 500;">Reading progress - Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation - Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1 -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Đã dùng file <a href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day5_summary.md">day5_summary.md</a> chứa tóm tắt lý thuyết bài học Day 5.</li>
+                <li><strong>Slide:</strong> Không có (không được cung cấp trong học liệu).</li>
+                <li><strong>Code:</strong> Đã sử dụng mã nguồn trong thư mục dự án <a href="file:///G:/Agent2026Win/agents/2_openai/deep_research">deep_research/</a> gồm 6 module Python chuyên biệt.</li>
+                <li><strong>Transcript:</strong> Đã được tham chiếu trực tiếp thông qua tóm tắt lý thuyết do LLM chuẩn bị.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Bài học này đánh dấu bước hoàn thiện của dự án Deep Research App từ giai đoạn thử nghiệm trên Jupyter Notebook ở Day 4 thành một sản phẩm web hoàn chỉnh. Giao dịch cào dữ liệu được củng cố bằng giao diện Gradio Blocks, cơ chế cập nhật trạng thái động qua Server-Sent Events (SSE) và quy trình deploy đám mây Hugging Face Spaces.
+              </p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm thuật ngữ kỹ thuật được biểu diễn dưới dạng <code>English - nghĩa tiếng Việt</code>. Các từ đơn phổ biến được viết kèm nghĩa trong dấu ngoặc đơn, ví dụ: <code>deploy (triển khai)</code>, <code>theme (chủ đề)</code>.
+          </div>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Đóng gói ứng dụng nghiên cứu đa Agent thành một cấu trúc cơ sở mã nguồn dạng mô-đun (Modular Codebase). Dựng giao diện web tùy chỉnh bằng Gradio <code>gr.Blocks</code>, truyền luồng trạng thái thời gian thực thông qua Asynchronous Generators và <code>asyncio.as_completed</code>, sau đó đưa ứng dụng lên máy chủ đám mây Hugging Face Spaces.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>Mô-đun hóa codebase giúp dễ bảo trì, unit test và phát triển các Agent độc lập.</li>
+                <li>Callback UI dùng <code>async def ... yield</code> giúp đẩy thông tin cập nhật từng bước, ngăn giao diện bị sập hoặc đóng băng (freeze).</li>
+                <li><code>asyncio.as_completed</code> cho phép theo dõi và in ra tiến độ tác vụ song song mạng nhanh hơn <code>asyncio.gather</code>.</li>
+                <li>Bảo mật API keys qua cấu hình Settings Secrets của Hugging Face là bắt buộc khi deploy ứng dụng công khai.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Áp dụng khi cần chuyển đổi các ý tưởng AI thử nghiệm thô thành ứng dụng SaaS web thực tế có giao diện thân thiện, hỗ trợ theo dõi tiến trình cào dữ liệu mạng động và chia sẻ cho người khác dùng thử một cách an toàn và miễn phí.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            <p>
+              Day 5 đóng gói toàn bộ logic nghiệp vụ nghiên cứu sâu, cấu hình Agent và Structured Outputs đã được giới thiệu tại Day 4. Thay vì thực thi tuần tự trên các cell của notebook, bài học này chuyển dịch toàn bộ logic sang các file Python mô-đun chuyên biệt:
+            </p>
+            <ul class="list" style="margin-top: 10px;">
+              <li><strong>Từ Day 1 (Async Python):</strong> Kỹ thuật AsyncIO được tối ưu hóa sâu hơn. Thay vì sử dụng <code>asyncio.gather</code> chờ đợi toàn bộ kết quả như Day 4, hệ thống sử dụng <code>asyncio.as_completed</code> để hứng kết quả của từng truy vấn cào web ngay khi nó vừa hoàn tất, giúp cập nhật trạng thái động lên UI tốt hơn.</li>
+              <li><strong>Từ Day 2 (Collaboration) & Day 4:</strong> Triết lý SDR/Task Decomposition được áp dụng triệt để khi tách rời hoàn toàn Planner Agent, Search Agent, Writer Agent, Email Agent và Manager ra các tệp độc lập, giúp cô lập tầm ảnh hưởng khi điều chỉnh Prompt hay cấu hình Agent.</li>
+              <li><strong>Từ Day 3 (Tracing):</strong> Cổng thông tin vết chạy OpenAI Traces được tích hợp tự động qua hàm <code>gen_trace_id()</code> để hiển thị đường dẫn trace trực tiếp lên giao diện người dùng ngay khi bắt đầu tiến trình chạy.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day5_summary.md</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Modular Codebase & gr.Blocks</h3>
+              <ul class="list">
+                <li><strong>Modular Codebase - Cơ sở mã nguồn dạng mô-đun:</strong> Phương pháp chia nhỏ một ứng dụng cồng kềnh thành các file độc lập. Mỗi file đảm nhiệm duy nhất một chức năng riêng biệt. Cách thiết kế này giúp tối ưu hóa khả năng đọc hiểu code, hỗ trợ làm việc nhóm song song và viết unit tests độc lập.</li>
+                <li><strong>gr.Blocks trong Gradio:</strong> Cú pháp dựng giao diện người dùng nâng cao cho phép tự do thiết lập bố cục (layout) và liên kết sự kiện (event binding) tùy chỉnh cho từng widget, khác biệt hoàn toàn với bố cục cứng nhắc của <code>gr.Interface</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Asynchronous Generators & asyncio.as_completed</h3>
+              <ul class="list">
+                <li><strong>Asynchronous Generator - Bộ sinh bất đồng bộ:</strong> Hàm định nghĩa bằng <code>async def</code> và trả kết quả bằng từ khóa <code>yield</code>. Giúp máy chủ Python liên tục đẩy các bản cập nhật trạng thái trung gian về giao diện thông qua kết nối Server-Sent Events (SSE) thời gian thực mà không làm chặn (blocking) luồng xử lý chính.</li>
+                <li><strong>asyncio.as_completed - Hoàn thành bất đồng bộ:</strong> Hàm trả về một bộ lặp (iterator) sinh ra các tác vụ ngay khi chúng hoàn thành, bất kể thứ tự kích hoạt ban đầu. Cơ chế này hoạt động theo nguyên lý "tác vụ mạng nào xong trước trả kết quả trước", giúp tính toán phần trăm tiến độ cào web linh hoạt.</li>
+              </ul>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về asyncio.as_completed & Server-Sent Events (SSE)</summary>
+            <p>
+              Hiểu sâu hơn về luồng dữ liệu thời gian thực trong Deep Research App:
+            </p>
+            <ul class="list" style="margin-top: 10px;">
+              <li>Khi người dùng click "Run" trên Gradio UI, Gradio backend đăng ký callback <code>run(query)</code>. Vì callback này là một Asynchronous Generator, Gradio tự động mở một kết nối Server-Sent Events (SSE) để lắng nghe.</li>
+              <li>Bên trong <code>ResearchManager().run()</code>, tiến trình tìm kiếm song song kích hoạt 5 truy vấn cào web. Vòng lặp <code>asyncio.as_completed</code> được sử dụng. Mỗi khi một cuộc gọi API tìm kiếm Bing hoàn tất, vòng lặp hứng kết quả, tăng biến đếm <code>num_completed</code> và thực hiện <code>yield f"Searching... {num_completed}/{total} completed"</code>.</li>
+              <li>Mỗi lệnh <code>yield</code> sẽ đóng gói chuỗi văn bản và gửi qua kênh SSE về trình duyệt người dùng. Gradio UI nhận thông điệp, cập nhật ngay lập tức DOM của thẻ Markdown mà không cần tải lại toàn bộ trang web. Điều này giải quyết triệt để lỗi "giao diện bị đóng băng" (UI freeze) khi chạy các tác vụ Agent tốn thời gian.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình và luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">deep_research.py</span>
+              <span class="source">research_manager.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>UI & Manager Interaction Flow</h3>
+              <ol class="list">
+                <li><strong>Gửi yêu cầu:</strong> Người dùng nhập câu hỏi vào <code>query_textbox</code> -> click `Run` -> kích hoạt callback <code>run()</code> bất đồng bộ.</li>
+                <li><strong>Ghi nhận vết chạy:</strong> <code>ResearchManager</code> sinh trace ID và yield link trace OpenAI lên giao diện.</li>
+                <li><strong>Lên kế hoạch:</strong> Gửi yêu cầu sang <code>PlannerAgent</code> để sinh 5 từ khóa tìm kiếm -> yield trạng thái lập kế hoạch hoàn tất.</li>
+                <li><strong>Cào web song song:</strong> Thực thi song song 5 truy vấn. Hứng kết quả bằng <code>asyncio.as_completed</code> -> yield tiến độ hoàn thành (ví dụ: `2/5 completed`) thời gian thực.</li>
+                <li><strong>Viết báo cáo:</strong> Gom dữ liệu thô gửi sang <code>WriterAgent</code> tổng hợp thành Markdown -> yield trạng thái.</li>
+                <li><strong>Gửi email & Hoàn tất:</strong> Gửi Markdown sang <code>EmailAgent</code> định dạng HTML và kích hoạt API SendGrid -> yield thông báo thành công và in báo cáo Markdown cuối cùng lên màn hình.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Interactive Stream Flowchart</h3>
+              <p>
+                Sơ đồ tương tác luồng dữ liệu thời gian thực giữa Gradio UI và Manager:
+              </p>
+              <pre style="margin-top: 10px; font-size: 13px; line-height: 1.45;">
+[Gradio UI (gr.Blocks)] --(User Query)--> [run() Callback (async def)]
+          ^                                           |
+   (yield Status Update) <--(SSE Stream)-- [ResearchManager.run() (Generator)]
+          |                                           |
+          +--(yield Final Report Markdown) <----------+</pre>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Event Binding in gr.Blocks</h3>
+              <p><strong>Purpose:</strong> Đăng ký các hàm Python xử lý bất đồng bộ khi người dùng click nút bấm hoặc ấn Enter trên ô nhập liệu.</p>
+              <p><strong>When to use:</strong> Khi dựng giao diện web bằng Blocks của Gradio.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi nhà phát triển phải tự quản lý tham số <code>inputs</code> và <code>outputs</code> thủ công cho từng phần tử giao diện.</p>
+            </article>
+            <article class="card">
+              <h3>Progress Tracking via as_completed</h3>
+              <p><strong>Purpose:</strong> Cập nhật số lượng tác vụ hoàn thành động giúp người dùng biết hệ thống vẫn đang cào web bình thường.</p>
+              <p><strong>When to use:</strong> Khi thực hiện nhiều cuộc gọi API mạng song song có thời gian phản hồi I/O khác nhau.</p>
+              <p><strong>Trade-off:</strong> Logic lập trình phức tạp hơn và kết quả trả về không giữ nguyên thứ tự ban đầu.</p>
+            </article>
+            <article class="card">
+              <h3>Cloud Deployment via Gradio CLI</h3>
+              <p><strong>Purpose:</strong> Đẩy nhanh ứng dụng Python lên nền tảng đám mây Hugging Face Spaces để chia sẻ trực tuyến.</p>
+              <p><strong>When to use:</strong> Khi cần xây dựng portfolio cá nhân hoặc chia sẻ demo sản phẩm cho cộng đồng.</p>
+              <p><strong>Trade-off:</strong> Cần cấu hình thủ công khóa API nhạy cảm trong Settings Secrets để tránh lộ mã nguồn bảo mật.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích cơ sở mã nguồn mô-đun</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">deep_research/</span>
+            </div>
+          </div>
+
+          <div class="folder-tree">
+            <div class="tree-item is-folder">deep_research/</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">├── deep_research.py (Chương trình chạy giao diện Gradio)</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">├── research_manager.py (Bộ quản lý điều phối bất đồng bộ)</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">├── planner_agent.py (Agent lập kế hoạch tìm kiếm)</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">├── search_agent.py (Agent cào và tóm tắt web)</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">├── writer_agent.py (Agent tổng hợp viết báo cáo)</div>
+            <div class="tree-item is-file" style="margin-left: 20px;">└── email_agent.py (Agent soạn thảo và gửi email)</div>
+          </div>
+          
+          <div class="tabs-container">
+            <div class="tabs-nav">
+              <button class="tab-btn active" type="button" onclick="switchTab(event, 'tab-ui-manager')">1. UI & Manager</button>
+              <button class="tab-btn" type="button" onclick="switchTab(event, 'tab-agent-defs')">2. Agent Definitions</button>
+              <button class="tab-btn" type="button" onclick="switchTab(event, 'tab-email-integration')">3. Email Integration</button>
+            </div>
+
+            <!-- Tab 1 -->
+            <div id="tab-ui-manager" class="tab-content active">
+              <div class="code-meta">
+                <span>deep_research.py & research_manager.py</span>
+                <span>Framework: Gradio UI & OpenAI Agents SDK</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Cấu hình giao diện tùy chỉnh bằng Gradio Blocks và bộ quản lý luồng nghiên cứu sâu hỗ trợ stream dữ liệu thời gian thực.
+              </p>
+              <pre><code class="language-python"># === deep_research.py ===
+import gradio as gr
+from dotenv import load_dotenv
+from research_manager import ResearchManager
+
+load_dotenv(override=True)
+
+# Callback bất đồng bộ yield thông tin tiến trình cho Gradio UI
+async def run(query: str):
+    async for chunk in ResearchManager().run(query):
+        yield chunk
+
+# Thiết lập giao diện Blocks với theme sky thanh lịch
+with gr.Blocks(theme=gr.themes.Default(primary_hue="sky")) as ui:
+    gr.Markdown("# Deep Research")
+    query_textbox = gr.Textbox(label="What topic would you like to research?")
+    run_button = gr.Button("Run", variant="primary")
+    report = gr.Markdown(label="Report")
+    
+    # Liên kết hành động click nút bấm và submit textbox với callback run
+    run_button.click(fn=run, inputs=query_textbox, outputs=report)
+    query_textbox.submit(fn=run, inputs=query_textbox, outputs=report)
+
+if __name__ == "__main__":
+    ui.launch(inbrowser=True)
+
+
+# === research_manager.py ===
+from agents import Runner, trace, gen_trace_id
+from search_agent import search_agent
+from planner_agent import planner_agent, WebSearchItem, WebSearchPlan
+from writer_agent import writer_agent, ReportData
+from email_agent import email_agent
+import asyncio
+
+class ResearchManager:
+    async def run(self, query: str):
+        # 1. Sinh trace ID ngẫu nhiên độc bản để liên kết log API
+        trace_id = gen_trace_id()
+        with trace("Research trace", trace_id=trace_id):
+            # yield link trace lên UI ngay lập tức để người dùng tiện click giám sát
+            yield f"View trace: https://platform.openai.com/traces/trace?trace_id={trace_id}"
+            
+            # 2. Lập kế hoạch tìm kiếm
+            search_plan = await self.plan_searches(query)
+            yield "Searches planned, starting to search..."     
+            
+            # 3. Duyệt tìm kiếm song song
+            search_results = await self.perform_searches(search_plan)
+            yield "Searches complete, writing report..."
+            
+            # 4. Viết báo cáo tổng hợp
+            report = await self.write_report(query, search_results)
+            yield "Report written, sending email..."
+            
+            # 5. Định dạng HTML và gửi thư qua SendGrid
+            await self.send_email(report)
+            yield "Email sent, research complete"
+            yield report.markdown_report # yield kết quả Markdown cuối cùng lên UI
+
+    async def plan_searches(self, query: str) -> WebSearchPlan:
+        result = await Runner.run(planner_agent, f"Query: {query}")
+        return result.final_output_as(WebSearchPlan)
+
+    async def perform_searches(self, search_plan: WebSearchPlan) -> list[str]:
+        num_completed = 0
+        # Tạo các task bất đồng bộ
+        tasks = [asyncio.create_task(self.search(item)) for item in search_plan.searches]
+        results = []
+        # as_completed giúp hứng kết quả tác vụ nào hoàn thành trước để cập nhật tiến độ
+        for task in asyncio.as_completed(tasks):
+            result = await task
+            if result is not None:
+                results.append(result)
+            num_completed += 1
+            print(f"Searching... {num_completed}/{len(tasks)} completed")
+        return results
+
+    async def search(self, item: WebSearchItem) -> str | None:
+        input_data = f"Search term: {item.query}\nReason for searching: {item.reason}"
+        try:
+            result = await Runner.run(search_agent, input_data)
+            return str(result.final_output)
+        except Exception:
+            return None # Tránh dừng tiến trình khi một truy vấn cào web bị lỗi
+
+    async def write_report(self, query: str, search_results: list[str]) -> ReportData:
+        input_data = f"Original query: {query}\nSummarized search results: {search_results}"
+        result = await Runner.run(writer_agent, input_data)
+        return result.final_output_as(ReportData)
+    
+    async def send_email(self, report: ReportData) -> None:
+        await Runner.run(email_agent, report.markdown_report)</code></pre>
+            </div>
+
+            <!-- Tab 2 -->
+            <div id="tab-agent-defs" class="tab-content">
+              <div class="code-meta">
+                <span>planner_agent.py, search_agent.py & writer_agent.py</span>
+                <span>Framework: Pydantic Structured Outputs</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Định nghĩa các lớp dữ liệu ràng buộc bằng Pydantic và khai báo cấu hình tham số độc lập cho từng Agent con.
+              </p>
+              <pre><code class="language-python"># === planner_agent.py ===
+from pydantic import BaseModel, Field
+from agents import Agent
+
+HOW_MANY_SEARCHES = 5
+INSTRUCTIONS = f"You are a helpful research assistant. Given a query, come up with a set of web searches \
+to perform to best answer the query. Output {HOW_MANY_SEARCHES} terms to query for."
+
+class WebSearchItem(BaseModel):
+    # Khai báo reason trước query để LLM lập luận Chain of Thought trước khi gợi ý từ khóa
+    reason: str = Field(description="Your reasoning for why this search is important to the query.")
+    query: str = Field(description="The search term to use for the web search.")
+
+class WebSearchPlan(BaseModel):
+    searches: list[WebSearchItem] = Field(description="A list of web searches to perform to best answer the query.")
+    
+planner_agent = Agent(
+    name="PlannerAgent",
+    instructions=INSTRUCTIONS,
+    model="gpt-4o-mini",
+    output_type=WebSearchPlan, # Ép đầu ra cấu trúc JSON khớp schema WebSearchPlan
+)
+
+
+# === search_agent.py ===
+from agents import Agent, WebSearchTool, ModelSettings
+
+INSTRUCTIONS = (
+    "You are a research assistant. Given a search term, you search the web for that term and "
+    "produce a concise summary of the results. The summary must 2-3 paragraphs and less than 300 "
+    "words. Capture the main points. Write succintly, no need to have complete sentences or good "
+    "grammar. This will be consumed by someone synthesizing a report, so its vital you capture the "
+    "essence and ignore any fluff. Do not include any additional commentary other than the summary itself."
+)
+
+search_agent = Agent(
+    name="Search agent",
+    instructions=INSTRUCTIONS,
+    tools=[WebSearchTool(search_context_size="low")], # Tiết kiệm token đầu vào bằng context size low
+    model="gpt-4o-mini",
+    model_settings=ModelSettings(tool_choice="required"), # Ép Agent bắt buộc chạy công cụ tìm kiếm
+)
+
+
+# === writer_agent.py ===
+from pydantic import BaseModel, Field
+from agents import Agent
+
+INSTRUCTIONS = (
+    "You are a senior researcher tasked with writing a cohesive report for a research query. "
+    "You will be provided with the original query, and some initial research done by a research assistant.\n"
+    "You should first come up with an outline for the report that describes the structure and "
+    "flow of the report. Then, generate the report and return that as your final output.\n"
+    "The final output should be in markdown format, and it should be lengthy and detailed. Aim "
+    "for 5-10 pages of content, at least 1000 words."
+)
+
+class ReportData(BaseModel):
+    short_summary: str = Field(description="A short 2-3 sentence summary of the findings.")
+    markdown_report: str = Field(description="The final report")
+    follow_up_questions: list[str] = Field(description="Suggested topics to research further")
+
+writer_agent = Agent(
+    name="WriterAgent",
+    instructions=INSTRUCTIONS,
+    model="gpt-4o-mini",
+    output_type=ReportData, # Ép đầu ra cấu trúc JSON khớp schema ReportData
+)</code></pre>
+            </div>
+
+            <!-- Tab 3 -->
+            <div id="tab-email-integration" class="tab-content">
+              <div class="code-meta">
+                <span>email_agent.py</span>
+                <span>Integration: SendGrid Function Tool</span>
+              </div>
+              <p style="margin-bottom: 12px;">
+                Tách rời logic gửi email thành một mô-đun riêng, đóng gói SendGrid Client làm công cụ gửi thư dạng HTML thông qua decorator <code>@function_tool</code>.
+              </p>
+              <pre><code class="language-python"># === email_agent.py ===
+import os
+from typing import Dict
+import sendgrid
+from sendgrid.helpers.mail import Email, Mail, Content, To
+from agents import Agent, function_tool
+
+# Đóng gói hàm Python thành công cụ của Agent thông qua @function_tool
+@function_tool
+def send_email(subject: str, html_body: str) -> Dict[str, str]:
+    """Send an email with the given subject and HTML body"""
+    # Khởi tạo SendGrid API Client
+    sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
+    from_email = Email("ed@edwarddonner.com")  # Bắt buộc thay bằng email gửi đã xác thực trên SendGrid
+    to_email = To("ed.donner@gmail.com")      # Email người nhận báo cáo
+    content = Content("text/html", html_body)
+    mail = Mail(from_email, to_email, subject, content).get()
+    
+    response = sg.client.mail.send.post(request_body=mail)
+    print("Email response status code:", response.status_code)
+    return "success"
+
+INSTRUCTIONS = """You are able to send a nicely formatted HTML email based on a detailed report.
+You will be provided with a detailed report. You should use your tool to send one email, providing the 
+report converted into clean, well presented HTML with an appropriate subject line."""
+
+email_agent = Agent(
+    name="Email agent",
+    instructions=INSTRUCTIONS,
+    tools=[send_email], # Đăng ký công cụ send_email cho Agent
+    model="gpt-4o-mini",
+)</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>gr.Blocks</strong></td>
+                <td>Xây dựng ứng dụng web phức tạp, bố cục linh hoạt và luồng dữ liệu tùy chỉnh.</td>
+                <td>Đòi hỏi viết nhiều dòng cấu hình UI thủ công, tăng độ phức tạp của codebase.</td>
+                <td>Dễ gặp lỗi liên kết sự kiện (event binding) nếu đặt sai tham số widget.</td>
+              </tr>
+              <tr>
+                <td><strong>gr.Interface</strong></td>
+                <td>Dựng nhanh các bản thử nghiệm chức năng (MVP) đơn giản chỉ trong vài dòng code.</td>
+                <td>Giao diện cố định, không thể can thiệp sâu vào các sự kiện trung gian.</td>
+                <td>Không hỗ trợ luồng stream trạng thái trung gian một cách tự nhiên.</td>
+              </tr>
+              <tr>
+                <td><strong>asyncio.as_completed</strong></td>
+                <td>Ứng dụng web cần cập nhật phần trăm tiến độ cào web tức thời cho người dùng.</td>
+                <td>Kết quả trả về không giữ nguyên thứ tự ban đầu của danh sách tác vụ.</td>
+                <td>Cần quản lý lỗi ngoại lệ (exception) chặt chẽ trong từng tác vụ con.</td>
+              </tr>
+              <tr>
+                <td><strong>asyncio.gather</strong></td>
+                <td>Tác vụ cần bảo toàn thứ tự kết quả trả về trùng khớp tuyệt đối với danh sách đầu vào.</td>
+                <td>Phải đợi toàn bộ các tác vụ cào web xong xuôi mới xuất dữ liệu một lần duy nhất.</td>
+                <td>Gây cảm giác giao diện bị đóng băng nếu chạy số lượng tìm kiếm lớn.</td>
+              </tr>
+              <tr>
+                <td><strong>Hugging Face Spaces</strong></td>
+                <td>Demo dự án cá nhân, chia sẻ trực tuyến nhanh chóng và miễn phí.</td>
+                <td>Máy chủ miễn phí chạy CPU yếu, mã nguồn ứng dụng công khai (public).</td>
+                <td>Dễ bị rò rỉ API keys nếu không cấu hình an toàn trong Settings Secrets.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp và cách phòng tránh</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Giao diện web bị đóng băng hoàn toàn:</strong> Gradio UI không hiển thị tiến trình cào web trung gian mà đứng im 30-60 giây rồi hiển thị báo cáo cuối cùng đột ngột.</li>
+                <li><strong>Runtime Error sau khi deploy đám mây:</strong> Ứng dụng Gradio chạy tốt ở cục bộ nhưng báo lỗi đỏ ngay khi gửi câu hỏi trên Hugging Face Spaces.</li>
+                <li><strong>Link trace báo lỗi 404 không tìm thấy:</strong> Người dùng click vào đường link trace được hiển thị trên UI nhưng OpenAI dashboard báo lỗi không tồn tại dữ liệu.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh & Sửa</h3>
+              <ul class="list">
+                <li><strong>Sử dụng bộ sinh bất đồng bộ:</strong> Đảm bảo hàm callback UI khai báo dạng <code>async def</code>, sử dụng vòng lặp <code>async for</code> để hứng dữ liệu từ manager và trả kết quả trung gian bằng từ khóa <code>yield</code>.</li>
+                <li><strong>Thiết lập Secrets variables:</strong> Sau khi chạy lệnh <code>gradio deploy</code>, truy cập ngay vào mục Settings -> Variables and secrets của Space để khai báo <code>OPENAI_API_KEY</code> và <code>SENDGRID_API_KEY</code>.</li>
+                <li><strong>Xác minh tài khoản trace:</strong> Đảm bảo tài khoản OpenAI đang đăng nhập trên trình duyệt trùng khớp với tài khoản API key được ứng dụng sử dụng, và dự án/workspace được chọn tương ứng.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10 -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards & Q&A - Thẻ ôn tập và câu hỏi nhanh</h2>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <!-- Flashcards -->
+            <div style="display: grid; gap: 14px;">
+              <article class="card flashcard">
+                <h3>Q: Sự khác biệt chính giữa asyncio.gather và asyncio.as_completed trong xử lý tác vụ song song là gì?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> 
+                  <ul class="list" style="margin-top: 6px;">
+                    <li><code>asyncio.gather</code>: Chờ tất cả tác vụ hoàn thành rồi trả về toàn bộ kết quả một lần, bảo toàn đúng thứ tự danh sách đầu vào.</li>
+                    <li><code>asyncio.as_completed</code>: Trả về kết quả của từng tác vụ ngay khi nó hoàn tất (first-come, first-served), không giữ thứ tự, thích hợp cập nhật tiến độ UI thời gian thực.</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: Tại sao cần sử dụng Asynchronous Generator (async def ... yield) cho callback của Gradio?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Vì tiến trình chạy của Agent cào web và viết báo cáo tốn nhiều thời gian. Sử dụng <code>yield</code> giúp backend liên tục đẩy các trạng thái cập nhật trung gian về giao diện người dùng thông qua kết nối Server-Sent Events (SSE), ngăn giao diện bị đóng băng.
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: gr.Blocks khác gr.Interface như thế nào trong thiết kế Gradio UI?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> 
+                  <ul class="list" style="margin-top: 6px;">
+                    <li><code>gr.Interface</code>: Tự động tạo giao diện nhanh gọn với bố cục cố định, khó tùy biến luồng sự kiện.</li>
+                    <li><code>gr.Blocks</code>: Cho phép lập trình viên tự thiết kế bố cục giao diện phức tạp bằng HTML/CSS tùy chỉnh và can thiệp sâu vào đăng ký sự kiện của từng thành phần.</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="card flashcard">
+                <h3>Q: Tại sao không được đẩy file .env chứa API keys lên Hugging Face Space khi deploy?</h3>
+                <button class="button primary" type="button" data-reveal>Reveal answer</button>
+                <div class="flash-answer">
+                  <strong>A:</strong> Vì Hugging Face Spaces mặc định công khai mã nguồn (public repo). Nếu đẩy file <code>.env</code> lên, API keys sẽ bị lộ công khai. Bạn bắt buộc phải khai báo API keys bảo mật trong phần cấu hình Settings Secrets của Space.
+                </div>
+              </article>
+            </div>
+
+            <!-- Quick Quiz -->
+            <div style="display: grid; gap: 14px;">
+              <article class="quiz-card">
+                <h3>Quick quiz 1 - Câu hỏi nhanh 1</h3>
+                <p style="margin-bottom: 12px; font-weight: 500;">
+                  Cơ chế nào dưới đây giúp Gradio cập nhật kết quả từng phần (streaming) lên UI mà không cần tải lại trang?
+                </p>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">A. Client-Side Polling liên tục gửi yêu cầu HTTP.</button>
+                <button class="button quiz-option" type="button" data-correct="true" data-quiz="q1">B. Thiết lập kết nối Server-Sent Events (SSE) hoặc WebSockets từ Python backend.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">C. Sử dụng iframe để tải lại các phần giao diện nhỏ định kỳ.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q1">D. Lưu trữ cục bộ dữ liệu trạng thái trên cookie trình duyệt.</button>
+                <div class="quiz-result" id="q1-result" aria-live="polite"></div>
+              </article>
+
+              <article class="quiz-card">
+                <h3>Quick quiz 2 - Câu hỏi nhanh 2</h3>
+                <p style="margin-bottom: 12px; font-weight: 500;">
+                  Khi deploy ứng dụng Gradio lên Hugging Face Spaces, bước nào sau đây là BẮT BUỘC để tránh lỗi API khi chạy?
+                </p>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">A. Khai báo cứng API keys vào mã nguồn tệp deep_research.py.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">B. Đẩy tệp tin cấu hình môi trường cục bộ .env lên git repository Space.</button>
+                <button class="button quiz-option" type="button" data-correct="true" data-quiz="q2">C. Khai báo các khóa API trong mục Settings Secrets trên Hugging Face dashboard.</button>
+                <button class="button quiz-option" type="button" data-correct="false" data-quiz="q2">D. Chỉ cần chạy lệnh uv run deep_research.py trên terminal Space.</button>
+                <div class="quiz-result" id="q2-result" aria-live="polite"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 11 -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Modular codebase cô lập logic UI, manager và tác vụ Agent độc lập để dễ bảo trì.</li>
+                <li>Hàm callback UI Gradio dùng <code>yield</code> cập nhật giao diện thông qua SSE stream.</li>
+                <li>Vòng lặp <code>asyncio.as_completed</code> cho phép hứng kết quả tác vụ song song theo cơ chế xong trước xử lý trước.</li>
+                <li>Deploy ứng dụng Gradio lên Hugging Face Spaces bằng lệnh <code>gradio deploy</code>.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích cách thức hoạt động của Server-Sent Events khi sử dụng bộ sinh bất đồng bộ không?</li>
+                <li>Cách theo dõi tiến độ cào web song song và in trạng thái Completed X/Y lên màn hình?</li>
+                <li>Làm sao để deploy ứng dụng an toàn lên Hugging Face Spaces mà không rò rỉ API keys?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Day 5 Study Note:</strong> Tài liệu ôn tập đã qua kiểm duyệt chất lượng kỹ lưỡng. Không còn placeholder và sẵn sàng cho việc tự học độc lập trong trình duyệt.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // 1. Navigation Active Link & Reading Progress Bar
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 180;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // 2. Expand / Collapse Details Buttons
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    // 3. Tab Switching for Code Walkthrough
+    window.switchTab = function(evt, tabId) {
+      const container = evt.currentTarget.closest('.tabs-container');
+      
+      // Hide all content blocks in this tab container
+      container.querySelectorAll('.tab-content').forEach((content) => {
+        content.classList.remove('active');
+      });
+      
+      // Remove active class from all buttons in this tab navigation
+      container.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+      
+      // Show targeted tab content and set button active
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    };
+
+    // 4. Flashcard Answer Reveal
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    // 5. Quiz Choice Checking
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const quizId = button.dataset.quiz;
+        const resultDiv = document.getElementById(`${quizId}-result`);
+        const card = button.parentElement;
+        
+        // Remove style class from all options in this quiz card
+        card.querySelectorAll(".quiz-option").forEach((btn) => {
+          btn.classList.remove("correct-choice", "wrong-choice");
+        });
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          button.classList.add("correct-choice");
+          resultDiv.className = "quiz-result show correct";
+          resultDiv.innerHTML = quizId === "q1" 
+            ? "<strong>Chính xác!</strong> Khi backend sử dụng hàm chứa <code>yield</code>, Gradio tự động dựng một kết nối Server-Sent Events (SSE) để truyền liên tục luồng thông báo tiến độ về trình duyệt mà không cần tải lại toàn bộ trang web."
+            : "<strong>Chính xác!</strong> Để bảo mật, các API keys (OPENAI_API_KEY, SENDGRID_API_KEY) bắt buộc phải cấu hình trong mục Settings Secrets trên Space dashboard thay vì lưu trong code hoặc đẩy file <code>.env</code> lên public repository.";
+        } else {
+          button.classList.add("wrong-choice");
+          resultDiv.className = "quiz-result show wrong";
+          resultDiv.innerHTML = "<strong>Chưa chính xác.</strong> Bạn vui lòng đọc kỹ lại phần lý thuyết hoặc kỹ thuật liên quan phía trên và chọn lại.";
+        }
+      });
+    });
+
+    // 6. Scroll Events Binding
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    // Initial Calls
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

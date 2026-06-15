@@ -1,0 +1,112 @@
+Okay, now there's something a bit confusing now, which I'll have to get your head around, which is
+that you can, as we've just done, turn a function into a tool.
+There's something else you can turn into a tool as well.
+You can turn a whole agent into a tool.
+You can say, we've got this sales agent, something that can write a sales email.
+Well, that whole thing, that whole process of calling that LM with that prompt, that can just be
+considered itself to be a tool.
+We can think of it as a sales agent tool.
+And doing that might sound like there's a fair amount of work to be done to package an LM call into
+a tool.
+But no, all you have to do is call as tool on the agent, and you will convert the agent into a tool.
+What does it mean to convert an agent into a tool?
+All it means is it's going to create a new tool.
+It's going to have all of the JSON gunk that describes what that tool can do.
+And if that tool is called it's going to actually call the agent and make the agent make the call to
+the LM.
+So it's a wrapper.
+A wrapper around the agent that turns the agent into a tool.
+That's all it is.
+So let's look at this sales agent one as tool.
+We're going to give it a tool name sales agent one still and write a cold sales email is our description
+of what that tool can do.
+And now if we look at tool one you can see it's a function tool just like this one.
+Just like send email.
+It's got a different name.
+Its description is this description here.
+Now it's got the same parameters, the JSON blob that we would expect.
+And it's got a special function to tell it what to do when the tool is actually called.
+And that of course is actually going to call our agent.
+So hopefully that makes sense.
+We're now going to package our agents into tools and use them.
+All right here we go.
+So this I could have done this with a fancy loop, but I thought, you know what?
+I'll just spell it out so that you're crystal clear on what's happening here.
+We're going to have three tools.
+Tool one, tool two, and tool three.
+And it is just taking the three agents.
+Sales agent one, two and three.
+And calling as tool on each of them.
+And for each one we just give it a tool name and a tool description which is the same tool description.
+That is it.
+Now if you if you feel up to it, just rewrite that as a nice little loop so that we don't have a silliness
+with repetition like this.
+But but I wanted to spell it out.
+And now I'm giving myself a list called tools and tools has tool one, tool two, tool three.
+And these are like the agents wrapped as tools.
+They're tools that would simply call the agents and then send email is the real tool that is just a
+function.
+Send email that calls SendGrid the email program.
+And let's have a look at what we get if we run this.
+So now this is our list of tools.
+And it is indeed four function tools sales agent one, sales agent two, salesperson three and send
+email all in a list of tools.
+Okay, now it's time to put all of that into a sales manager.
+Our planning agent.
+So now it's a bit like we did before, except we're giving an agent the ability to choose what to run
+when.
+It's not like we're just writing Python code to say, do this, this, this, and then send email.
+But rather, we're letting the agent decide.
+You are a sales manager working for comply.
+You use the tools given to you to generate cold sales emails.
+You never generate sales emails yourself.
+You always use the tools.
+You try all three tools once before choosing the best.
+You pick the single best email and use the Send Email tool to send the best email and only the best
+email to the user.
+Now, I'm probably over spelling it out here.
+You can experiment.
+It's not always required to be so pedantic, but I'm also doing it to show you what's going on.
+And it's never a bad thing to be very precise and instructive with your prompts.
+Okay, so with that, we want to create a new sales manager agent.
+There it is.
+We want to give it these instructions.
+It's system prompt.
+We want to pass in all four tools, all these tools right here.
+And we give it a model.
+And then we say send a cold sales email addressed to dear CEO.
+And we start this going and off it runs.
+And this will take about 30s.
+So I will see you in a sec.
+Well actually it didn't take 30s.
+It took 18 seconds.
+So it's quite quick and it finished and we can first let's look look in my email I did in fact just
+receive an email and here it is.
+And very good.
+It does indeed do things quite nicely.
+You'll see it's put like like a template CEO's name not dear CEO you can improve the prompting to stop
+it doing that if you wish, but there's an exercise at the end to incorporate mail merge.
+So it actually would put in real people's names here.
+But but very nice.
+We got the email, it came through to me and it came from the verified email sender as expected.
+The other thing to do, of course, is to go and have a look at the trace.
+Let's go and do that now.
+So here it is.
+Sales manager is what we called it for.
+Tools were used.
+It took 18 seconds.
+Let's go in and have a look.
+So it called Sales Agent one.
+It called sales agent two.
+Sales agent three.
+And then it called Send Email.
+That's the the the tool that is just a tool.
+If you look at each of these sales agents tools representing by this this sort of green thing, you'll
+see that underneath that was an agent.
+So this hopefully makes it crystal clear for you that we had an agent, the professional sales agent
+that was wrapped in the tool, sales agent one.
+And you can see that again for this one and for this one.
+But in the case of send email, it was simply a function that was called with a body.
+But you can look through the trace and you should look through the trace and understand the interactions
+between tools and agents to allow the sales manager to carry out its full activity, allowing itself
+to make its decisions about what it does, in what order.

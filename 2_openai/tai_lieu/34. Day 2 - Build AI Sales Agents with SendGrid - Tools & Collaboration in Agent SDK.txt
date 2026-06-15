@@ -1,0 +1,137 @@
+So look, you're here because you like getting hands on and building stuff.
+And that's why I'm here, too.
+And I got good news for both of us.
+That's what we're doing right now.
+Today we're going to be building our first OpenAI agents SDK project, building a sales development
+rep.
+And we're going to be building really three different pieces.
+We're going to be building three different layers of Agentic architecture.
+What we do this, we're going to be starting with something quite simple, a workflow of agent calls.
+We're then going to spice it up by adding an agent that can use a tool.
+Remembering back to when we did this, the sort of manual way with the the JSON with the boilerplate
+in week one.
+And then we're going to have agents that can call on other agents, and you're going to discover there
+are two different ways of doing this.
+You can treat agents as tools, or you can use the thing called handoffs that I mentioned before.
+So keep this in mind.
+Keep this construct in mind.
+This is how we'll be approaching it.
+There's a lot of coding to do.
+Let's get started.
+And so here we are back in cursor ready for the day to begin, we open the open AI folder.
+We go to lab two.
+Here we are at the start of week two.
+Lab two, day two.
+We're going to do an agent workflow.
+We're going to use tools to call functions.
+And then we're going to collaborate with tools and handoffs.
+So before we start we're going to be making use of a tool.
+It's called SendGrid.
+And it will allow you to send transactional emails from their servers.
+It is free.
+So it's going to be very easy to set up.
+It's actually owned by Twilio.
+So it's a very well known company.
+It's similar to something like Sparkpost if you've used that before.
+And of course you can use Sparkpost instead if you'd prefer.
+So there's a link here.
+If you visit SendGrid right there up, it will come and you can start for free by pressing this button
+right here.
+And once you do that and you've set up an account, I will switch to another window.
+Here we go.
+This is what I get once I've signed in.
+You can see that I've sent 1 or 2 emails, and there's just a few things for you to do.
+Once you've done this, you go to the settings menu down here and to the API keys section.
+That is where you will set up an API key and copy it to your clipboard.
+You can guess where that's going to go in just a second.
+The other thing to do is to go to this tab here Sender Authentication.
+And you're going to click this verify a single sender button.
+And what that's going to do is it's going to allow you to set up your your own email address.
+This is my email address right here.
+And do like a verify email to confirm that you do own that email.
+And once you've done that, you'll be able to send emails from that email address.
+So that's a nice thing to do, just so that you'll be able to send emails via SendGrid from that email
+address.
+But don't worry, we're not actually going to be sending any cold emails out to the world.
+It will only be emails going back to you again, this would just be experimental, but you can always
+use it for more purposes in the future.
+So that is SendGrid.
+Please go ahead and get that set up.
+And shockingly, I'm sure you expected this.
+Once you've done that, you'll then edit your env file over there and you will add in a single row SendGrid
+API key equals.
+And of course you will paste in there the thing that you've copied from the API keys section.
+You created a key there in SendGrid itself.
+All right.
+So go ahead and do that and then we will proceed.
+Okay.
+And so now we have some imports.
+We're going to be doing some usual stuff.
+We've got a few more from agents.
+We're also importing this thing called function tool.
+We're importing something to help us stream back text.
+And we're importing some SendGrid stuff.
+We're going to load our environment variables as usual.
+And now let's do a simple workflow between agents without anything fancy.
+Here we're just going to have some agents calling other agents, and we're going to orchestrate it manually
+ourselves in Python code.
+And it's going to be super simple.
+So first of all three instructions.
+And these instructions again think of it in the back of your mind.
+These are basically system prompts.
+But they are the way that we are framing different agents.
+All three are about being sales agents working for a company that I'm calling.
+Comply.
+Comply.
+I.
+I.
+The wonderful naming.
+This is a soc2 compliance company that is looking at helping companies prepare for SOC two audits.
+So something to do with compliance if you're not familiar with this stuff.
+But, uh, yeah, it's a SaaS tool that will ensure SOC two compliance.
+So it's saying you're a sales agent working for this company.
+You write professional, serious cold emails.
+It's like a cold sales email or email to to get people interested.
+The second one is a humorous, engaging sales agent.
+You write witty, engaging, cold emails that are likely to get a response.
+And the third one is you're a busy sales agent and you write concise to the point cold emails.
+So, as you know from good prompting, you use a system prompt instructions to set the context, to
+give the tone to sort of set.
+Set the mood and the character and give as much background information as you can in a succinct, instructive
+way.
+Okay, so now we create three agents sales agent one, two and three.
+And this should be very simple.
+It should make complete sense to you.
+Each agent gets given a different name.
+They have the three instructions the three system prompts.
+And we're going to be using GPT four mini throughout.
+Keep it cheap.
+We've just created those three agents all right.
+And now we're just going to start with the first one.
+And I just wanted to show you a different way.
+You remember we had runner run before.
+Well now I'm calling runner run streamed which is a way that you can do it.
+That will allow us to stream back results.
+You may be familiar with streaming from from simpler OpenAI examples, but this is how you can do it
+with the agents SDK.
+So you may spot that there's no ace a wait word there which which may set off alarm bells, because
+that means that what we're getting here is not a response.
+We're getting a co-routine and you can see what happens next.
+We use a special construct async for a special way of of then calling this, calling this in a way that
+will return a coroutine, and we will then iterate through those answers.
+And this is just a little bit of boilerplate code to make sure that what's coming back is some text
+that we can print.
+And if we get that, then we print it.
+And this just stops it printing on a separate line every time.
+So if I run this, it's just very similar to what we did last time.
+But you'll see that what comes back streams back bit by bit.
+And it's a very nice use of the streaming APIs and I show it to you.
+So you have an example of how to how to do this.
+And of course, just as you would expect, we see a great behavior from our agent.
+This is the professional one, I think, and we can see that it's come back with something nice and
+professional, nice and slick.
+To simplify your soc2 compliance efforts.
+And it's no surprise to to everyone that's worked with Llms for a bit that they are really good at this
+kind of thing.
+They can write great professional, realistic, reasonable sales outreach emails.
+So far, so good.

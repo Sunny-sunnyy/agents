@@ -1,0 +1,17 @@
+And if you're able to build that more interactive challenge of a sales outreach agent that can take
+responses, I would love to see it.
+There's a community contributions folder in week two.
+Be sure to put your code in there.
+Submit a PR there are instructions on the class resources and use that as a way to share what you're
+doing with me and with other students.
+And remember as well the great trick of posting on LinkedIn.
+Tag me and then I can weigh in and and give give some thoughts on it.
+And that helps amplify the work you're doing.
+And make sure that people get to see all of the ways that you are applying agentic AI to business problems.
+All right.
+So congrats on getting through a fun project and learning about OpenAI agents SDK next time.
+I hate to beat this one to death, but I want to go through one more time about the sort of tools and
+agents discussion, and I want to talk about guardrails, which are super important way of putting controls
+around what you're doing.
+And then we'll be embarking on the larger project.
+See you next time.

@@ -1,0 +1,159 @@
+Well, I'm extremely excited about today.
+This is of course, day four of week two, and we're getting on to our first large, juicy project in
+the form of deep research.
+This is one of the classic use cases of Agentic AI, the case where you have an agent that is able to
+go off, search the internet and do some research, look at different links and try and research a topic
+that you give it.
+And we know this so well because many of the Frontier Labs offer this agent via their online chat tools.
+And for example, on OpenAI, you can go to GPT and you can press the deep research button.
+And that runs a model in deep research mode, which is basically running an agentic workflow.
+So we are going to do that.
+We are going to give our agents the ability to do deep research, and we're going to use a few things
+that we've already learned about.
+We're going to use tools.
+Of course we're going to use structured outputs again.
+We encountered it briefly last time a little bit more this time.
+And we're going to use something called hosted tools for the first time, using tools that are running
+remotely.
+All right, let's get straight to it.
+Okay.
+So here we are in Casl.
+We're going to open up the directory for week two.
+And we're now going to lab for deep research.
+And we are going to start again in a notebook like this in one of the notebooks running within cursor.
+And I know that a lot of you would prefer to be working with real Python modules.
+And fear not.
+We will get to that tomorrow.
+We will do this in Python code and proper modules.
+The lab, this kind of format, these notebooks, they're so good for talking through things for experimenting.
+And it gives you the power to be changing things, playing around while we go through this.
+So I think it's good just for today.
+So this is of course a enormous classic agentic use case.
+And what's great about it is it applies so broadly.
+You can apply this to any business area.
+You can build a deep research agent that's focused on your business area, or you can use this as something
+which is like a sidekick for yourself.
+We're going to build a different kind of sidekick later in this course.
+But but this is one kind already and it should be useful for you immediately.
+So I think it's terrific that we're doing this, and I hope you're as excited as me to be building your
+own deep research agent, something which the Frontier Labs have done themselves.
+Okay, so let's get started.
+Enough of my prattling away.
+We do some imports.
+We do one of these usual load dot envs.
+All right.
+And now it's time for me to talk about the big the big change this week, which is that we are going
+to use some things called hosted tools, which means that they are tools that OpenAI is going to run
+for us.
+There only are three of them that OpenAI provides, at least as of now, and we're going to use one
+of them.
+The three are the web search tool, the file search tool, and the computer tool.
+The web search tool All lets us do what we're going to do today, which is ask OpenAI to run a search
+on our behalf.
+The file search tool is how we can run searches across the vector stores that you can run.
+You can upload and have remotely with OpenAI and computer tool allows things like taking screenshots
+and clicking around a computer.
+Now we're not going to be using either of those two.
+We're going to be doing the web search tool.
+But fear not, later in the course we will have basically our own computer tool, but we won't be running
+it at hosted.
+We'll be running it on our own computers, as you will see.
+In case that sounds intriguing, but for now we're going to be using the web search tool.
+And I want to make an important point, which is that OpenAI's web search tool is not that cheap for
+some reason, which seems not entirely clear to me.
+It actually costs 2.5 cents right now for me to run this for, even at the low end of the cheapest model
+at the lowest end, 2.5 cents per call, which may not sound like it's a huge amount, But typically
+if we're running a deep research, we might be doing like ten different searches.
+And that means it's $0.25 a pop, which means that you can quite quickly add up to 2 to $3, which is
+what I spent the first time I did this.
+I think the way I have it set up now would be more like $1.
+Still, that's maybe not to be sniffed at.
+So I would suggest monitor this and you can decide to skip doing the searches, or I'll show you where
+you can turn it all the way down so that you're only spending a few cents.
+And then later in future weeks, we're going to be doing this a bit differently.
+And we'll have other ways to do this which will cost a fraction of this.
+So.
+So fear not.
+But for now, it's nice for us to use OpenAI's.
+And OpenAI's is actually really good.
+So.
+So maybe maybe it's worth a 2.5 cents.
+I don't know.
+The costs themselves are on this link here.
+So.
+So it's always worth double checking because it might be different for your region, or OpenAI might
+change the pricing all the time.
+So go there and you can look we are going to be using GPT four mini low search okay.
+With that, let's get started with our first search.
+Okay.
+It's now time for us to create our first agent for this product.
+And the first agent is called the search agent.
+So here are the instructions.
+The system prompt for this agent.
+You're a research assistant.
+Given a search term, you search the web for that term.
+You produce a concise summary 2 to 3 paragraphs, capture the main points, write succinctly, and no
+need to have good grammar because it will be consumed by someone else synthesizing a report.
+It's a very clearly written set of instructions right here, and I would love to take credit for it.
+But I must confess that I just took this verbatim from OpenAI's documentation for how to do web searches
+with their tool, so we can probably take it on good authority that this is a well written prompt,
+since it's written by the people that built the model.
+So, um, we're going to use this prompt.
+We're going to create a search agent.
+It is an agent named search agent.
+This is the the instructions.
+And we're going to give it one tool.
+And that tool is called a web search tool.
+And this is one of OpenAI's three hosted tools.
+So we're we're providing that as our tool.
+There is an optional parameter.
+You can specify the search context size which can be low, medium or high where that reflects the price
+that you'll pay.
+Low is of course the cheapest and then medium is.
+The default is only a little bit more, but high I think is quite a lot more.
+You can also pick the model.
+It's a lot cheaper to pick GPT four or mini.
+GPT four is a lot more.
+And um, finally there's there's this here.
+This is a nice little snippet of code to to to keep in mind.
+This is how you say that this agent is required to run the tool.
+It is mandatory.
+It doesn't have discretion over this.
+So this is this is the way you do it.
+You pass in this model settings with tool choices required.
+And that's a nice handy thing to have to one side.
+And of course in this case we want to do that.
+We want to it's basically this agent is wrapping this tool call.
+And so when we're picking GPT for a mini and we're picking low, this is when as of now this costs two
+and a half cents every time we run this agent.
+So let's run this agent.
+Let's ask for the latest AI agent frameworks in 2025.
+We will run that search and we will display the results and see what happens.
+It's running.
+And there we go.
+There are the results.
+It's come in nice markdown.
+Let's see it says lang chain lang graph crew semantic kernel autogen OpenAI gym.
+That's uh, not exactly I guess that's a that's a reinforcement learning framework.
+It doesn't know about itself.
+It doesn't know about OpenAI agents SDK.
+Amusingly, uh, Rasa is an older framework and Jade for Java people and, uh, yeah.
+So, so, uh, an interesting set of results, I'd say mixed accuracy because I would.
+I would argue that long chain and semantic kernel aren't really agent frameworks, but certainly Landgraf,
+crew, and Autogen are very much there, and ones that we will be spending a week on each.
+All right.
+But this is a perfectly pleasant search result, and it is the beginning of our deep research agent,
+and it's always worth taking a quick look at the trace in OpenAI.
+So click on this little useful link here.
+And up it comes.
+And here it is.
+The search agent is our current trace.
+If I open it up we'll see.
+Sure enough that the search agent was called.
+And it tells us over here the tool it used was web search.
+And we get a bit of information about the total number of tokens that it did.
+That's the instructions, the system prompt.
+That was the user prompt.
+And this comes back is the output.
+Just as we would expect the trace has worked nicely.
+Now we can get on with the show.

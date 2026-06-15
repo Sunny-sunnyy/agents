@@ -1,0 +1,66 @@
+Okay, so first of all, we bring up a new terminal, which we do by pressing the control button and
+hitting the tick.
+And when we do that, up it comes.
+You can also get there by going to the view menu and choosing terminal.
+So we need to CD into the two OpenAI directory.
+And now we need to change again into the Deep Research directory because that's where our stuff is.
+And you might be thinking we now type Python py.
+But that would not be right because we're working with UV.
+So you do UV and then run and deepresearch py because that will make sure that we're in our correct
+virtual environment.
+And that is what we do now.
+And it's then going to pop up a screen like this.
+This is our deep research screen.
+This is our Gradio UI.
+And make it a tiny bit bigger.
+All right.
+What topic would you like to research.
+So how about this.
+How about we say, uh, what are some of the most exciting commercial applications of autonomous agentic
+AI in as of April 2025?
+All right.
+That seems like a good question.
+Why not?
+Let's give it a whirl.
+Run!
+So first of all, we get this popping up.
+View the trace.
+If we click there, it comes up and shows us it's just beginning.
+We're still at the very beginning stages.
+We'll hopefully in a moment see a bit more of what's going on.
+Not not yet.
+It's still in the early stages.
+What we're seeing here is an update appearing for what's going on, and that is because we are yielding
+these updates.
+And every time that we yield those updates in our run, coroutine that gets surfaced through to to our
+callback and through to Gradio.
+And that's why it's appearing here because of those yields.
+That's why we did it.
+Otherwise we'd be sitting here wondering what's going on.
+So it's already done the 20 searches, because they all happened in parallel, as you know, thanks
+to the magic of Asyncio.
+And now it is writing.
+It's written the report, it's now sending the email.
+And hopefully any moment now it will complete, which will be nice and we will get to see.
+And here it is.
+And we don't need to go to our email for a change, because it's all appearing here in the Gradio app
+and it's appearing in beautiful markdown format.
+It's got a nice introduction overview of autonomous Agentic AI cybersecurity, using it for threat detection,
+reduced workloads, customer service, obviously healthcare, automotive and transport, financial services,
+analyzing market trends and executing trades based on real time information.
+Maybe we're going to be doing some of that ourselves.
+Logistics and supply chain okay.
+And ethical.
+Regulatory.
+So so now it's talking about about some of the sort of side effects or consequences and some conclusions
+and follow up questions.
+So there you have it.
+The result of our deep research right here for us to see.
+Let's look at the traces and see how this is going now.
+This is the research trace.
+And sure enough there of course are our agents.
+And at the end is our writer agent and our email agent.
+It successfully ran.
+And this is now a tool that you can use and that you can refer to and have as a deep research tool.
+And there's still one more thing to talk about, which is how we can now extend this and make it more
+powerful.

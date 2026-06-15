@@ -1,0 +1,152 @@
+Pressing on.
+So what we're now going to do is call this.
+It looks like I'm going to need to import async IO there.
+Hang on.
+Let's do that.
+Missed an import at the start.
+Actually let's do this properly.
+I'm going to take this out just so that it's nice and clean for you.
+I'm going to put that async import right up at the top there and rerun that cell.
+I like to do my imports at the top.
+I know people have different views on this stuff.
+Okay, so we are now going to say we want to write a cold sales email.
+That's going to be our instruction.
+And what we're going to do now is we're going to call this async IO.
+Do you remember this?
+I showed this to you back when we had the async briefing, that this is where you start to see the power
+of async IO.
+We're going to be running three different runs at the same time.
+And of course again it's not multithreading.
+It's not like the CPU is actually time slicing between them in some ways.
+But but rather it's going to be using an event loop, which will run each one, and whenever it's pausing
+waiting on I o it will let another one run.
+And because most of what these things are doing is pausing on I o that will allow all three of them
+to sort of alternate and be talking to to an LLM to open AI in parallel, and then we will collect back
+the results.
+What comes back from this await gather is a collection of results.
+And we will call final output on each one and print it.
+So we will let that run.
+And you can see that I've wrapped all of this in a trace, which means that we should see all of this
+in one trace.
+We will do in a little bit, but no surprise.
+Hopefully what you'll see down here is I have to click here to get a scrollable element, and you'll
+see that we can scroll through and read a bunch of emails.
+And the third one, of course, is very concise because we asked our third email writer to be concise.
+Okay, so so far all we've really done is multiple calls to LMS.
+And now the final piece of the puzzle.
+This is just a simple workflow of calling LMS.
+See if you can remember which one of the patterns this is, but it's a sort of variety of one of them.
+And we are going to create a new agent called sales picker.
+And sales picker picks the best cold sales email from the given options.
+Imagine you're a customer.
+Pick the one you're most likely to respond to.
+Don't give an explanation.
+Reply with the email you select only.
+It's a classic kind of prompting.
+You know that you often end with the constraint.
+With any limitation is a good way to end a system prompt.
+All right.
+So that's the message the user prompt writer called sales email.
+We again we have this same construct.
+We're going to run three agents in parallel to craft three messages.
+We're going to gather the outputs and then we just simply call another agent.
+So this is just Python code step by step.
+Call three agents in parallel.
+Take the output.
+Call another agent.
+It's just a Python script that runs these things in order, and it will then print the best email at
+the end of it.
+And because we've got the whole thing under one trace, we hope to see all of this in a single trace.
+So this is probably going to take I think like 30s in total.
+So I'll have to keep the sentence running if we want to see this live.
+And at the end of it we'll be able to go into the trace is run.
+So here is a single email that's been returned.
+And it is apparently the best one.
+But let's now go and have a look at the trace to see if we believe it.
+Okay.
+So this was our email.
+Now this is a link to go to see the traces in OpenAI.
+Here it comes.
+So at the top trace is selection from salespeople.
+Let's go and have a look into this trace.
+What you'll see is that, sure enough, it called the professional sales agent, and you can read the
+actual prompts that went in it called the engaging sales agent.
+It called the Busy sales agent, and then it called the sales picker.
+And you can go through this in the trace and see what's going on.
+So it's worth pointing out that we've really not done anything very magical so far.
+It's nice.
+It's elegant that we've had these wrappers, these agent constructs around things, but they're very
+lightweight wrappers.
+We've essentially simply called a total of four LMS.
+We've called the three sales LMS, and then we've called the one at the end to pick the email it preferred.
+And it's sort of elegant that you can go into the traces and see what's going on.
+But now it's time to get a bit more agentic and start talking about tools.
+So as we get into tools, let me remind you, have a think back to what we did in week one, when we
+had to build some boilerplate JSON to describe a function that we wanted to use as like a tool.
+It's quite chunky JSON that described the parameters and various other things about it.
+And then we had to write a function called handle tool calls, which is the one that had the the hokey
+if statement that I then tried to write into something a bit more fancy, but which was still a fair
+amount of sort of gunk, to use a technical word.
+And what we're now going to see is how that whole stuff can be, can be super simplified without taking
+any flexibility away from us.
+So first of all, we're just going to recap.
+We've got these three sales agents the professional, the engaging and the busy ones.
+And there they are.
+And let me just look at one of these sales agents.
+So if I look into it you can see that it's got a name.
+It's got the instructions.
+And you can see that it has things like tool choice tools, and it has like a list of tools that it
+has access to, which right now is empty.
+So just to give you a sense of what's going on under the covers, it's perfectly simple.
+But these are the constructs we're working with.
+So what we're now going to do is have a tool.
+So this is a function send email.
+It takes an email body which is a string.
+And it has a like a doc string.
+Send out an email with the given body to all sales prospects.
+Now what I've got in here is the from email.
+And this email needs to be what's called the verified sender, the email address that you've set up
+in SendGrid that you're allowed to send from.
+Otherwise it won't actually send.
+So you'll need to update this and then two email.
+You should put that to be an email where you don't mind it receiving an email.
+I would prefer that you change it from my Gmail here.
+Otherwise I will get flooded with emails from people doing this.
+So maybe I'll change it before I commit this to GitHub.
+But yes, send that to another of your email addresses.
+Or you could probably just send it to yourself.
+I'm not sure, but send it to somewhere where you don't mind receiving cold sales emails, there'll
+only be 1 or 2.
+We're not going to send a mass of them.
+And then this is Sendgrid's API.
+It's perfectly simple.
+It's SendGrid.
+And you give it a body so you can look through this.
+But it's honestly it's just a boilerplate to send an email to a recipient and we respond with success.
+So this is very much like the tools that we wrote last time.
+It's like a function to do it.
+And if you remember, the next step was to write a ton of JSON to describe this.
+But all we need to do with OpenAI is put one of these decorators above it at function tool.
+If you're not sure how decorators work, again, that's in the guides, or just ask ChatGPT to explain
+it.
+But that allows OpenAI to write some code to sort of do something with this function.
+And but all we need to care about is we simply put that decorator above the function that we want to
+treat as a tool.
+And so we will just simply define that function doesn't look like we've done anything, but let's look
+at this thing called send email.
+Now we think it's a function, right?
+But no, it's not a function because we have this decorator.
+It's been converted into something called a function tool.
+It has a name send email.
+It has a description.
+And that description is taken from the docstring comment we had right here.
+Look at that.
+It's just turned that into a tool description.
+And then and this is the great stuff params JSON schema.
+This stuff is all of the boilerplate JSON that we had to write last time.
+It's just done it for us because it's read this and it's figured out what's needed.
+And and that's basically it.
+So just by simply adding that decorator function tool, all of the work of faffing around with these
+JSON objects has been taken away from us, which is great.
+That's what a good framework should do.
+Take out the boilerplate but leave us in full control.

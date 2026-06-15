@@ -1,0 +1,188 @@
+Okay, next one is a boring one because you know it.
+Well, I've brought in the same send email tool that we used before.
+So this is we're using the decorator the function tool.
+If you remember you use that decorator if you want to convert a function into something that can be
+a tool.
+And it will generate all of that JSON for you behind the scenes.
+So this is send email a subject and a body, and it sends out an email with the given subject in the
+body.
+We're going to use SendGrid as before.
+Hopefully you still have your account handy and you have it in your env file.
+Remember to change this email.
+Let me change this to your verified email.
+And yes, and please do also change this one.
+Again, don't send me lots of emails with AI generated content, but by all means send me emails with
+your questions.
+Of course I always welcome them, but I don't welcome AI generated search deepresearch things as much.
+Uh, so then uh, content would be, uh, the HTML version, and then we send the email exactly as before.
+That is our tool.
+You don't need to see this, but I'm going to show it to you anyway.
+You remember that if I just print this.
+What's it doing here?
+If I just print this out, we should see that we get a function tool with a description and so on.
+And if you're not sure why this has happened, then do look up decorators.
+Make sure you understand how decorators work and how they're able to convert a function like this.
+Okay, with that in mind, this is an email agent.
+This is all old hat to you.
+Now we've done this several times.
+The instructions are you're able to send a nicely formatted HTML email based on a detailed report.
+You'll be provided with with a with a detailed report, you should use your tool to send one email providing
+the report.
+Convert it into a clean, well presented HTML with a subject line so you can see I'm no longer trying
+to break things out.
+I'm giving this agent full discretion to come up with a subject line, to rewrite the email, to do
+the whole lot using GPT four mini, and we're providing it with the one tool to actually send the email.
+So that is our email agent.
+And that is something which is old news to you.
+You know, it's super.
+Well, okay.
+We're about we're about to get real.
+And so I will, uh, take a pause for a second and then we will get into the real meat of the project.
+Okay.
+So we have another agent again that's going to use structured outputs.
+So this is the researcher.
+So you are a senior researcher tasked with writing a cohesive report for a query.
+You'll be provided with the original query and some initial research done by a research assistant.
+You come up with an outline for the report that describes the structure and flow of the report, and
+then generate the report and return that as your final output should be in markdown, it should be lengthy,
+The detailed 5 to 10 pages of content of at least a thousand words.
+Okay, so that has framed the situation.
+Now we're going to use structured outputs.
+Again we're going to have a report data pedantic object a subclass of base model.
+It has a short summary which we begin with a short 2 to 3 sentence summary.
+The full markdown final report and then some follow up suggestions.
+Suggested topics to research further.
+And so this is an agent.
+It will take these instructions.
+It will use GPT four or mini the output type.
+This is where you specify that we're using structured outputs.
+The output type is the report data.
+And there we have our our report writer.
+And this is our writer agent.
+And this is the final building block before we get to the actual flow through this project.
+Okay.
+So it's crunch time.
+We have five functions for me to show you.
+But they're relatively simple.
+They're pretty straightforward.
+So here they are the I'm going to show you three and then two.
+The first three, the ones that are going to execute a search using the two agents that we defined before
+the planner agent and the search agent.
+And these functions, you can see they're very short.
+They're very simple.
+Let me tell you what they each do plan searches.
+All right.
+This very simply calls runner run for our planner agent passing in the query.
+And we make a query and that gets passed into the planner agent.
+Remember the planner agent is the one that will then come back with a number of searches.
+So we'll then count how many searches there are and print that.
+And we will return that final output, which is in the form of that search list.
+That's what formatted it.
+Again, it is this thing here, the web search plan, a list of web search items.
+All right.
+Back we go.
+Okay.
+So then the next function is perform searches.
+This is when we're actually going to do the searches for each of these.
+Now do you remember I showed you that asyncio a while ago?
+That was the great way that you can run things in parallel.
+Perfect time for it right now.
+So we're going to create a bunch of asyncio tasks to search for each item for item in the the results
+of these searches.
+This this this is the Pydantic object that searches feel gives you the list of the search items.
+And for each item we we're going to call search searches.
+The next function we'll talk about we're going to call search.
+We're going to.
+This gives you a coroutine so we can turn that into a into a task.
+And then we can use this gather approach that I told you about async gather.
+If you then await that, it will run all of these tasks in parallel and the results will go into results.
+And then we will put finished.
+So hopefully I didn't lose you there.
+Basically all I'm saying is we take the results from the planner and we just search for all of these
+things in parallel using the search agent.
+And this is how we actually use the search agent.
+We give it an input.
+And what we're actually doing is we don't just tell it the query.
+We also tell it the reason that we're searching for that.
+Remember I said there's more than one one reason why we asked for a reason.
+It's also so we can give some context here.
+And then we, uh, we we run the search agent and then we return the final output of the search.
+Okay.
+Hopefully you followed these three.
+If not, come back and look at these as such short functions that that it should make sense.
+And then finally some housekeeping.
+Two functions.
+One of them to write the report, one of them to send the email.
+The writing the report will use a writer agent.
+It will, uh, run that agent that is going to reconstitute the output in HTML.
+And then finally we will write an email using the email agent.
+And that will then complete the process.
+So I should run these two to define these two functions.
+These two these five functions.
+And now we should be ready for showtime.
+All right.
+And if you're one of the people that doesn't like the way that I just execute code and talk to it,
+it's sort of lazy, then you're going to be happy.
+This time I will type the code so that we get to do this part together.
+So it is a moment of truth.
+We're going to say, like with trace research, Trace Curse is already filling it in.
+I'm not.
+No, no luck for me.
+Well, I'm going to ignore what curse is saying here.
+I'm not looking at that.
+So we're going to print a message like starting research.
+Sometimes cursor is too good.
+All right, let's get rid of cursor.
+No cheating.
+I'm not looking I'm not looking at cursor saying search.
+What if I type something different?
+Uh.
+Confuse cursor.
+All right.
+Now search.
+That doesn't work.
+It's still.
+It still figures it out.
+All right.
+But there we go.
+It knows.
+So the first thing we're going to do is have a variable called search plan, which is going to await
+planning the searches.
+So if you come up here there is planning the searches.
+So that's the first step.
+We do that.
+All right.
+The next step is the search results.
+We're going to perform the searches.
+So we come up here we perform the searches passing in the search plan.
+That's the next step of this which we also await.
+The next thing we need to do is actually run the report.
+So we await writing the report, passing in the query and the search results.
+And cursor knows well as do you.
+You're already saying what we need to do next is send the email.
+And that really is it.
+I can take out the and then I can print.
+All right.
+We won't we will do something different to what cursor suggests to show that we have some autonomy here.
+We're not just ruled by the machines.
+Okay, there we go.
+Let's kick this off.
+Let's have this running.
+So it's starting the research.
+It's planning the searches.
+It will perform through searches.
+So it's.
+And it's already finished.
+So.
+So it used an agent to figure out what three searches to do.
+And then for each of those, it used a remote a hosted tool from OpenAI to actually carry out that search.
+It got back all of the results.
+We're now using an agent to synthesize the results and turn it into a report using.
+It's going to generate a report in markdown, and then it's going to turn that into an HTML email.
+So um, we will let it do its thing.
+Let's just come back up.
+The final report is is is is in this format which has markdown as one of the, the parts of it.
+And that's the part we're now doing the writing email.
+And it's in writing the email that it will both come up with a subject line.
+And it will also write it as an HTML email.
+And in a second, hopefully I will receive that email.

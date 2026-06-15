@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3 - Multi-Model Integration, Structured Outputs, and Guardrails in Agent SDK - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "EB Garamond", Garamond, "Times New Roman", serif;
+      font-weight: 400;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 70ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      font-family: "EB Garamond", serif;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "EB Garamond", serif;
+      font-weight: 400;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.8rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-top: 36px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 30px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 24px;
+    }
+
+    .toc h2 {
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 7px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      font-weight: 400;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+      border-color: var(--muted-soft);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 30px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 24px;
+    }
+
+    .card.accent {
+      border-color: rgba(204, 120, 92, 0.3);
+      background: #faf9f5;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 12px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 20px;
+      background: var(--canvas);
+      border-color: var(--hairline);
+      transition: all 0.3s ease;
+    }
+
+    details[open] {
+      background: var(--surface-soft);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.05rem;
+      outline: none;
+      user-select: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 20px;
+      margin-top: 20px;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 14px;
+      margin-top: 6px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-container {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      background: var(--canvas);
+    }
+
+    .quiz-option:hover {
+      background: var(--surface-soft);
+    }
+
+    .quiz-option.correct {
+      background: rgba(93, 184, 114, 0.15);
+      border-color: #5db872;
+      color: #2b6135;
+    }
+
+    .quiz-option.incorrect {
+      background: rgba(198, 69, 69, 0.1);
+      border-color: #c64545;
+      color: #7b2626;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 16px;
+      color: var(--ink);
+      font-weight: 500;
+      border-top: 1px dotted var(--hairline);
+      padding-top: 12px;
+      display: none;
+    }
+
+    .text-link {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .text-link:hover {
+      color: var(--primary-active);
+      border-bottom-color: var(--primary-active);
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      text-align: center;
+      margin-top: 36px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 24px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Học liệu ôn tập</span>
+        <h1>Day 3 - Multi-Model Integration, Structured Outputs, and Guardrails</h1>
+        <p class="lead">Tìm hiểu kỹ thuật tích hợp đa mô hình (Gemini, DeepSeek, Groq Llama) vào Agent SDK, cách ép kiểu đầu ra Structured Outputs bằng Pydantic và thiết lập Input Guardrails bẫy dây (Tripwire) để bảo vệ an toàn thông tin doanh nghiệp.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Structured Outputs & Safety</span>
+          <span class="tag">Tuần 2 - Day 3</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM</span>
+          <span class="source">Code</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm</h2>
+        <ul class="list">
+          <li><strong>Multi-Model - Đa mô hình:</strong> Kết nối Google Gemini, DeepSeek và Groq thông qua client AsyncOpenAI tương thích.</li>
+          <li><strong>Structured Outputs - Đầu ra cấu trúc:</strong> Ép kiểu trả về của Agent bằng Pydantic BaseModel giúp lập trình an toàn, tin cậy.</li>
+          <li><strong>Guardrails - Thanh chắn:</strong> Dùng decorator <code>@input_guardrail</code> và cờ <code>tripwire_triggered</code> để chặn đứng dữ liệu PII nhạy cảm.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-size: 0.85rem;">Tiến trình đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Mở rộng ghi chú</button>
+          <button class="button" type="button" id="collapseAll">Thu gọn ghi chú</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng tóm tắt lý thuyết bài học <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day3_summary.md">day3_summary.md</a> tích hợp nội dung bài 40, 41, 42.</li>
+                <li><strong>Slide:</strong> Không có tài liệu slide được cung cấp.</li>
+                <li><strong>Code:</strong> Phân tích và giải nghĩa mã nguồn Lab 3 từ file notebook <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/3_lab3.ipynb">3_lab3.ipynb</a>.</li>
+                <li><strong>Bài học trước:</strong> Liên kết từ <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day2_study_guide.html">day2_study_guide.html</a> (Sales Manager Agent).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>Mã nguồn kết nối đa mô hình, định nghĩa Pydantic, bộ lọc guardrail và kịch bản sập bẫy tripwire đều được lấy trực tiếp từ file notebook thực hành. Giải pháp tích hợp Anthropic's Claude qua Open Router được dán nhãn kiến thức mở rộng.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <div class="callout-title">Terminology rule - Quy tắc thuật ngữ</div>
+            Các cụm từ chuyên môn viết dưới dạng <code>English - nghĩa tiếng Việt</code> (ví dụ: <code>Structured Outputs - đầu ra có cấu trúc</code>). Các từ đơn phổ biến viết dưới dạng <code>từ (nghĩa)</code> (ví dụ: <code>tripwire (bẫy dây)</code>).
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>Tận dụng hạ tầng đa mô hình (Gemini, DeepSeek, Groq) bằng cách bọc client bất đồng bộ qua <code>OpenAIChatCompletionsModel</code>. Giải quyết sự mất ổn định của Agent tự trị bằng Structured Outputs (Pydantic) và bảo mật an toàn dữ liệu PII bằng Input Guardrail độc lập hoạt động như cờ hiệu Tripwire chặn đứng luồng thực thi khi có vi phạm.</p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>SDK hỗ trợ đa mô hình qua các endpoint tương thích với client AsyncOpenAI của hãng.</li>
+                <li>Tham số <code>output_type</code> gán BaseModel Pydantic ép LLM trả định dạng JSON chuẩn.</li>
+                <li>Đặt <code>tripwire_triggered=True</code> trong <code>GuardrailFunctionOutput</code> để ném exception dừng hệ thống ngay lập tức.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Thực tế</h3>
+              <p>Áp dụng khi triển khai các hệ thống Agent thương mại (production) tiếp nhận thông tin trực tiếp từ người dùng. Thiết lập bộ lọc Input Guardrail độc lập để lọc bỏ dữ liệu tên riêng, thông tin bảo mật trước khi gửi lên mô hình ngôn ngữ chính, tránh rò rỉ dữ liệu hoặc prompt injection.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 3</div>
+              <h2>Previous Context - Liên hệ bài học trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Tại Day 2, chúng ta đã tích hợp luồng Automated SDR. Tuy nhiên, khi cho phép Agent tự trị gọi lại công cụ nhiều lần (vòng lặp tự trị), hệ thống dễ bị mất kiểm soát và gọi công cụ vô hạn (gây trễ mạng lớn và tốn tokens). Ở Day 3, chúng ta sử dụng Structured Outputs để ép LLM trả JSON chuẩn, tăng tính ổn định, đồng thời bổ sung thêm Input Guardrails để làm chốt chặn bảo mật đầu vào, bảo vệ các Agent bán hàng của Day 2.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>OpenAI-compatible Endpoints - Điểm cuối tương thích OpenAI:</strong> Địa chỉ API bên thứ ba (như Google, DeepSeek, Groq) được xây dựng giống hệt chuẩn API của OpenAI về cấu trúc đường dẫn và định dạng dữ liệu truyền tải.</li>
+                <li><strong>OpenAIChatCompletionsModel:</strong> Lớp bọc mô hình trong SDK giúp liên kết model name cụ thể với custom client chỉ định.</li>
+                <li><strong>Structured Outputs - Đầu ra có cấu trúc:</strong> Cơ chế bắt buộc LLM phản hồi tuân thủ nghiêm ngặt định dạng JSON được mô tả qua Pydantic BaseModel để hệ thống tự động parse dữ liệu an toàn.</li>
+                <li><strong>Tripwire - Bẫy dây / Thanh chắn bảo mật:</strong> Cờ hiệu boolean trong guardrail, nếu mang giá trị <code>True</code> sẽ kích hoạt dừng luồng chạy ngay lập tức.</li>
+                <li><strong>PII (Personally Identifiable Information) - Thông tin nhận dạng cá nhân:</strong> Các thông tin nhạy cảm của người dùng (tên riêng, số điện thoại) cần được bảo mật và chặn lọc qua guardrail.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ</h3>
+              <p>Mối quan hệ an toàn: Khi có yêu cầu, SDK chạy danh sách <code>input_guardrails</code> đầu tiên. Bộ lọc guardrail này chạy một <code>guardrail_agent</code> chuyên trách có tham số <code>output_type</code> ép kiểu Pydantic. Kết quả phân tích trả về cờ <code>tripwire_triggered</code>. Nếu sập bẫy, hệ thống dừng lập tức bằng Exception và hoàn toàn không khởi chạy Agent chính hay gọi các công cụ viết thư nháp chạy trên đa mô hình (Gemini, DeepSeek, Groq).</p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Tại sao Guardrails độc lập lại bảo mật tốt hơn Prompting?</summary>
+            <p><strong>1. Hạn chế của Prompting (Chỉ dẫn hệ thống):</strong></p>
+            <p>Việc viết câu lệnh cấm như "Không được tiết lộ thông tin cá nhân của người dùng" vào system prompt của Agent chính không đảm bảo an toàn tuyệt đối. LLM có tính chất không xác định (non-deterministic) và rất dễ bị vượt qua bằng kỹ thuật Prompt Injection hoặc Jailbreak (người dùng cố tình lừa Agent bỏ qua chỉ thị ban đầu). Khi đó Agent chính vẫn sẽ thực thi công cụ gửi thư và làm lộ thông tin nhạy cảm.</p>
+            <p><strong>2. Sức mạnh của Guardrails (Thanh chắn độc lập):</strong></p>
+            <p>Guardrail hoạt động như một lớp phần mềm bọc ngoài chạy độc lập. Khi người dùng truyền prompt vào, hàm guardrail sẽ được gọi trước tiên. Nó sử dụng một Guardrail Agent nhỏ để phân loại xem prompt có chứa PII hay không dưới dạng Structured Outputs (Pydantic). Nếu phát hiện vi phạm, hàm guardrail trả về cờ <code>tripwire_triggered=True</code>. SDK nhận diện cờ này và lập tức ném ra Exception chặn đứng luồng thực thi, không cho phép Agent chính hay bất kỳ công cụ gửi mail nào được kích hoạt. Chốt chặn lập trình cứng này đảm bảo an toàn 100% cho ứng dụng doanh nghiệp.</p>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 5</div>
+              <h2>Workflow / Pipeline - Luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Input Guardrail Execution - Quy trình chạy Guardrail</h3>
+              <ol class="list">
+                <li><strong>Nhận Prompt:</strong> Người dùng nhập tin nhắn gửi cho Careful Sales Manager (ví dụ: "Send email from Alice").</li>
+                <li><strong>Chạy Guardrail:</strong> SDK tự động gọi hàm <code>guardrail_against_name</code> trước tiên.</li>
+                <li><strong>Gọi Guardrail Agent:</strong> Hàm chạy <code>Name check</code> agent để phân tích tin nhắn và nhận về đối tượng Pydantic <code>NameCheckOutput</code>.</li>
+                <li><strong>Kiểm tra:</strong> Nếu thuộc tính <code>is_name_in_message == True</code>, trả về <code>GuardrailFunctionOutput(tripwire_triggered=True)</code>.</li>
+                <li><strong>Chặn đứng:</strong> SDK nhận cờ tripwire, dừng lập tức hệ thống và ném Exception. Các Agent bán hàng con hoàn toàn không được gọi.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Multi-Model SDR Pipeline - Luồng Automated SDR đa mô hình</h3>
+              <ol class="list">
+                <li><strong>Manager nhận việc:</strong> Sales Manager (chạy GPT-4o-mini) tiếp nhận yêu cầu gửi thư.</li>
+                <li><strong>Gọi đa mô hình:</strong> Manager gọi song song 3 công cụ:
+                  <ul>
+                    <li><code>sales_agent1</code> chạy mô hình <code>deepseek-chat</code> qua DeepSeek client.</li>
+                    <li><code>sales_agent2</code> chạy mô hình <code>gemini-2.0-flash</code> qua Gemini client.</li>
+                    <li><code>sales_agent3</code> chạy mô hình <code>llama-3.3-70b-versatile</code> qua Groq client.</li>
+                  </ul>
+                </li>
+                <li><strong>Lựa chọn & Handoff:</strong> Manager tự so sánh 3 bản nháp email và Handoff bản nháp tốt nhất sang cho Email Manager gửi đi.</li>
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Custom OpenAI Client (AsyncOpenAI)</h3>
+              <p><strong>Purpose:</strong> Cấu hình trỏ địa chỉ API và nạp khóa xác thực của các bên thứ ba để tích hợp đa mô hình vào SDK.</p>
+              <p><strong>When to use:</strong> Khi muốn gọi mô hình của Google Gemini, DeepSeek hoặc Groq Llama.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi lập trình viên phải tự đăng ký tài khoản, nạp tiền và quản lý nhiều API Keys khác nhau trong file <code>.env</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Pydantic Structured Outputs</h3>
+              <p><strong>Purpose:</strong> Ép kiểu trả về của Agent tuân thủ nghiêm ngặt schema dữ liệu để hệ thống tự động xử lý an toàn bằng code.</p>
+              <p><strong>When to use:</strong> Phù hợp khi xây dựng các tác nhân phân loại, trích xuất dữ liệu, chấm điểm hoặc guardrails.</p>
+              <p><strong>Trade-off:</strong> LLM phải hỗ trợ Structured Outputs và có thể tiêu tốn thêm thời gian suy luận để định dạng định dạng JSON đầu ra.</p>
+            </article>
+            <article class="card">
+              <h3>Input Guardrail Decorator (@input_guardrail)</h3>
+              <p><strong>Purpose:</strong> Đăng ký hàm kiểm duyệt an toàn đầu vào, tự động chạy trước khi kích hoạt Agent chính và các công cụ con.</p>
+              <p><strong>When to use:</strong> Sử dụng cho các Agent tiếp nhận prompt tự do từ người dùng trong môi trường thực tế.</p>
+              <p><strong>Trade-off:</strong> Làm tăng nhẹ thời gian thực thi tổng thể do phải chạy thêm cuộc gọi LLM kiểm duyệt phụ trợ.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <article class="code-panel">
+            <div>
+              <h3>Phân tích file thực hành: <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/3_lab3.ipynb" style="color: var(--accent-teal);">3_lab3.ipynb</a></h3>
+              <p>Dưới đây là các đoạn mã nguồn cốt lõi trong Lab 3 thể hiện kỹ thuật tích hợp đa mô hình, định nghĩa Structured Outputs qua Pydantic và viết hàm Input Guardrail bắt lỗi Tripwire.</p>
+            </div>
+            <div class="code-meta">
+              <span>Mục đích: Tích hợp Đa mô hình & Guardrail an toàn</span>
+              <span>Công cụ: Pydantic, AsyncOpenAI, OpenAIChatCompletionsModel</span>
+            </div>
+            
+            <p><strong>1. Khởi tạo custom client AsyncOpenAI trỏ sang các nhà cung cấp bên thứ ba:</strong></p>
+            <pre><code># Khai báo địa chỉ Base URL tương thích OpenAI của Google, DeepSeek và Groq
+GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+# Khởi tạo các client bất đồng bộ AsyncOpenAI với API Key tương ứng
+deepseek_client = AsyncOpenAI(base_url=DEEPSEEK_BASE_URL, api_key=deepseek_api_key)
+gemini_client = AsyncOpenAI(base_url=GEMINI_BASE_URL, api_key=google_api_key)
+groq_client = AsyncOpenAI(base_url=GROQ_BASE_URL, api_key=groq_api_key)
+
+# Bọc các client và khai báo tên mô hình thông qua OpenAIChatCompletionsModel
+deepseek_model = OpenAIChatCompletionsModel(model="deepseek-chat", openai_client=deepseek_client)
+gemini_model = OpenAIChatCompletionsModel(model="gemini-2.0-flash", openai_client=gemini_client)
+llama3_3_model = OpenAIChatCompletionsModel(model="llama-3.3-70b-versatile", openai_client=groq_client)
+
+# Gán đối tượng model vừa bọc vào tham số model khi khai báo Agent
+sales_agent1 = Agent(name="DeepSeek Sales Agent", instructions=instructions1, model=deepseek_model)</code></pre>
+
+            <p style="margin-top: 20px;"><strong>2. Ép kiểu đầu ra Structured Outputs bằng Pydantic BaseModel:</strong></p>
+            <pre><code>from pydantic import BaseModel
+
+# Định nghĩa schema cấu trúc đầu ra mong muốn
+class NameCheckOutput(BaseModel):
+    is_name_in_message: bool
+    name: str
+
+# Khởi tạo guardrail agent và truyền class NameCheckOutput vào tham số output_type
+guardrail_agent = Agent( 
+    name="Name check",
+    instructions="Check if the user is including someone's personal name in what they want you to do.",
+    output_type=NameCheckOutput, # Bắt buộc đầu ra tuân thủ schema JSON của Pydantic
+    model="gpt-4o-mini"
+)</code></pre>
+
+            <p style="margin-top: 20px;"><strong>3. Viết hàm Input Guardrail kiểm duyệt và bắt cờ Tripwire:</strong></p>
+            <pre><code>from agents import input_guardrail, GuardrailFunctionOutput
+
+# Đăng ký hàm Python làm Input Guardrail chạy trước
+@input_guardrail
+async def guardrail_against_name(ctx, agent, message):
+    # Chạy guardrail agent để phân tích tin nhắn đầu vào
+    result = await Runner.run(guardrail_agent, message, context=ctx.context)
+    
+    # Do sử dụng Structured Outputs, ta truy cập trực tiếp thuộc tính boolean đã parse
+    is_name_in_message = result.final_output.is_name_in_message
+    
+    # Trả về đối tượng GuardrailFunctionOutput.
+    # tripwire_triggered nhận giá trị boolean; nếu True sẽ chặn đứng chương trình.
+    return GuardrailFunctionOutput(
+        output_info={"found_name": result.final_output},
+        tripwire_triggered=is_name_in_message
+    )</code></pre>
+
+            <p style="margin-top: 20px;"><strong>4. Khởi chạy và bắt Exception bảo vệ an toàn bằng try-except:</strong></p>
+            <pre><code>careful_sales_manager = Agent(
+    name="Sales Manager",
+    instructions=sales_manager_instructions,
+    tools=tools,
+    handoffs=[emailer_agent],
+    model="gpt-4o-mini",
+    input_guardrails=[guardrail_against_name] # Đăng ký bộ lọc bảo mật đầu vào
+)
+
+# Kịch bản vi phạm: tin nhắn chứa tên riêng "Alice"
+message = "Send out a cold sales email addressed to Dear CEO from Alice"
+
+# Sử dụng try-except để bắt exception khi guardrail sập bẫy, tránh crash chương trình
+try:
+    with trace("Protected Automated SDR"):
+        result = await Runner.run(careful_sales_manager, message)
+except Exception as e:
+    # In ra thông báo lỗi tripwire của guardrail
+    print(f"Chặn đứng thành công! Guardrail phát hiện vi phạm: {e}")</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 8</div>
+              <h2>Options / Trade-offs - So sánh lựa chọn</h2>
+            </div>
+          </div>
+
+          <h3>So sánh giải pháp tích hợp Anthropic's Claude vào OpenAI Agents SDK</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Giải pháp</th>
+                <th>Ưu điểm (Pros)</th>
+                <th>Nhược điểm (Cons)</th>
+                <th>Khuyên dùng khi nào</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Không dùng Claude (Dùng Gemini/DeepSeek/Groq)</strong></td>
+                <td>Rất đơn giản, không cần cấu hình bên thứ ba, chạy trực tiếp qua client chuẩn.</td>
+                <td>Không tận dụng được năng lực suy luận xuất sắc của mô hình Claude 3.5 Sonnet.</td>
+                <td>Các dự án thực hành cơ bản hoặc khi các mô hình mặc định đáp ứng đủ yêu cầu.</td>
+              </tr>
+              <tr>
+                <td><strong>Tích hợp Claude qua Open Router</strong></td>
+                <td>Cho phép gọi Claude bằng chính AsyncOpenAI client thông qua Base URL tương thích của Open Router, giữ nguyên code SDK. <strong>(Khuyên dùng)</strong></td>
+                <td>Yêu cầu đăng ký tài khoản Open Router, nạp phí sử dụng và quản lý thêm API key.</td>
+                <td>Khi dự án bắt buộc phải sử dụng trí tuệ của Claude 3.5 Sonnet làm Planning Agent.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh Structured Outputs và Free Text Outputs</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Định dạng</th>
+                <th>Ưu điểm (Pros)</th>
+                <th>Nhược điểm (Cons)</th>
+                <th>Khuyên dùng khi nào</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Structured Outputs (Pydantic)</strong></td>
+                <td>Đầu ra được ép kiểu JSON chuẩn, tự động parse thành đối tượng Python có thuộc tính rõ ràng. Lập trình an toàn, tin cậy. <strong>(Khuyên dùng)</strong></td>
+                <td>Mô hình LLM phải hỗ trợ Structured Outputs và tốn thêm thời gian suy luận để format JSON.</td>
+                <td>Các tác vụ trích xuất thực thể, phân loại, chấm điểm hoặc các bộ lọc bảo mật.</td>
+              </tr>
+              <tr>
+                <td><strong>Free Text Outputs (Văn bản tự do)</strong></td>
+                <td>Thực thi nhanh hơn, mô hình LLM tự do diễn đạt nội dung phong phú và tự nhiên.</td>
+                <td>Khó parse dữ liệu bằng code Python; dễ gặp lỗi định dạng hoặc lỗi cú pháp khi dùng regex.</td>
+                <td>Các tác vụ viết email nháp, viết truyện, hội thoại tự do với người dùng.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 9</div>
+              <h2>Pitfalls - Các bẫy lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Các trường hợp lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi kết nối đa mô hình (AuthenticationError):</strong> Ném ra ngoại lệ xác thực ngay khi chạy Agent đa mô hình do thiếu khai báo API Key tương ứng trong file <code>.env</code>.</li>
+                <li><strong>Lỗi định dạng Base URL:</strong> Khởi tạo client AsyncOpenAI thành công nhưng bị báo lỗi API Connection Error khi gọi chạy mô hình do viết sai Base URL của nhà cung cấp.</li>
+                <li><strong>Crash hệ thống do Guardrail:</strong> Khi Input Guardrail phát hiện vi phạm và sập bẫy tripwire, toàn bộ ứng dụng Python bị dừng đột ngột (crash) và báo lỗi hệ thống.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Xử lý thiếu API key:</strong> [Alert] Bắt buộc cấu hình đầy đủ các keys trong `.env`. Nếu thiếu key của hãng nào, tạm thời cấu hình gán <code>model="gpt-4o-mini"</code> cho Agent đó để test.</li>
+                <li><strong>Cú pháp Base URL chuẩn:</strong> Viết chính xác cấu trúc API URL của các hãng, ví dụ DeepSeek: <code>https://api.deepseek.com/v1</code> (phải có `/v1` ở cuối).</li>
+                <li><strong>Bọc khối try-except:</strong> Luôn bọc lời gọi chạy Agent chính bằng khối lệnh <code>try-except</code> để bắt ngoại lệ do guardrail ném ra và in thông báo thân thiện.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 10</div>
+              <h2>Flashcards & Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          
+          <h3>Flashcards (Nhấn vào nút để xem đáp án)</h3>
+          <div class="grid-3" style="margin-bottom: 24px;">
+            <article class="card flashcard">
+              <h3>Q: Khác biệt khi truyền model dạng string so với truyền dạng đối tượng model?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Truyền dạng chuỗi (string) sẽ khiến Agent tự động sử dụng client mặc định trỏ về máy chủ OpenAI, trong khi truyền đối tượng <code>OpenAIChatCompletionsModel</code> cho phép tùy biến trỏ sang các Custom Clients (Base URLs) của hãng khác.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao Structured Outputs giúp Agent tự trị chạy ổn định hơn?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Vì nó ép buộc LLM trả về cấu trúc JSON chặt chẽ và an toàn, loại bỏ hoàn toàn các lỗi cú pháp khi sinh văn bản tự do, giúp Agent Manager dễ dàng đưa ra quyết định dừng chính xác dựa trên thuộc tính đối tượng rõ ràng.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tripwire (Bẫy dây) hoạt động như thế nào trong Guardrail?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Hoạt động bằng cách gán cờ <code>tripwire_triggered=True</code> trong đối tượng <code>GuardrailFunctionOutput</code> trả về. Khi nhận diện cờ này, SDK lập tức dừng hệ thống và ném ra Exception chặn đứng Agent chính.</p>
+            </article>
+          </div>
+
+          <h3>Quick quiz - Trắc nghiệm tương tác</h3>
+          <div class="quiz-container">
+            <p><strong>Câu hỏi:</strong> Tại sao việc sử dụng bộ lọc Guardrail độc lập chạy ở khâu đầu vào lại an toàn hơn việc chỉ viết câu lệnh cấm trong system prompt của Agent chính?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Vì bộ lọc Guardrail chạy trực tiếp trên card đồ họa GPU cục bộ nên có tốc độ nhanh hơn.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Vì system prompt có thể bị bỏ qua do tính không xác định (non-deterministic) của LLM hoặc bị bypass qua prompt injection, trong khi Guardrail là chốt chặn lập trình độc lập chạy trước, nếu phát hiện vi phạm sẽ trả về cờ tripwire buộc SDK chặn đứng hệ thống bằng exception trước khi Agent chính thực thi.</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Vì Guardrail sử dụng các mô hình ngôn ngữ lớn mạnh hơn nhiều so với Agent chính.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc nhớ</h3>
+              <ol class="list">
+                <li>SDK hỗ trợ đa mô hình thông qua Custom Clients và lớp <code>OpenAIChatCompletionsModel</code>.</li>
+                <li>Sử dụng Pydantic BaseModel và tham số <code>output_type</code> để ép kiểu đầu ra JSON có cấu trúc.</li>
+                <li>Input Guardrail được khai báo bằng decorator <code>@input_guardrail</code> và tự động chạy trước Agent chính.</li>
+                <li>Cờ <code>tripwire_triggered=True</code> sẽ kích hoạt lỗi chặn đứng chương trình và ném Exception bảo vệ.</li>
+                <li>Bắt buộc dùng khối lệnh <code>try-except</code> khi gọi chạy Agent có guardrail để tránh sập hệ thống.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra kiến thức</h3>
+              <ul class="list">
+                <li>Làm sao để cấu hình trỏ Base URL tương thích OpenAI cho Google Gemini?</li>
+                <li>Nêu cú pháp để truy cập kết quả đã parse của Structured Outputs từ thuộc tính <code>final_output</code>.</li>
+                <li>Giải thích cơ chế hiển thị vết trace của kịch bản sập bẫy tripwire trên OpenAI Platform.</li>
+                <li>Làm thế nào để tích hợp Claude 3.5 Sonnet của Anthropic vào hệ thống OpenAI Agents SDK?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn ôn tập tự chứa được thiết kế tối ưu cho trải nghiệm học tập dài hạn. Mọi kiến thức mở rộng đều được đánh dấu rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 120;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Ẩn đáp án" : "Xem đáp án";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const parent = button.parentElement;
+        const result = parent.querySelector(".quiz-result");
+        
+        // Reset states of all sibling buttons in this quiz
+        parent.querySelectorAll(".quiz-option").forEach((opt) => {
+          opt.classList.remove("correct", "incorrect");
+        });
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          button.classList.add("correct");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #5db872;'>Chính xác!</span> Giải thích: System prompt chỉ đóng vai trò chỉ dẫn cho LLM chính và rất dễ bị bypass bằng prompt injection/jailbreak do tính chất không xác định của LLM. Trái lại, Guardrails là một bộ lọc lập trình độc lập bọc ngoài luồng chạy chính. Khi phát hiện vi phạm, nó kích hoạt cờ tripwire, buộc SDK dừng lập tức và ném ra exception trước khi LLM chính hoặc các công cụ hệ thống có cơ hội thực thi, đảm bảo an toàn tuyệt đối.";
+        } else {
+          button.classList.add("incorrect");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #c64545;'>Chưa chính xác.</span> Gợi ý: Hãy đọc lại phần giải thích sâu (Deep explanation) ở mục Core Theory để hiểu rõ cơ chế hoạt động độc lập và tính bảo mật của Guardrails.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

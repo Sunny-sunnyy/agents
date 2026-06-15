@@ -1,0 +1,187 @@
+So I have good news and bad news for you.
+The good news is that today, the last day of week two, it's going to be quick and easy and satisfying.
+So there's going to be fun stuff right away.
+The bad news is there's going to be a really hard challenge at the end of it.
+It's going to be hard, but really big and juicy and good.
+So I do hope that you will take on the challenge that's coming up.
+But first, let's just talk about what we're going to do today.
+We're going to take our deep research.
+The agent that we built last time in a notebook.
+And we're going to turn it into proper Python code in modules.
+Yes, with a user interface featuring Gradio.
+Let's go and do that right now.
+And so here we are in cursor and we're going into the OpenAI folder.
+But now we're going into another folder into the deep research folder that is beneath it.
+And you will see that there are some Python modules you'll be happy to see.
+Because I know you like Python modules, and I'm going to just talk you through them, and I hope going
+to be pleasantly surprised how easy it is, and also how natural it is to move from a notebook world
+into proper modules.
+And again, one more sales pitch.
+It's where I like to work experimentally, first in a notebook and then turn it into modules.
+As you've built out your prompts, as you've experimented and refined your agent architecture.
+So what we've got in here are some agent classes, some agent modules with a single agent class, and
+then a manager that packages it all together.
+And then finally, deep research is the user interface, which is a very simple user interface.
+So let's start with the classes that represent the agents.
+And it's going to be really simple.
+We will start with the planner agent, which is exactly where we started when we were in the notebook
+the planner agent.
+We've got this.
+How many searches?
+I've got it set to 20 now, but I'll turn it back to three before I check this in so that no one racks
+up a big bill.
+If you use it, and you'll recognize the same old instructions and the same pedantic objects for a web
+search item and a web search plan, which is the list of web search items in the single field searches.
+And here is our planner agent that takes our instructions and it uses the web search plan.
+There we go.
+Okay, next up, the search agent and I need to make one little change to this guy.
+So this is the search agent.
+The instructions you'll see here your research assistant.
+And it's got got this this format.
+You'll remember that we stole that format from OpenAI's documentation.
+A very nice set of instructions right there.
+I don't know if you spot the little change I have to make, but the tools in here, I need to add in
+that parameter to make it nice and cheap.
+So let's go and do that together.
+If we go to this lab, if we look at what that parameter was, that parameter was actually near the
+top.
+I think we did at the very beginning.
+There we go.
+It is that the search context size is low.
+Let's go and put that in there right now so that no one spends unexpected amounts there.
+We have it done.
+Okay, so that is the search agent class in the search agent module.
+And now we've got a couple more, two more agents to talk about the writer agent again.
+And you know, the benefit of having these in Python modules, it looks very crisp and simple.
+You can see exactly what's going on.
+We've got our instructions.
+We've got the pedantic report data that has a short summary, a markdown report and follow up questions.
+And then our writer agent, which is the agent that will take all of the information from all of the
+searches and turn it into a report data object.
+And the final agent, if you remember, is of course, the email agent.
+Here it is.
+This is stuff that you will recognize.
+This is just the same thing that is going to send the email.
+You must remember, please to change this to be your verified sender here, not make put your verified
+sender here and then put some other email here.
+Put your recipient here, not me.
+I think I might change this before I check it in because otherwise someone's going to forget.
+Well, many people will forget and I'll be overloaded with spam email.
+All right, so this is the tool.
+And actually it's good to have a comment in here because that will send an email with the given subject
+in HTML body.
+Very nice.
+Okay.
+So that is our email agent and that is all four of our agents.
+What's coming next is research manager.
+Okay.
+So research manager is a class.
+And this contains those short functions that we had last time with a little bit of a twist spiced it
+up.
+So first of all there is a single method here run or it's a coroutine.
+If you want to be pedantic with me, this coroutine run an async def run.
+And this is just the same as the as the code that I had before.
+We've got a little trick here to, to generate a trace ID so that we can, we can print where to go
+to look at the precise trace that we're looking at here.
+Now you may wonder why we've got all of this yielding going on.
+We, uh, we're treating this as a generator that is going to yield various bits of text along the way.
+So that is going to become clear in a bit, but just take a look at what's going on here.
+I print some updates and I also yield those updates.
+And I end by yielding the full markdown report.
+Now hopefully you've done your intermediate.
+Either you already know all about generators or if you don't, then you've taken a look at the guide
+that explains generators so that there's no surprise.
+Okay.
+And then I've just got each of these functions plan searches, perform searches, search and write,
+report and send email.
+These are the five functions that are exactly the same as the five functions we talked through before,
+except a little bit beefed up.
+They've got more type hints put in, as one should do for proper checked in Python modules.
+And there's a bit more exception handling.
+And this is a little bit fancier to handle the being able to print a status update while it's going
+through the different searches, but otherwise it is much the same.
+So it's just a bit tidied up, which is the kind of practice you should do when you move from the notebook
+environment, when you're being more experimental into something that's more well baked code, but it's
+the same functionality.
+And that finally brings us to Deepresearch.
+Here we are.
+This is our Gradio app.
+This is where the magic happens.
+So Gradio which we import here.
+This is the the the package which you may know I love, which lets data scientists build great UIs without
+needing to know anything about front end.
+And I'm going to give you just some, some insights into how this works without I'm not giving you a
+full radio lesson here.
+And radio has great docs.
+It's really easy to read up about it and build build your own.
+But just very briefly, this this code here is where the user interface is defined.
+And we're used to using things like chat interface which is the super canned simple one where you just
+you can create an interface out of nothing.
+If you want to actually build your own user interface from scratch, then you have to use a slightly
+more detailed version when you do with great blocks as and then something like UI, and then you put
+your your code in there and then you say UI dot launch at the end and that that's the way to do it,
+that that will then build your user interface.
+So that is exactly what we've got here.
+We say with great blocks.
+And then you can pass in a theme if you want to have a different theme to the to the standard theme,
+and you can find the different colors that you can have in here.
+And then you simply put down the fields that you want.
+So we're going to start with a heading GR markdown gives us a heading and we want to have the word deep
+research as a big heading.
+Then we want a text box that says what topic would you like to research.
+And we're associating that text box with a field called query.
+So this this is a is a field.
+It might be a bit query clearer if we call this query text box.
+Let's say that query text box.
+And then here the next field we're going to put on a user interface is called run button.
+It's a button.
+It says run on it and it's a primary button.
+So it'll be nice and blue because blue is the sky, blue is the color we've chosen.
+And then the next one is going to be report, which is going to be our actual report text.
+It's a markdown and its label is report.
+Okay I'm going to change this here to query text box.
+So what we can now do is register an event.
+We want to register an event with the run button.
+We're going to say if the run button is clicked and we register that event by calling a function, click
+on run button and we just have to tell Gradio we want you to call us back.
+If that run button is clicked, then call this callback.
+And that callback is going to be something called run.
+And spoiler alert, run is right up here.
+So if if run button is clicked then call that callback.
+Run.
+The inputs that you should use should be the contents of the query text box.
+So the inputs to this callback should be whatever's in the text box when they press the run button,
+when they click the run button, and the outputs.
+Whatever comes out of this callback should go into, I want you to hook that up Gradio hook it up into
+this report markdown.
+And then for the this, this next one is really the same thing.
+It's, it's saying that if they're in the query text box and they hit the enter key to submit, then
+again call the run.
+The input should be the contents of the query text box, and the output should be the report.
+So this is a way that you can hook up gradio so that the widgets that you've constructed here get associated
+with inputs and outputs of a callback function that's getting called.
+And this this method here is going to generate front end code that's going to run in a browser.
+And when they press that button it's actually going to call back this Python code in our class populating
+it with the right the right fields.
+So it doesn't matter if you didn't follow all of that, or you don't get or even care how Gradio hooks
+things up together, just have some general intuition for it and know that UI launch is the thing that
+is then going to generate the front end code based on that, and figure out how to make sure that our
+callback gets called in browser equals true means that it's going to bring up a browser window right
+away.
+You don't need to have that if you don't wish.
+So the only remaining thing for me to mention is what then is this?
+What is going on with the with the run up here?
+So This is the callback that gets called, and you can see that as part of this I am calling the research
+manager Dot run, and that is the the long function that we looked at a moment ago that had lots of
+yields in there.
+And that brings me to the final part of the puzzle, which is normally in Gradio.
+With these callbacks, you just return a result, the chat function that we've worked on in the past,
+that's an example of a callback.
+Chat just returns the result, but you can also, instead of doing that, have your callback functions
+be generators that Gradio needs to needs to iterate over and they will yield back results.
+And if you do that, then Gradio will show that incrementally in the user interface, so that you don't
+have to sit there and wait for a long time and suddenly see an output.
+You can see interim results as well.
+And that is why we had a bunch of yields, and that is why we have them here in our callback.
+I hope that makes some sense, but it certainly will do when we actually see it.
+If it works, let's find out.

@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1 - OpenAI Agents SDK Fundamentals - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "EB Garamond", Garamond, "Times New Roman", serif;
+      font-weight: 400;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 70ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      font-family: "EB Garamond", serif;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "EB Garamond", serif;
+      font-weight: 400;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.8rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-top: 36px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 30px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 24px;
+    }
+
+    .toc h2 {
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 7px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      font-weight: 400;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+      border-color: var(--muted-soft);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 30px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 24px;
+    }
+
+    .card.accent {
+      border-color: rgba(204, 120, 92, 0.3);
+      background: #faf9f5;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 12px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 20px;
+      background: var(--canvas);
+      border-color: var(--hairline);
+      transition: all 0.3s ease;
+    }
+
+    details[open] {
+      background: var(--surface-soft);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.05rem;
+      outline: none;
+      user-select: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 20px;
+      margin-top: 20px;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 14px;
+      margin-top: 6px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-container {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      background: var(--canvas);
+    }
+
+    .quiz-option:hover {
+      background: var(--surface-soft);
+    }
+
+    .quiz-option.correct {
+      background: rgba(93, 184, 114, 0.15);
+      border-color: #5db872;
+      color: #2b6135;
+    }
+
+    .quiz-option.incorrect {
+      background: rgba(198, 69, 69, 0.1);
+      border-color: #c64545;
+      color: #7b2626;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 16px;
+      color: var(--ink);
+      font-weight: 500;
+      border-top: 1px dotted var(--hairline);
+      padding-top: 12px;
+      display: none;
+    }
+
+    .text-link {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .text-link:hover {
+      color: var(--primary-active);
+      border-bottom-color: var(--primary-active);
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      text-align: center;
+      margin-top: 36px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 24px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Học liệu ôn tập</span>
+        <h1>Day 1 - OpenAI Agents SDK Fundamentals</h1>
+        <p class="lead">Tìm hiểu nền tảng của lập trình bất đồng bộ trong Python làm cơ sở hoạt động cho OpenAI Agents SDK, cách khởi tạo và theo dõi vết thực thi của agent, đồng thời áp dụng phương pháp luận Vibe Coding hiệu quả, an toàn.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">OpenAI Agents SDK</span>
+          <span class="tag">Tuần 2 - Day 1</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM</span>
+          <span class="source">Code</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm</h2>
+        <ul class="list">
+          <li><strong>Async IO - Lập trình bất đồng bộ:</strong> Chạy đơn luồng thông qua Event Loop, cực kỳ tối ưu cho các cuộc gọi mạng I/O bound (gọi LLM API).</li>
+          <li><strong>OpenAI Agents SDK:</strong> Framework tối giản (non-opinionated) thay thế Swarm, tự động hóa xử lý Function Calling thông qua Agent và Runner.</li>
+          <li><strong>Vibe Coding:</strong> Tận dụng LLM viết code thông qua phân rã bài toán nhỏ (10 dòng/lượt) và xác thực chéo đa mô hình để chống code slop.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-size: 0.85rem;">Tiến trình đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Mở rộng ghi chú</button>
+          <button class="button" type="button" id="collapseAll">Thu gọn ghi chú</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng file tóm tắt <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day1_summary.md">day1_summary.md</a> tích hợp nội dung của các bài học 29, 30, 31, 32, 33.</li>
+                <li><strong>Slide:</strong> Không có slide nào được cung cấp cho buổi học này.</li>
+                <li><strong>Code:</strong> Phân tích file Jupyter Notebook thực hành <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/1_lab1.ipynb">1_lab1.ipynb</a>.</li>
+                <li><strong>Transcript:</strong> Đã được tổng hợp trực tiếp đầy đủ vào nội dung của file docx tóm tắt.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>Toàn bộ kiến thức lý thuyết về Asynchronous Python và các lớp cốt lõi của OpenAI Agents SDK đều được đối chiếu chính xác từ nguồn học liệu chính thống. Phần mã nguồn thực hành được bóc tách trực tiếp từ file notebook tương tác. Kiến thức mở rộng được dán nhãn rõ ràng để phân biệt với tài liệu gốc.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <div class="callout-title">Terminology rule - Quy tắc thuật ngữ</div>
+            Các cụm từ chuyên môn viết dưới dạng <code>English - nghĩa tiếng Việt</code> (ví dụ: <code>Event Loop - vòng lặp sự kiện</code>). Các từ đơn phổ biến viết dưới dạng <code>từ (nghĩa)</code> (ví dụ: <code>coroutine (hàm bất đồng bộ đặc biệt)</code>).
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 2</div>
+              <h2>Cheat Sheet - Tóm tắt cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>Lập trình bất đồng bộ (Async IO) sử dụng Event Loop để chạy các Coroutine trên một luồng duy nhất là nền tảng cốt lõi của các multi-agent frameworks như OpenAI Agents SDK, giúp tối ưu hóa tài nguyên mạng khi giao tiếp với LLM API.</p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li>Async IO không chạy đa luồng cấp OS mà chuyển đổi ngữ cảnh (context switching) cực nhẹ trên 1 thread.</li>
+                <li>Dùng <code>async def</code> định nghĩa coroutine, bắt buộc gọi bằng <code>await</code> để thực thi.</li>
+                <li>OpenAI Agents SDK có 3 lớp chính: <code>Agent</code>, <code>Runner</code>, <code>trace</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Thực tế</h3>
+              <p>Áp dụng ngay khi lập trình ứng dụng có nhiều Agent gọi API LLM đồng thời qua <code>asyncio.gather</code>, tránh tình trạng ứng dụng bị đơ (block) trong thời gian chờ đợi phản hồi mạng. Khi viết code, áp dụng Vibe Coding từng phần nhỏ để kiểm soát chất lượng sinh mã của LLM.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 3</div>
+              <h2>Previous Context - Liên hệ bài học</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Đây là ngày học mở đầu cho Tuần 2 (Day 1), thiết lập nền tảng kỹ thuật lập trình bất đồng bộ hoàn toàn mới trong Python. Kiến thức này chuẩn bị trực tiếp cho việc xây dựng dự án thực tế đầu tiên ở Day 2: SDR (Sales Development Representative) Agent tự động hóa quy trình bán hàng bằng mô hình Multi-agent cộng tác.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Asynchronous Python (async IO) - Lập trình bất đồng bộ:</strong> Mô hình lập trình cho phép thực hiện nhiều tác vụ đồng thời trên một luồng duy nhất mà không bị chặn (non-blocking), tối ưu hóa thời gian chờ phản hồi mạng.</li>
+                <li><strong>Coroutine - Hàm bất đồng bộ đặc biệt:</strong> Đối tượng được tạo ra từ hàm khai báo bằng <code>async def</code>, có thể tạm dừng thực thi tại các điểm <code>await</code> và khôi phục trạng thái sau đó.</li>
+                <li><strong>Event Loop - Vòng lặp sự kiện:</strong> Trình điều phối chạy ngầm liên tục để quản lý và phân bổ thời gian chạy cho các coroutine đang ở trạng thái sẵn sàng.</li>
+                <li><strong>Non-opinionated framework - Framework không áp đặt:</strong> Triết lý thiết kế tối giản, cung cấp các khối gạch nền tảng và để nhà phát triển tự quyết định cấu trúc dự án và luồng điều khiển (ví dụ: OpenAI Agents SDK), trái ngược với LangChain.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ</h3>
+              <p>Event Loop hoạt động như một trái tim trung tâm điều phối. Các Coroutine là các thực thể công việc được đăng ký vào Event Loop. Khi một coroutine gặp điểm chặn I/O (gọi API LLM qua mạng), nó sử dụng từ khóa <code>await</code> để tạm thời nhường quyền điều khiển (yield) lại cho Event Loop, giúp Event Loop lập tức chuyển sang chạy một coroutine khác trong hàng đợi mà không cần chờ đợi một cách vô ích.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về Event Loop đơn luồng</summary>
+            <p>Trong hệ điều hành, lập trình đa luồng (multithreading) truyền thống đòi hỏi OS phải liên tục thực hiện chuyển ngữ cảnh (context switch) ở cấp độ phần cứng. Việc này tiêu tốn nhiều tài nguyên bộ nhớ và có nguy cơ gặp lỗi tranh chấp dữ liệu (race conditions). </p>
+            <p>Ngược lại, <code>Event Loop</code> của Python hoạt động ở cấp độ ứng dụng trên một luồng duy nhất. Nó liên tục kiểm tra danh sách các tác vụ bất đồng bộ. Khi gặp lệnh <code>await</code>, Python sẽ lưu lại trạng thái thanh ghi và bộ nhớ của coroutine đó rồi chuyển sang chạy task khác. Khi hệ điều hành báo tác vụ I/O đã hoàn tất, coroutine cũ sẽ được đưa trở lại hàng đợi để tiếp tục chạy. Cơ chế này nhẹ hơn hàng trăm lần so với OS threads, cho phép xử lý hàng ngàn kết nối I/O cùng một lúc.</p>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 5</div>
+              <h2>Workflow / Pipeline - Quy trình hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Event Loop Task Dispatching - Quy trình Event Loop</h3>
+              <ol class="list">
+                <li><strong>Đăng ký:</strong> Danh sách coroutines được nạp vào Event Loop (ví dụ qua <code>asyncio.gather</code>).</li>
+                <li><strong>Thực thi:</strong> Event Loop lấy coroutine đầu tiên ra chạy cho đến khi gặp điểm chặn <code>await</code>.</li>
+                <li><strong>Nhường quyền:</strong> Coroutine nhường quyền điều khiển, chuyển sang trạng thái chờ. Event Loop lập tức chạy coroutine tiếp theo.</li>
+                <li><strong>Hoàn thành:</strong> Khi I/O phản hồi, Event Loop xếp lịch đưa coroutine trở lại hàng đợi để chạy tiếp từ vị trí tạm dừng cho đến khi trả ra kết quả cuối cùng.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Agent Execution Lifecycle - Quy trình khởi chạy Agent</h3>
+              <ol class="list">
+                <li><strong>Khởi tạo:</strong> Định nghĩa đối tượng <code>Agent</code> với các tham số <code>name</code>, <code>instructions</code> (system prompt) và <code>model</code>.</li>
+                <li><strong>Giám sát:</strong> Mở context manager <code>with trace("Tên Trace"):</code> để cấu hình thu thập dữ liệu telemetry.</li>
+                <li><strong>Thực thi:</strong> Gọi <code>Runner.run(agent, prompt)</code> kèm từ khóa <code>await</code> để khởi chạy vòng lặp xử lý bất đồng bộ, tự động xử lý các vòng lặp tool calling nếu có cho đến khi LLM kết thúc hội thoại.</li>
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Parallel Coroutines with <code>asyncio.gather</code></h3>
+              <p><strong>Purpose:</strong> Gom nhiều tác vụ bất đồng bộ độc lập lại và thực thi đồng thời nhằm tối ưu hóa tổng thời gian chờ đợi.</p>
+              <p><strong>When to use:</strong> Khi cần thực hiện nhiều cuộc gọi API LLM độc lập cùng lúc (ví dụ hỏi ý kiến nhiều agent chuyên biệt).</p>
+              <p><strong>Trade-off:</strong> Khó kiểm soát lỗi hơn; một coroutine con bị crash có thể làm ảnh hưởng đến kết quả của cả nhóm tác vụ.</p>
+            </article>
+            <article class="card">
+              <h3>Telemetry Tracing with <code>with trace</code></h3>
+              <p><strong>Purpose:</strong> Ghi lại toàn bộ chuỗi sự kiện, tham số đầu vào/đầu ra và hoạt động gọi công cụ (tool call) của Agent để hiển thị trực quan.</p>
+              <p><strong>When to use:</strong> Bắt buộc dùng trong quá trình phát triển để debug hành vi của Agent qua giao diện web.</p>
+              <p><strong>Trade-off:</strong> Gửi dữ liệu telemetry lên cloud của OpenAI, yêu cầu kết nối mạng và có thể tăng nhẹ độ trễ cuộc gọi.</p>
+            </article>
+            <article class="card">
+              <h3>Incremental Vibe Coding</h3>
+              <p><strong>Purpose:</strong> Sinh mã nguồn an toàn với AI, tránh bẫy mã nguồn rác/lỗi (code slop) khi sinh quá nhiều code cùng lúc.</p>
+              <p><strong>When to use:</strong> Khi xây dựng các tính năng mới hoặc làm việc với các thư viện/SDK mới chưa quen thuộc.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi lập trình viên phải cực kỳ kỷ luật, chia nhỏ bài toán (10 dòng/lượt) và liên tục chạy kiểm thử thủ công.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <article class="code-panel">
+            <div>
+              <h3>Phân tích file thực hành: <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/1_lab1.ipynb" style="color: var(--accent-teal);">1_lab1.ipynb</a></h3>
+              <p>File notebook này hướng dẫn các bước cơ bản nhất để khởi tạo một Agent kể chuyện cười (Jokester) bằng OpenAI Agents SDK, thực thi bất đồng bộ trong context manager của Trace và cách lấy phản hồi cuối cùng.</p>
+            </div>
+            <div class="code-meta">
+              <span>Mục đích: Khởi tạo & chạy thử Agent cơ bản</span>
+              <span>Lớp chính: Agent, Runner, trace</span>
+              <span>Môi trường: Jupyter Notebook (.ipynb)</span>
+            </div>
+            <pre><code># Bước 1: Nhập các lớp cốt lõi từ thư viện agents và thư viện cấu hình môi trường
+from dotenv import load_dotenv
+from agents import Agent, Runner, trace
+
+# Bước 2: Nạp API Key của OpenAI từ file .env cục bộ
+# Tham số override=True đảm bảo ghi đè các biến môi trường cũ trong hệ thống
+load_dotenv(override=True)
+
+# Bước 3: Định nghĩa thực thể Agent
+# jokester là một tác nhân kể chuyện cười sử dụng mô hình gpt-4o-mini
+agent = Agent(
+    name="Jokester", 
+    instructions="You are a joke teller", 
+    model="gpt-4o-mini"
+)
+
+# Bước 4: Thực thi Agent bất đồng bộ bên trong khối Trace giám sát
+# "Telling a joke" là nhãn hiển thị của trace trên OpenAI Platform (platform.openai.com/traces)
+with trace("Telling a joke"):
+    # Sử dụng từ khóa await trước Runner.run vì đây là một coroutine bất đồng bộ.
+    # Trong môi trường Jupyter Notebook, tính năng Top-level Await được hỗ trợ mặc định.
+    result = await Runner.run(agent, "Tell a joke about Autonomous AI Agents")
+    
+    # In ra nội dung phản hồi dạng chuỗi ký tự cuối cùng của Agent
+    print(result.final_output)</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 8</div>
+              <h2>Options / Trade-offs - So sánh lựa chọn</h2>
+            </div>
+          </div>
+          
+          <h3>So sánh cơ chế xử lý đồng thời trong Python</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Phương pháp</th>
+                <th>Phù hợp nhất khi</th>
+                <th>Đánh đổi (Trade-off)</th>
+                <th>Rủi ro tiềm ẩn (Risk)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Multiprocessing (Đa tiến trình)</strong></td>
+                <td>Tác vụ tính toán nặng (CPU-bound) như xử lý ảnh, ma trận, AI model cục bộ.</td>
+                <td>Chi phí tài nguyên bộ nhớ rất lớn do mỗi tiến trình có vùng nhớ riêng biệt.</td>
+                <td>Giao tiếp giữa các tiến trình phức tạp, khởi tạo tiến trình chậm.</td>
+              </tr>
+              <tr>
+                <td><strong>Multithreading (Đa luồng hệ điều hành)</strong></td>
+                <td>Tác vụ I/O bound ở mức độ trung bình khi làm việc với các thư viện cũ không hỗ trợ async.</td>
+                <td>Tiêu tốn tài nguyên bộ nhớ cho mỗi thread, bị giới hạn bởi khóa GIL của Python.</td>
+                <td>Dễ gặp lỗi tranh chấp bộ nhớ (race conditions), khó debug.</td>
+              </tr>
+              <tr>
+                <td><strong>Async IO (Bất đồng bộ - Đơn luồng)</strong></td>
+                <td>Tác vụ I/O bound chiếm phần lớn thời gian (như gọi LLM API qua mạng). <strong>(Khuyên dùng)</strong></td>
+                <td>Không giải quyết được tác vụ tính toán CPU-bound. Code viết theo cú pháp phức tạp hơn.</td>
+                <td>Một tác vụ CPU-bound nặng không nhường quyền (non-yielding) sẽ làm đơ toàn bộ ứng dụng.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh trường phái xây dựng Agent Framework</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Loại Framework</th>
+                <th>Ví dụ</th>
+                <th>Ưu điểm (Pros)</th>
+                <th>Nhược điểm (Cons)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Opinionated (Áp đặt kiến trúc)</strong></td>
+                <td>LangChain, CrewAI</td>
+                <td>Cung cấp sẵn các mẫu thiết kế (templates), nhiều tính năng ăn liền cho bài toán phổ thông.</td>
+                <td>Rất cồng kềnh, khó tùy biến sâu, khó kiểm soát luồng chạy ngầm bên dưới.</td>
+              </tr>
+              <tr>
+                <td><strong>Non-opinionated (Tự do kiến trúc)</strong></td>
+                <td>OpenAI Agents SDK</td>
+                <td>Siêu nhẹ, dễ học, kiểm soát hoàn toàn luồng điều khiển (control flow), dễ dàng debug. <strong>(Khuyên dùng)</strong></td>
+                <td>Lập trình viên phải tự xây dựng các thành phần quản lý trạng thái khi hệ thống phình to.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 9</div>
+              <h2>Pitfalls - Các bẫy lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Các trường hợp lỗi</h3>
+              <ul class="list">
+                <li><strong>Quên từ khóa <code>await</code>:</strong> Gọi coroutine nhưng chương trình chỉ trả về một đối tượng dạng <code>&lt;coroutine object...&gt;</code> mà không thực thi logic bên trong hàm.</li>
+                <li><strong>Lỗi cú pháp Await ở file Python (.py):</strong> Viết từ khóa <code>await</code> ở cấp ngoài cùng trong file script Python truyền thống dẫn đến lỗi <code>SyntaxError: 'await' outside function</code>.</li>
+                <li><strong>Không cập nhật được biến môi trường:</strong> Đã thay đổi API Key trong file <code>.env</code> nhưng code chạy vẫn nhận giá trị cũ của hệ thống.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Sửa lỗi quên await:</strong> Luôn viết cú pháp nhận kết quả dạng <code>result = await my_async_function()</code> đối với các coroutine.</li>
+                <li><strong>Sửa lỗi SyntaxError ngoài Jupyter:</strong> Bọc toàn bộ logic chạy vào trong hàm bất đồng bộ <code>async def main():</code> và gọi chạy Event Loop thông qua <code>asyncio.run(main())</code>.</li>
+                <li><strong>Sửa lỗi nạp env:</strong> Sử dụng tham số ghi đè khi nạp biến môi trường: <code>load_dotenv(override=True)</code> ngay dòng đầu chương trình.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 10</div>
+              <h2>Flashcards & Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          
+          <h3>Flashcards (Nhấn vào nút để xem đáp án)</h3>
+          <div class="grid-3" style="margin-bottom: 24px;">
+            <article class="card flashcard">
+              <h3>Q: Coroutine trong Python là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Là đối tượng được tạo ra từ hàm khai báo bằng <code>async def</code>, có khả năng tạm ngưng thực thi tại các điểm <code>await</code> để nhường luồng chạy cho tác vụ khác và được đánh thức lại bởi Event Loop khi tác vụ hoàn thành.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Handoff trong Multi-agent hoạt động ra sao?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Hoạt động bằng cách cho phép một Agent trả về thực thể của một Agent khác từ bên trong một hàm công cụ (tool function). Runner sẽ nhận biết và chuyển giao toàn bộ ngữ cảnh trò chuyện sang Agent mới.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Lợi thế của non-opinionated framework là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Giúp tối giản hóa mã nguồn boilerplate, cho phép lập trình viên toàn quyền kiểm soát luồng điều khiển, dễ dàng tùy biến cấu trúc và tích hợp linh hoạt mà không bị gò bó bởi các lớp trừu tượng phức tạp.</p>
+            </article>
+          </div>
+
+          <h3>Quick quiz - Trắc nghiệm tương tác</h3>
+          <div class="quiz-container">
+            <p><strong>Câu hỏi:</strong> Sự khác biệt cốt lõi nhất giữa Async IO và Multithreading truyền thống là gì?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Async IO tạo ra các luồng thực thi ở cấp độ hệ điều hành (OS-level threads) còn Multithreading chạy trên một luồng duy nhất.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Async IO chạy hoàn toàn trên một luồng duy nhất (single thread) ở cấp độ mã nguồn Python và tự động nhường quyền điều khiển, loại bỏ rủi ro tranh chấp bộ nhớ, trong khi Multithreading tạo nhiều luồng OS và phụ thuộc vào hệ điều hành điều phối.</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Async IO cho phép tận dụng đa nhân CPU thực tế cho các tác vụ tính toán toán học nặng (CPU-bound) so với Multithreading.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc nhớ</h3>
+              <ol class="list">
+                <li>Lập trình bất đồng bộ Async IO chạy đơn luồng, tối ưu cho tác vụ chờ mạng như gọi API LLM.</li>
+                <li>Định nghĩa coroutine bằng <code>async def</code> và thực thi qua <code>await</code>.</li>
+                <li>OpenAI Agents SDK có 3 thực thể chính: Agent (vai trò), Runner (vòng lặp chạy), và trace (giám sát bối cảnh).</li>
+                <li>Vibe Coding đòi hỏi chia nhỏ chương trình thành các mảnh nhỏ 10 dòng để viết và kiểm thử liên tục nhằm chống sinh mã rác (code slop).</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra kiến thức</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được cách Event Loop nhường quyền điều khiển khi gặp điểm chặn I/O không?</li>
+                <li>Tại sao gọi một hàm coroutine mà không có <code>await</code> lại nhận về đối tượng coroutine chưa thực thi?</li>
+                <li>Làm thế nào để chạy coroutine có sử dụng <code>await</code> trong file script <code>.py</code> truyền thống?</li>
+                <li>Để xem sơ đồ trace hiển thị trực quan các bước gọi Agent và tool, bạn cần truy cập vào đường link nào?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn ôn tập tự chứa được thiết kế tối ưu cho trải nghiệm học tập dài hạn. Mọi kiến thức mở rộng đều được đánh dấu rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 120;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Ẩn đáp án" : "Xem đáp án";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const parent = button.parentElement;
+        const result = parent.querySelector(".quiz-result");
+        
+        // Reset states of all sibling buttons in this quiz
+        parent.querySelectorAll(".quiz-option").forEach((opt) => {
+          opt.classList.remove("correct", "incorrect");
+        });
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          button.classList.add("correct");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #5db872;'>Chính xác!</span> Giải thích: Async IO hoạt động đơn luồng ở cấp độ ứng dụng Python, chỉ hoán đổi ngữ cảnh khi gặp await nên không phát sinh chi phí tạo thread hệ điều hành và không bị race conditions.";
+        } else {
+          button.classList.add("incorrect");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #c64545;'>Chưa chính xác.</span> Gợi ý: Hãy xem lại so sánh giữa Async IO và Multithreading trong phần Options/Trade-offs để nắm rõ cơ chế phân bổ thread.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

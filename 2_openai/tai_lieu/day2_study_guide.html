@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 2 - Build AI Sales Agents with SendGrid - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "EB Garamond", Garamond, "Times New Roman", serif;
+      font-weight: 400;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 4px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 20px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 14px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 32px;
+      align-items: stretch;
+      padding: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 5px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 70ch;
+      color: var(--body-strong);
+      font-size: 1.1rem;
+      font-family: "EB Garamond", serif;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 4px 12px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 28px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "EB Garamond", serif;
+      font-weight: 400;
+    }
+
+    .hero-panel h2 {
+      font-size: 1.8rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 6px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+      margin-top: 6px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.1s ease-out;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+      margin-top: 36px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 30px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 24px;
+    }
+
+    .toc h2 {
+      font-family: Inter, sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 7px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      font-weight: 400;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+      border-color: var(--muted-soft);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 30px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 36px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-soft);
+      padding: 24px;
+    }
+
+    .card.accent {
+      border-color: rgba(204, 120, 92, 0.3);
+      background: #faf9f5;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 12px;
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 20px;
+      background: var(--canvas);
+      border-color: var(--hairline);
+      transition: all 0.3s ease;
+    }
+
+    details[open] {
+      background: var(--surface-soft);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.05rem;
+      outline: none;
+      user-select: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-card);
+      padding: 16px 20px;
+      margin-top: 20px;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--on-dark-soft);
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--surface-dark-elevated);
+      padding-bottom: 10px;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 12px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 14px;
+      margin-top: 6px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-container {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      text-align: left;
+      background: var(--canvas);
+    }
+
+    .quiz-option:hover {
+      background: var(--surface-soft);
+    }
+
+    .quiz-option.correct {
+      background: rgba(93, 184, 114, 0.15);
+      border-color: #5db872;
+      color: #2b6135;
+    }
+
+    .quiz-option.incorrect {
+      background: rgba(198, 69, 69, 0.1);
+      border-color: #c64545;
+      color: #7b2626;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 16px;
+      color: var(--ink);
+      font-weight: 500;
+      border-top: 1px dotted var(--hairline);
+      padding-top: 12px;
+      display: none;
+    }
+
+    .text-link {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .text-link:hover {
+      color: var(--primary-active);
+      border-bottom-color: var(--primary-active);
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 32px;
+      text-align: center;
+      margin-top: 36px;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 24px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Học liệu ôn tập</span>
+        <h1>Day 2 - Build AI Sales Agents with SendGrid</h1>
+        <p class="lead">Tìm hiểu cách xây dựng dự án SDR đầu tiên, tích hợp email giao dịch, lập trình bất đồng bộ song song, chuyển đổi Agent thành công cụ, thực hiện chuyển giao bối cảnh (Handoff), và đối chiếu triết lý Workflow vs. Agent tự trị.</p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Multi-Agent System</span>
+          <span class="tag">Tuần 2 - Day 2</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM</span>
+          <span class="source">Code</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus - Trọng tâm</h2>
+        <ul class="list">
+          <li><strong>Transactional Email - Email giao dịch:</strong> Kết nối dịch vụ SendGrid hoặc Resend để gửi email thật từ code Python của Agent.</li>
+          <li><strong>Streaming & Parallel:</strong> Sử dụng <code>Runner.run_streamed</code> sinh text thời gian thực và <code>asyncio.gather</code> chạy song song nhiều agent.</li>
+          <li><strong>Workflow vs. Autonomy:</strong> Khác biệt giữa chạy workflow tĩnh (hard-coded) và agent tự trị có khả năng tự sửa lỗi qua Autonomy Loop.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 4px; font-size: 0.85rem;">Tiến trình đọc bài</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Mở rộng ghi chú</button>
+          <button class="button" type="button" id="collapseAll">Thu gọn ghi chú</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng file tóm tắt <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day2_summary.md">day2_summary.md</a> bao gồm các bài học từ 34 đến 39.</li>
+                <li><strong>Slide:</strong> Không có slide nào được cung cấp.</li>
+                <li><strong>Code:</strong> Phân tích mã nguồn Lab 2 từ file notebook <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/2_lab2.ipynb">2_lab2.ipynb</a>.</li>
+                <li><strong>Previous Context:</strong> Đối chiếu với <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/tai_lieu/day1_study_guide.html">day1_study_guide.html</a> để đảm bảo tính liên kết.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>Mã nguồn kiểm thử kết nối SendGrid và cấu hình Multi-agent được trích xuất nguyên bản từ file notebook. Phần giải pháp thay thế sử dụng Resend Email được bổ sung vào phần kiến thức mở rộng để hỗ trợ khi SendGrid gặp sự cố đăng ký tài khoản.</p>
+            </article>
+          </div>
+          <div class="callout">
+            <div class="callout-title">Terminology rule - Quy tắc thuật ngữ</div>
+            Các cụm từ chuyên môn viết dưới dạng <code>English - nghĩa tiếng Việt</code> (ví dụ: <code>Autonomous Agent - Tác nhân tự trị</code>). Các từ đơn phổ biến viết dưới dạng <code>từ (nghĩa)</code> (ví dụ: <code>streaming (luồng dữ liệu thời gian thực)</code>).
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>Xây dựng dự án SDR hoàn chỉnh bằng cách kết hợp 3 Agent viết email nháp (chạy song song qua <code>asyncio.gather</code>) và 1 Agent đánh giá (chọn lọc nháp). Sau đó, nâng cấp hệ thống thành một mô hình phân cấp tự trị sử dụng Agent-as-a-tool và Handoff để chuyển giao bối cảnh sang Email Manager định dạng HTML và gửi đi thực tế.</p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><code>Runner.run_streamed()</code> cho phép duyệt từng token qua vòng lặp <code>async for</code> để in ra màn hình.</li>
+                <li><code>@function_tool</code> tự động sinh JSON schema từ docstring và type hints của hàm.</li>
+                <li>Agent-as-a-tool trả quyền điều khiển về cha; Handoff ủy thác bối cảnh hội thoại và quyền điều khiển đi tiếp một chiều.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Thực tế</h3>
+              <p>Áp dụng khi lập trình các quy trình nghiệp vụ doanh nghiệp tự động hóa (Business Process Automation - BPA). Dùng Handoff khi chuyển hẳn trạng thái công việc sang một Agent chuyên gia khác. Cấu hình Autonomy Loop cho phép LLM tự lặp cuộc gọi công cụ để tự động sửa đổi hoặc tối ưu hóa kết quả.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 3</div>
+              <h2>Previous Context - Liên hệ bài học trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Ở Day 1, chúng ta đã nắm được cơ chế Event Loop, Coroutine trong lập trình bất đồng bộ Python và cách chạy một Agent cơ bản (Jokester). Ở Day 2, chúng ta áp dụng trực tiếp các khái niệm bất đồng bộ này để chạy song song nhiều Agent cùng lúc bằng <code>asyncio.gather</code> và chuyển giao từ các ví dụ đồ chơi sang một hệ thống SDR tự động hóa quy trình nghiệp vụ gửi mail bán hàng lạnh thực tế của doanh nghiệp.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>Transactional Email Service - Dịch vụ email giao dịch:</strong> Hệ thống chuyên dụng để gửi email tự động từ ứng dụng đến người dùng cuối một cách tin cậy thông qua API (ví dụ: SendGrid hoặc Resend).</li>
+                <li><strong>Sender Authentication - Xác thực người gửi:</strong> Quy trình cấu hình và xác minh với nhà cung cấp email rằng bạn thực sự sở hữu địa chỉ email gửi đi nhằm tránh bị đánh dấu thư rác.</li>
+                <li><strong>Streaming - Luồng dữ liệu thời gian thực:</strong> Cơ chế truyền tải dữ liệu phản hồi từ LLM dưới dạng các mảnh nhỏ (tokens/deltas) ngay khi chúng vừa được sinh ra nhằm giảm thời gian chờ đợi cảm nhận (perceived latency).</li>
+                <li><strong>Agent-as-a-tool - Tác nhân đóng vai công cụ:</strong> Kỹ thuật bọc một Agent hoàn chỉnh thành một công cụ bằng phương thức <code>.as_tool()</code> để Agent quản lý cấp cao hơn gọi thực thi theo cơ chế Request-Response.</li>
+                <li><strong>Handoff - Chuyển giao quyền lực:</strong> Hành động chuyển giao toàn bộ bối cảnh cuộc hội thoại (messages history) và quyền điều hành từ Agent này sang Agent khác một chiều (Delegation).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ</h3>
+              <p>Trong một hệ thống Multi-agent phức tạp, <code>Hierarchical AI System - Hệ thống AI phân cấp</code> sử dụng Agent quản lý (Manager) để điều hành. Manager có thể gọi các Agent cấp thấp (Workers) dưới hai hình thức: hoặc bọc Worker thành công cụ qua <code>Agent-as-a-tool</code> (luồng chạy quay lại Manager sau khi hoàn thành), hoặc thực hiện <code>Handoff</code> chuyển hẳn quyền điều phối sang một Email Manager Agent khác (quyền điều hành chuyển hẳn đi tiếp một chiều).</p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Phân biệt chi tiết triết lý Handoff và Agent-as-a-tool</summary>
+            <p><strong>1. Agent-as-a-tool (Mẫu Yêu cầu - Phản hồi):</strong></p>
+            <p>Hoạt động giống như một hàm Python thuần túy. Khi Agent quản lý gọi <code>sales_agent1.as_tool()</code>, Agent quản lý sẽ đóng gói yêu cầu của mình, gửi sang cho sales_agent1 chạy riêng biệt, nhận lại kết quả dạng chuỗi (string) và tiếp tục thực hiện logic của mình. Lịch sử hội thoại nội bộ của sales_agent1 không bị phình to vào lịch sử chính của Manager, tuy nhiên Manager phải lưu trữ kết quả trả về trong context window của mình.</p>
+            <p><strong>2. Handoff (Mẫu Ủy quyền):</strong></p>
+            <p>Hoạt động giống như việc chuyển cuộc gọi trong tổng đài. Khi Sales Manager quyết định bàn giao cho Email Manager, OpenAI Agents SDK sẽ trích xuất toàn bộ lịch sử tin nhắn hiện tại (messages history) và gửi nó trực tiếp sang cho Email Manager. Quyền kiểm soát luồng chạy lúc này thuộc về Email Manager. Email Manager sẽ đọc lịch sử tin nhắn để biết Sales Manager đã chọn email nào và tiếp tục thực hiện chỉ dẫn hệ thống của riêng nó để format và gửi đi. Luồng chạy sẽ không quay lại Sales Manager trừ khi Email Manager chủ động thực hiện một cú handoff ngược lại.</p>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 5</div>
+              <h2>Workflow / Pipeline - Luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source font-style: italic;">Code</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Generator Streaming Flow - Luồng xử lý Streaming</h3>
+              <ol class="list">
+                <li><strong>Gọi stream:</strong> Gọi phương thức <code>Runner.run_streamed()</code> để bắt đầu nhận generator bất đồng bộ.</li>
+                <li><strong>Lặp sự kiện:</strong> Duyệt qua generator bằng vòng lặp bất đồng bộ <code>async for event in result.stream_events()</code>.</li>
+                <li><strong>Lọc sự kiện:</strong> Kiểm tra nếu <code>event.type == "raw_response_event"</code> và lớp dữ liệu là <code>ResponseTextDeltaEvent</code>.</li>
+                <li><strong>In kết quả:</strong> Trích xuất text delta thông qua thuộc tính <code>event.data.delta</code> và in trực tiếp ra console thời gian thực.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Integrated Automated SDR Flow - Luồng Automated SDR</h3>
+              <ol class="list">
+                <li><strong>Khởi đầu:</strong> Người dùng nhập yêu cầu viết và gửi email chào hàng đến CEO.</li>
+                <li><strong>Tạo nháp:</strong> <code>Sales Manager</code> gọi song song 3 công cụ <code>sales_agent1</code>, <code>sales_agent2</code>, <code>sales_agent3</code> để lấy 3 bản nháp email phong cách khác nhau.</li>
+                <li><strong>Chấm điểm & Chọn lọc:</strong> <code>Sales Manager</code> đánh giá và chọn ra email tốt nhất (có thể tự động chạy lại nếu chưa ưng ý).</li>
+                <li><strong>Chuyển giao:</strong> Sales Manager chuyển giao (Handoff) email được chọn sang cho <code>Email Manager</code>.</li>
+                <li><strong>Định dạng & Gửi:</strong> <code>Email Manager</code> gọi <code>subject_writer</code> tạo tiêu đề, gọi <code>html_converter</code> convert sang HTML và gọi <code>send_html_email</code> gửi đi thực tế qua SendGrid.</li>
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Asynchronous Event Streaming (Streaming)</h3>
+              <p><strong>Purpose:</strong> Cải thiện trải nghiệm người dùng bằng cách in ra từng từ của phản hồi ngay khi LLM vừa sinh ra.</p>
+              <p><strong>When to use:</strong> Phù hợp cho các giao diện chat thời gian thực hoặc ứng dụng dòng lệnh tương tác.</p>
+              <p><strong>Trade-off:</strong> Logic lập trình phức tạp hơn do phải bóc tách các gói tin sự kiện thô của API OpenAI.</p>
+            </article>
+            <article class="card">
+              <h3>Parallel Agent Execution (asyncio.gather)</h3>
+              <p><strong>Purpose:</strong> Tối ưu hóa tổng thời gian chờ đợi bằng cách gửi đồng thời nhiều yêu cầu LLM API (tác vụ I/O bound).</p>
+              <p><strong>When to use:</strong> Khi cần sinh nhiều phương án nội dung độc lập (A/B testing) hoặc hỏi ý kiến nhiều agent cùng lúc.</p>
+              <p><strong>Trade-off:</strong> Gây tiêu tốn một lượng token lớn tại cùng một thời điểm và dễ chạm hạn mức cuộc gọi (Rate Limits).</p>
+            </article>
+            <article class="card">
+              <h3>Autonomy Loop (Vòng lặp tự trị trong Prompt)</h3>
+              <p><strong>Purpose:</strong> Cho phép Agent tự tối ưu hoặc chạy lại công cụ nếu đánh giá kết quả lần đầu chưa đạt yêu cầu.</p>
+              <p><strong>When to use:</strong> Các bài toán cần kiểm soát chất lượng kỹ lưỡng hoặc sinh mã nguồn, tự sửa lỗi.</p>
+              <p><strong>Trade-off:</strong> Rủi ro rơi vào vòng lặp vô hạn và làm tăng đột biến chi phí sử dụng API LLM.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <article class="code-panel">
+            <div>
+              <h3>Phân tích file thực hành: <a class="text-link" href="file:///G:/Agent2026Win/agents/2_openai/2_lab2.ipynb" style="color: var(--accent-teal);">2_lab2.ipynb</a></h3>
+              <p>Dưới đây là các đoạn mã nguồn cốt lõi trong Lab 2 thể hiện các kỹ thuật thiết lập biến môi trường an toàn, streaming, chạy song song và cấu hình Agent tự trị phân cấp.</p>
+            </div>
+            <div class="code-meta">
+              <span>Mục đích: Thiết lập hệ thống Automated SDR</span>
+              <span>Công cụ: SendGrid, asyncio, trace</span>
+            </div>
+            
+            <p><strong>1. Khắc phục lỗi chứng chỉ SSL trên Windows/macOS khi kết nối SendGrid API:</strong></p>
+            <pre><code>import certifi
+import os
+
+# Định cấu hình trỏ đường dẫn file chứng chỉ bảo mật của certifi vào biến môi trường hệ thống
+os.environ['SSL_CERT_FILE'] = certifi.where()</code></pre>
+
+            <p style="margin-top: 20px;"><strong>2. Duyệt các sự kiện và in phản hồi dạng Streaming:</strong></p>
+            <pre><code># Gọi chạy Agent dưới dạng stream generator (không dùng await ở đây)
+result = Runner.run_streamed(sales_agent1, input="Write a cold sales email")
+
+# Sử dụng vòng lặp bất đồng bộ async for để duyệt qua các sự kiện được gửi về
+async for event in result.stream_events():
+    # Kiểm tra nếu sự kiện chứa mảnh văn bản thô mới được sinh ra
+    if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+        # In mảnh văn bản ra màn hình console và đẩy trực tiếp ra luồng hiển thị (flush=True)
+        print(event.data.delta, end="", flush=True)</code></pre>
+
+            <p style="margin-top: 20px;"><strong>3. Cấu hình decorator @function_tool tự động sinh JSON schema cho công cụ:</strong></p>
+            <pre><code>from agents import function_tool
+
+# Decorator tự động phân tích docstring và kiểu dữ liệu tham số để gửi cho OpenAI
+@function_tool
+def send_email(body: str):
+    """ Send out an email with the given body to all sales prospects """
+    sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("ed@edwarddonner.com")  # Email gửi đi (phải được xác thực trong SendGrid)
+    to_email = To("ed.donner@gmail.com")      # Email người nhận thử nghiệm
+    content = Content("text/plain", body)
+    mail = Mail(from_email, to_email, "Sales email", content).get()
+    
+    # Thực hiện gọi API SendGrid để gửi thư
+    sg.client.mail.send.post(request_body=mail)
+    return {"status": "success"}</code></pre>
+
+            <p style="margin-top: 20px;"><strong>4. Khởi chạy Sales Manager Agent tự trị tích hợp Handoff và Vòng lặp tự sửa lỗi:</strong></p>
+            <pre><code>sales_manager_instructions = """
+You are a Sales Manager at ComplAI. Your goal is to find the single best cold sales email using the sales_agent tools.
+ 
+Follow these steps carefully:
+1. Generate Drafts: Use all three sales_agent tools to generate three different email drafts. Do not proceed until all three drafts are ready.
+ 
+2. Evaluate and Select: Review the drafts and choose the single best email using your judgment of which one is most effective.
+# Dòng chỉ dẫn dưới đây cho phép Agent tự lặp lại cuộc gọi công cụ nếu kết quả chưa đạt yêu cầu (kích hoạt tính tự trị)
+You can use the tools multiple times if you're not satisfied with the results from the first try.
+ 
+3. Handoff for Sending: Pass ONLY the winning email draft to the 'Email Manager' agent. The Email Manager will take care of formatting and sending.
+ 
+Crucial Rules:
+- You must use the sales agent tools to generate the drafts — do not write them yourself.
+- You must hand off exactly ONE email to the Email Manager — never more than one.
+"""
+
+# Khởi tạo tác nhân quản lý có chứa danh sách tools và danh sách handoffs
+sales_manager = Agent(
+    name="Sales Manager",
+    instructions=sales_manager_instructions,
+    tools=[tool1, tool2, tool3], # Các sales agents đã được bọc thành công cụ bằng .as_tool()
+    handoffs=[emailer_agent],    # Email Manager Agent phụ trách định dạng HTML và gửi thư
+    model="gpt-4o-mini"
+)
+
+# Chạy thử nghiệm hệ thống Automated SDR và ghi nhận trace
+with trace("Automated SDR"):
+    result = await Runner.run(sales_manager, "Send out a cold sales email addressed to Dear CEO from Alice")</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 8</div>
+              <h2>Options / Trade-offs - So sánh lựa chọn</h2>
+            </div>
+          </div>
+
+          <h3>So sánh cơ chế Agent-as-a-tool và Handoff</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cơ chế</th>
+                <th>Luồng điều khiển (Control)</th>
+                <th>Xử lý bối cảnh (Context Window)</th>
+                <th>Phù hợp nhất khi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Agent-as-a-tool</strong></td>
+                <td><strong>Quay lại tác nhân gọi (passes back):</strong> Hoạt động như một hàm phụ trợ dạng Request-Response.</td>
+                <td>Giữ bối cảnh hội thoại tập trung tại Agent quản lý; thông tin của Worker không làm loãng lịch sử chính.</td>
+                <td>Các tác vụ phụ trợ nhỏ, mang tính chất tiện ích hoặc truy vấn thông tin ngắn hạn.</td>
+              </tr>
+              <tr>
+                <td><strong>Handoff</strong></td>
+                <td><strong>Chuyển hẳn đi tiếp (passes across):</strong> Giao quyền điều phối một chiều sang Agent mới.</td>
+                <td>Chia sẻ toàn bộ lịch sử tin nhắn sang Agent mới; giúp giảm tải dung lượng context window cho Agent ban đầu.</td>
+                <td>Khi quy trình nghiệp vụ chuyển hẳn sang một giai đoạn mới do một Agent chuyên gia chịu trách nhiệm. <strong>(Khuyên dùng cho SDR)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh các giải pháp gửi email khi thực hành dự án</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Giải pháp</th>
+                <th>Ưu điểm (Pros)</th>
+                <th>Nhược điểm (Cons)</th>
+                <th>Khuyên dùng khi nào</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>SendGrid API</strong></td>
+                <td>Hạ tầng gửi thư mạnh mẽ, là giải pháp mặc định của khóa học.</td>
+                <td>Dễ bị Twilio khóa tài khoản tự động khi đăng ký; thường gặp lỗi chứng chỉ SSL trên Windows.</td>
+                <td>Khi tài khoản hoạt động bình thường và chứng chỉ SSL đã được cấu hình đúng.</td>
+              </tr>
+              <tr>
+                <td><strong>Resend Email API</strong></td>
+                <td>Đăng ký cực nhanh, không bị kiểm duyệt gắt gao, ít lỗi SSL kết nối từ Python.</td>
+                <td>Cần cài thêm thư viện <code>resend</code> và sửa đổi hàm gửi thư trong code lab.</td>
+                <td><strong>Phương án dự phòng hoàn hảo</strong> khi SendGrid bị khóa tài khoản hoặc lỗi SSL không tự xử lý được.</td>
+              </tr>
+              <tr>
+                <td><strong>Flat File Output</strong></td>
+                <td>Chạy offline 100%, không cần internet, không cần tài khoản bên thứ ba.</td>
+                <td>Không gửi được thư thật để kiểm tra định dạng hiển thị trên hòm thư thực tế.</td>
+                <td>Khi chỉ cần test nhanh logic hoạt động của vòng lặp Agent mà không cần gửi thư.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 9</div>
+              <h2>Pitfalls - Các bẫy lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Các trường hợp lỗi</h3>
+              <ul class="list">
+                <li><strong>Lỗi kết nối SSL với SendGrid:</strong> Lỗi <code>SSL: CERTIFICATE_VERIFY_FAILED</code> xuất hiện khi Python gọi API trên môi trường Windows hoặc macOS do thiếu file chứng chỉ bảo mật.</li>
+                <li><strong>LLM gọi công cụ thiếu tham số:</strong> Tác nhân gọi công cụ bọc bằng <code>@function_tool</code> bị báo lỗi API thiếu tham số đầu vào cần thiết.</li>
+                <li><strong>Vòng lặp vô hạn của Agent tự trị:</strong> Cho phép Agent lặp lại cuộc gọi công cụ khi chưa hài lòng nhưng Agent liên tục gọi công cụ vô hạn khiến chương trình không thể kết thúc.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách khắc phục</h3>
+              <ul class="list">
+                <li><strong>Khắc phục SSL:</strong> Cài đặt <code>certifi</code> và cấu hình trỏ đường dẫn file chứng chỉ SSL trong code Python thông qua <code>os.environ['SSL_CERT_FILE'] = certifi.where()</code>.</li>
+                <li><strong>Bổ sung Type Hinting:</strong> Luôn khai báo đầy đủ kiểu dữ liệu cho tất cả các đối số đầu vào của hàm Python (ví dụ: <code>def send_email(body: str)</code>).</li>
+                <li><strong>Đặt giới hạn trong Prompt:</strong> Bổ sung các tiêu chí đánh giá chất lượng rõ ràng và ràng buộc số lần thử tối đa (ví dụ: "chỉ thử tối đa 2 lần") ở cuối system prompt.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 10</div>
+              <h2>Flashcards & Quiz - Ôn tập tương tác</h2>
+            </div>
+          </div>
+          
+          <h3>Flashcards (Nhấn vào nút để xem đáp án)</h3>
+          <div class="grid-3" style="margin-bottom: 24px;">
+            <article class="card flashcard">
+              <h3>Q: Khi nào nên dùng Handoff thay vì Agent-as-a-tool?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Nên dùng Handoff khi quy trình nghiệp vụ chuyển giao hoàn toàn một chiều sang một Agent chuyên gia mới xử lý (Delegation), giúp giải phóng dung lượng context window của Agent cha thay vì bắt Agent cha lưu trữ toàn bộ lịch sử chạy phụ trợ.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao docstring của hàm Python lại quan trọng đối với `@function_tool`?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Vì OpenAI Agents SDK sẽ tự động trích xuất chuỗi docstring đó để làm phần mô tả chức năng của công cụ gửi lên mô hình ngôn ngữ lớn (LLM), giúp LLM biết khi nào cần lựa chọn và gọi công cụ này.</p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự tự trị (Autonomy) của Agent được kích hoạt bằng cách nào trong SDK?</h3>
+              <button class="button primary" type="button" data-reveal>Xem đáp án</button>
+              <p class="flash-answer"><strong>A:</strong> Bằng cách đưa thêm câu chỉ dẫn vào system prompt cho phép Agent tự động gọi lại công cụ nhiều lần nếu chưa hài lòng với kết quả lần chạy đầu tiên, thay vì lập trình cứng vòng lặp bằng code Python.</p>
+            </article>
+          </div>
+
+          <h3>Quick quiz - Trắc nghiệm tương tác</h3>
+          <div class="quiz-container">
+            <p><strong>Câu hỏi:</strong> Theo định nghĩa của hãng Anthropic, sự khác biệt bản chất nhất giữa một Agentic Workflow và một Autonomous Agent là gì?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Việc hệ thống có sử dụng công cụ gửi email thực tế qua mạng internet (SendGrid/Resend) hay chỉ xuất ra màn hình console.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Việc luồng chạy được lập trình cứng (hard-coded) bằng mã nguồn Python tuần tự/song song (Workflow) hay để mô hình tự quyết định gọi công cụ nào và tự sửa đổi kết quả qua vòng lặp tự đánh giá (Autonomous Agent).</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Việc sử dụng decorator `@function_tool` để tự động hóa Function Calling thay vì cấu hình JSON schema thủ công.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Mục 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Điều bắt buộc nhớ</h3>
+              <ol class="list">
+                <li><code>Runner.run_streamed</code> cùng <code>async for</code> dùng để lặp và in phản hồi dạng stream token thời gian thực.</li>
+                <li>Decorator <code>@function_tool</code> tự động sinh JSON schema từ docstring và type hint của hàm Python.</li>
+                <li>Agent-as-a-tool sử dụng mẫu Request-Response (trả control về), Handoff sử dụng mẫu Delegation (chuyển control đi tiếp).</li>
+                <li>Resend Email là phương án dự phòng tuyệt vời thay thế cho SendGrid khi gặp sự cố tài khoản.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra kiến thức</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được cách thức bối cảnh hội thoại (messages history) được chia sẻ khi thực hiện Handoff không?</li>
+                <li>Tại sao hàm Python làm công cụ bắt buộc phải có type hinting cho tất cả đối số đầu vào?</li>
+                <li>Hãy phân tích cấu trúc hiển thị của vết trace song song (asyncio.gather) trên trục thời gian của OpenAI Platform.</li>
+                <li>Cách khắc phục lỗi SSL kết nối API SendGrid trên hệ thống Windows.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Hướng dẫn ôn tập tự chứa được thiết kế tối ưu cho trải nghiệm học tập dài hạn. Mọi kiến thức mở rộng đều được đánh dấu rõ ràng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 120;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Ẩn đáp án" : "Xem đáp án";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const parent = button.parentElement;
+        const result = parent.querySelector(".quiz-result");
+        
+        // Reset states of all sibling buttons in this quiz
+        parent.querySelectorAll(".quiz-option").forEach((opt) => {
+          opt.classList.remove("correct", "incorrect");
+        });
+
+        const isCorrect = button.dataset.correct === "true";
+        if (isCorrect) {
+          button.classList.add("correct");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #5db872;'>Chính xác!</span> Giải thích: Theo Anthropic, Workflow là mô hình lập trình mã hóa cứng luồng chạy (hard-coded) bằng code Python (tuần tự hoặc song song). Trong khi đó, Autonomous Agent trao mục tiêu và công cụ cho LLM để mô hình tự do quyết định chọn công cụ nào và tự động sửa đổi thông qua vòng lặp tự trị.";
+        } else {
+          button.classList.add("incorrect");
+          result.style.display = "block";
+          result.innerHTML = "<span style='color: #c64545;'>Chưa chính xác.</span> Gợi ý: Hãy đọc kỹ phần so sánh triết lý ở mục Options/Trade-offs để phân biệt rõ giữa Workflow tĩnh và Agent tự trị có vòng lặp tự sửa lỗi.";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

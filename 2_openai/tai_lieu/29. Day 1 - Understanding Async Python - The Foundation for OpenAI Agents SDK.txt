@@ -1,0 +1,173 @@
+Well.
+I am so excited to welcome you to week two of our time together in this journey into Agents Land.
+And as well, you know, week two is all about open AI agents SDK, formerly known as swarm, released
+very recently, the newest of our arrivals into the agents Framework land and one that I cannot wait
+to tell you all about.
+But first, isn't there always a but first but first, before we can do open AI agents SDK, I have
+a sidebar, a topic that I have to cover with you, a very important topic, and it's to talk to you
+about asynchronous Python async IO.
+It's something which is common across all of the agent frameworks.
+So all of them make use of asynchronous Python, and it's something which you can get by without really
+understanding.
+There's a couple of rules that you can you can learn and then you just follow those rules always.
+And it will just kind of work and that's okay.
+But I'm here to tell you that that's unsatisfactory and that it's much better to just take half an hour
+to get get to the bottom of this, to really understand it, to thrash it out until you're like, okay,
+I get asynchronous Python, I understand it, and if you do this, if you take the half an hour, you
+will thank me.
+It will again and again you will come across this and you'll you will be completely comfortable with
+it.
+And it's only half an hour.
+And so I've put a guide and the guides that will take you through this, so that you can be left with
+no questions in your mind at all about what it means to write asynchronous Python.
+And I'm also now going to cover it just very briefly at a high level.
+Let's talk async IO.
+Well, look, first of all there is like a short version, a simple version.
+This is what I mean when I say you can get by without really understanding it.
+So async IO is a way of writing Python code, which is a kind of lightweight version of multithreading.
+So many people from a software engineering background will be familiar with the idea of multithreading.
+When you write code that can run concurrently, you can have multiple threads which are each executing
+code together, and there's often a lot of baggage that comes with that, some sort of framework stuff
+that comes with it.
+Well, async IO, which was introduced I think, in Python 3.5, is this very lightweight way of doing
+it, which doesn't actually involve threads at an operating system level.
+And it also doesn't involve what's called multiprocessing, which is when you spawn multiple Python
+processes and they all run together.
+This is another way of doing it that is super lightweight.
+And because it's super lightweight, it means that you can have thousands or tens of thousands of these
+things all running without consuming much resources at all.
+So it's a simple, easy peasy, lightweight way of writing code that can run concurrently.
+And particularly it's good when you have code that makes use of of input output, like waiting on networks.
+It allows other things to be running.
+Whilst one bit of code is waiting on network, and when you're running LM requests, you're mostly.
+If you're using paid APIs like OpenAI, most of the time is being spent waiting for stuff to feed back
+from a model running on the cloud.
+So there's a lot of waiting on networks, a lot of IO bound waiting.
+And as a result, asynchronous code is great to use.
+And when you're thinking of multi-agent frameworks, when potentially you have lots of these all hitting
+different APIs, it makes so much sense to be using it.
+And that is why all of the frameworks we'll look at use async IO.
+Okay.
+So with that preamble this is the short version.
+The short version is async.
+IO is actually two things.
+It's a a package called async IO that you can import, and it's also some language constructs baked
+into Python.
+And those language constructs include two keywords that you see right here.
+And one of those keywords is the word async.
+And anytime that you have a function which is potentially going to be able to run in a way that allows
+other things to happen concurrently, you simply put the word async before it like this async def do
+some processing, so def do some processing becomes async def do some processing.
+That's how you say this is a function which can run asynchronously.
+And when you call that function you don't just call do some processing like you're used to.
+You have to put the word await before it.
+So you say await, do some processing and if do some processing returns a string, then you can't just
+say result equals do some processing.
+You have to say result equals await.
+Do some processing.
+But otherwise it's just the same.
+So that's the short version.
+And if you wanted to get by without really understanding it, you could just follow those rules and
+keep going and it might be enough.
+But now let me tell you the bigger story.
+Okay.
+Now we're going to go a little bit deeper and talk about the real story with async IO.
+So look as I say, it's a lightweight alternative to multithreading or multiprocessing.
+Something like multithreading is implemented at the OS level.
+And it supports concurrent execution of different programs where the CPU, the CPU level that's being
+managed to sort of switch between these two programs and treat them as if they're running at the same
+time.
+This is different in the case of async IO.
+So there are some some special keywords.
+There's this keyword async.
+If you define a function as async def and then the function instead of just def the function, then
+this thing is no longer actually called a function.
+It's known as a coroutine.
+Now most people still use the word function.
+You'll hear me saying function, but strictly speaking, anytime you see async def, you should say,
+okay, that's not a function, it is a coroutine.
+And that means it's something special that that Python can pause and resume.
+When you call a coroutine, it doesn't run unlike any other function that you call that does run.
+When you call a coroutine, it just returns a coroutine object, but nothing is executed to actually
+run that coroutine object.
+There are a few ways to do it, but the most common one, and the one that we will use all the time
+is to await it.
+So you say await, and then the coroutine object and that schedules it for execution.
+What does it mean to say it's scheduled for execution.
+Well, there is this piece of code written in the async IO library, which does what's known as an event
+loop, which means it's a kind of while loop that iterates and it takes this coroutine and it starts
+executing it, and it can only execute one coroutine at a time.
+It's not like multithreading.
+It's going to be executing this coroutine, except if this coroutine gets to a point when it's stopped
+and it's waiting for something like it's waiting for IO.
+Perhaps.
+Perhaps it's made a call to OpenAI and it's waiting for OpenAI to respond.
+At that point, the event loop can put that on pause and start executing a different one of the coroutines
+that's in its sort of list of coroutines waiting to be run.
+And if that hits a point when it's waiting on on IO, then the event loop can run another one or it
+can continue the first one.
+So it's a sort of manual way of handling multithreading.
+It's a manual approach to implementing multithreading, but only really working when something is blocked.
+Waiting on I o.
+And because of this, because it's sort of written at a code level and it's super simple and very easy
+to understand, it's also lightweight.
+You can have thousands or tens of thousands of these things.
+And, and so it's and it's really easy and quick to get this running.
+And that is why it's so popular.
+And that is why it's used so ubiquitously across a genetic frameworks.
+So I hope obviously I've only given you a bit of detail here, but I hope that gives you some perspective
+on what's going on.
+And when we look back now at at this, you can see that that whilst a simple interpretation is just
+to say, okay, whenever I use async I've got to use await.
+The deeper interpretation is to understand that when I say async def do some processing that's no longer
+a function, it's now a coroutine do some processing.
+We need to call await, do some processing in order to schedule that coroutine.
+And that is now blocking until that completes and the result will go into that variable result.
+I hope that made some sense, but if not, as I say, there's a whole guide.
+You should go and look at the guide now.
+And so just to beat this one to death, I'll give you a couple more examples.
+And then hopefully you've really got this.
+So look at this again.
+This is back to the async def do some processing.
+It's going to do some work.
+And then it's going to return the string done.
+If I just say like my coroutine equals do some processing, you might, you know, if you didn't know
+already about this, you might think that that will run do some processing.
+But of course it will not.
+It will return a coroutine object and that's what will go into the variable, my coroutine.
+In order to actually run it you have to call await.
+So you'd say my result equals await my coroutine.
+It's now going to run.
+And the result?
+The string done is going to go into my result.
+So that is the point.
+That's how it works.
+And of course you don't need to do that.
+It's simpler than that.
+You can just say my result equals await.
+Do some processing, which is what we always do.
+And then just to hopefully sort of connect the dots to make this really click for you.
+There are other constructs you don't just have to call await.
+And then the name of of a coroutine, because if that's all you could do, you might think, you might
+say to me, okay, hang on.
+But in that case there's no real there's nothing concurrent happening here.
+Every time I call await and then a coroutine, it will block until that finishes and then it will go
+on to the next.
+Well, there are a few other constructs in the async IO package that allow us to be more to do more
+interesting things, and this is one of them, and it's one that we will use this week in our code.
+And it's where you can say results, plural Results equals await.
+And then call this this function Asyncio dot gather.
+And you can then pass in multiple coroutines.
+And I'm sure you can imagine what happens.
+But the event loop is going to schedule all three.
+And as soon as one of them is blocking, the others will start running, or one of the others will run
+until it's blocking, and then the third one will run.
+And so all three of those coroutines will, will, will run, will execute.
+And the results as a list will go into the variable results, a list of each of the three results from
+each of those three coroutines.
+So in some ways it's kind of fake multithreading.
+It's sort of brute force multithreading.
+It's multithreading not at the operating system level, but multithreading implemented almost manually
+with this event loop, and just handling things like IO blocking and being able to schedule the next
+one.
+That's how to think about it.
