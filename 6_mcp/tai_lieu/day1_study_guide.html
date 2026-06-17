@@ -1,0 +1,1471 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1 MCP (109-114) - Study Guide</title>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1220px;
+      --shadow-soft: 0 8px 24px rgba(20, 20, 19, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--body);
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.08), transparent 26%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--canvas) 22%, var(--canvas) 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.66;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 2.7vw, 2.7rem);
+    }
+
+    h3 {
+      font-size: 1.24rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    strong {
+      color: var(--body-strong);
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.92em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(245, 240, 232, 0.95));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.06rem;
+    }
+
+    .tag-row,
+    .source-row,
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source,
+    .mini-pill {
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.64);
+      color: var(--muted);
+    }
+
+    .source.extended,
+    .mini-pill.extended {
+      border-color: rgba(204, 120, 92, 0.36);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .source.code,
+    .mini-pill.code {
+      border-color: rgba(93, 184, 166, 0.28);
+      background: rgba(93, 184, 166, 0.1);
+      color: #2f7d71;
+    }
+
+    .hero-panel,
+    .code-panel,
+    .footer {
+      border-radius: var(--radius-xl);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(204, 120, 92, 0.18), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero-panel>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3,
+    .footer h3,
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li,
+    .footer p,
+    .footer li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #e4a489);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(250, 249, 245, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 10px;
+      transition: 0.18s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      color: var(--ink);
+      background: var(--surface-card);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: 0.18s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .button.secondary-dark {
+      border-color: rgba(255, 255, 255, 0.08);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark);
+    }
+
+    .button.secondary-dark:hover {
+      background: #2d2b27;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.58);
+      padding: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .section-intro {
+      margin-top: 10px;
+      max-width: 74ch;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details,
+    .timeline-item {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    .card table,
+    details p,
+    details ul,
+    details ol,
+    details table,
+    .timeline-item p,
+    .timeline-item ul,
+    .timeline-item ol {
+      margin-top: 10px;
+    }
+
+    .dark-card {
+      background: var(--surface-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark-soft);
+    }
+
+    .dark-card h3,
+    .dark-card h4,
+    .dark-card strong {
+      color: var(--on-dark);
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    .dense-list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 750;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      float: right;
+      color: var(--primary-active);
+      font-size: 1.1rem;
+      font-weight: 700;
+      transform: translateY(-1px);
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .callout.extended {
+      border-left-color: var(--accent-amber);
+      background: rgba(232, 165, 90, 0.11);
+    }
+
+    .callout.success {
+      border-left-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.1);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 82px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .timeline-item .slot {
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 8px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--on-dark-soft);
+    }
+
+    .inline-note {
+      border-left: 3px solid rgba(204, 120, 92, 0.65);
+      margin-top: 12px;
+      padding-left: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(93, 184, 114, 0.45);
+      background: rgba(93, 184, 114, 0.14);
+    }
+
+    .quiz-option.incorrect {
+      border-color: rgba(198, 69, 69, 0.36);
+      background: rgba(198, 69, 69, 0.08);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      font-weight: 700;
+      color: var(--primary-active);
+    }
+
+    .footer {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .footer code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .hero {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-inline: 14px;
+      }
+
+      .section,
+      .hero,
+      .hero-panel,
+      .footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & thực hành</span>
+        <h1>Day 1 MCP (109-114)</h1>
+        <p class="lead">
+          Buổi học này đi từ câu hỏi nền tảng <strong>MCP là gì</strong> đến cách dùng
+          <code>MCPServerStdio</code> để nối OpenAI Agents SDK với fetch, Playwright, file system,
+          rồi kết lại bằng marketplace và security mindset. Trọng tâm không phải “MCP giúp xây agent”
+          mà là <strong>MCP giúp agent dùng tool của người khác theo một chuẩn kết nối thống nhất</strong>.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Week 6 • Day 1</span>
+          <span class="tag">MCP + OpenAI Agents SDK</span>
+        </div>
+        <div class="source-row">
+          <span class="source">LLM summary md</span>
+          <span class="source code">Notebook code</span>
+          <span class="source">Transcript snippets</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus</h2>
+        <ul class="list dense-list">
+          <li><strong>MCP - giao thức ngữ cảnh mô hình</strong> là protocol, không phải framework.</li>
+          <li><strong>Host / Client / Server</strong> là kiến trúc lõi để hiểu mọi integration về sau.</li>
+          <li><strong><code>MCPServerStdio</code></strong> là cầu nối thực hành quan trọng nhất trong lab ngày 1.</li>
+          <li><strong>Security</strong> của MCP gần với <code>pip install</code> hay <code>npm install</code> hơn là “plugin an toàn mặc định”.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px;">Reading progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+        <div class="callout success">
+          <strong>Ôn theo trục:</strong> 109 giải nghĩa, 110 dựng kiến trúc, 111-113 thực hành SDK + servers,
+          114 chốt marketplace và security.
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Q&amp;A</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+              <p class="section-intro">
+                File này được grounding chủ yếu từ bản tổng hợp Day 1 và notebook lab. Không có slide đi kèm, nên
+                mọi phần minh họa phải bám sát text source và code source hiện có.
+              </p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>LLM summary md:</strong> dùng trực tiếp <code>day1_summary.md</code> cho cụm 109-114.</li>
+                <li><strong>Code:</strong> dùng <code>1_lab1.ipynb</code> để kiểm tra các khối fetch, Playwright, file system, multi-server agent.</li>
+                <li><strong>Transcript:</strong> đối chiếu có chọn lọc ở các đoạn dễ hiểu sai như “USB-C of Agentic AI” và security analogy.</li>
+                <li><strong>Slide:</strong> không có.</li>
+                <li><strong>History docx:</strong> không có file docx riêng; phần “previous context” được lấy từ nội dung tổng hợp trong Day 1.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Bài 109 là lý thuyết thuần, nhưng từ 111 trở đi notebook đã phản ánh đúng mạch thực hành của ngày:
+                spawn server, inspect tools, nối nhiều server vào một agent, rồi suy nghĩ về marketplace và security.
+              </p>
+              <p>
+                Vì không có screenshot marketplace và không có trace screenshot, mọi mô tả marketplace/trace chỉ dừng ở mức
+                chức năng đã được nêu trong nguồn.
+              </p>
+            </article>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="slot">109</div>
+              <div>
+                <h4>Intro to MCP</h4>
+                <p>MCP là protocol, không phải framework; trọng tâm là ecosystem và adoption.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">110</div>
+              <div>
+                <h4>Host / Client / Server</h4>
+                <p>Hiểu local server, remote server, và transport <code>Stdio</code> / <code>SSE</code>.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">111-113</div>
+              <div>
+                <h4>SDK Practice</h4>
+                <p>Dùng <code>MCPServerStdio</code>, <code>list_tools()</code>, Playwright, file system và agent đa server.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">114</div>
+              <div>
+                <h4>Marketplace & Security</h4>
+                <p>Cross-reference mcp.so, Glama, Smithery và áp dụng due diligence.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong>
+            cụm technical term viết dạng <code>English - nghĩa tiếng Việt</code>;
+            từ đơn phổ biến viết dạng <code>cost (chi phí)</code>.
+            Ví dụ: <code>transport mechanism - cơ chế truyền tải</code>,
+            <code>tool aggregation - gom danh sách công cụ</code>.
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet / Executive Summary</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                <strong>MCP - giao thức ngữ cảnh mô hình</strong> là chuẩn giúp agent hoặc host app kết nối
+                với tool/resource/prompt do bên khác cung cấp. Giá trị lớn nhất không nằm ở “kỹ thuật mới”
+                mà nằm ở việc tiêu chuẩn hóa cách chia sẻ tool để tạo ecosystem.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list dense-list">
+                <li><strong>Protocol vs Framework</strong>: MCP không thay OpenAI Agents SDK, CrewAI hay LangGraph.</li>
+                <li><strong>Local first</strong>: đa số MCP server chạy local trên máy bạn, thường qua <code>Stdio</code>.</li>
+                <li><strong>SDK practice</strong>: <code>MCPServerStdio</code> + <code>list_tools()</code> + <code>Agent(..., mcp_servers=[...])</code>.</li>
+                <li><strong>Security</strong>: dùng MCP server gần với chạy code bên thứ ba hơn là bật một “tính năng vô hại”.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Khi agent của bạn cần năng lực phổ biến như browse web, đọc/ghi file, search, database access,
+                hoặc các integration do cộng đồng đã xây sẵn, MCP giúp bạn tái sử dụng thay vì tự viết toàn bộ tool.
+              </p>
+            </article>
+          </div>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Knowledge extension - kiến thức mở rộng:</strong> nguồn tổng hợp nhắc rằng MCP còn có
+            <strong>Tools, Resources, Prompts</strong>; trong ngày 1, trọng tâm gần như nằm hẳn ở <strong>Tools</strong>.
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Week 6 quay lại <strong>OpenAI Agents SDK</strong> sau khi khóa học đã đi qua OpenAI Agents SDK,
+            CrewAI, LangGraph và Autogen. Vì vậy Day 1 của MCP không bắt đầu từ con số 0: nó giả định bạn đã biết
+            agent, tool, orchestration và khái niệm <code>@function_tool</code>. Điểm mới ở đây là
+            <strong>không phải học cách “tạo tool cho riêng mình”</strong>, mà học cách <strong>dùng tool ecosystem</strong>
+            qua một chuẩn giao tiếp chung.
+          </div>
+          <details>
+            <summary>Vì sao mạch này hợp lý?</summary>
+            <p>
+              Nếu chưa học agent framework trước đó, bạn sẽ rất dễ hiểu sai MCP là “framework mới”. Nhưng sau khi đã thấy
+              framework lo phần orchestration và tools nội bộ, bạn mới phân biệt được rõ vai trò của MCP:
+              nó là lớp kết nối bên ngoài, không phải lõi dựng agent.
+            </p>
+          </details>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day1_summary.md</span>
+              <span class="source">lesson transcripts</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Khái niệm nền</h3>
+              <ul class="list">
+                <li><strong>Model Context Protocol - giao thức ngữ cảnh mô hình:</strong> chuẩn hóa cách host hoặc agent dùng tool/resource/prompt từ bên ngoài.</li>
+                <li><strong>Protocol vs Framework - giao thức so với framework:</strong> protocol định nghĩa cách nói chuyện; framework cung cấp bộ công cụ để xây hệ thống.</li>
+                <li><strong>USB-C of Agentic AI - cổng kết nối chuẩn của AI agent:</strong> nhấn vào tính kết nối và tương thích, không nhấn vào việc “làm agent thông minh hơn”.</li>
+                <li><strong>Tool ecosystem - hệ sinh thái công cụ:</strong> lợi ích lớn nhất của MCP là tái sử dụng hàng nghìn server/tool có sẵn.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Kiến trúc vận hành</h3>
+              <ul class="list">
+                <li><strong>MCP Host - ứng dụng chủ:</strong> Claude Desktop hoặc app agent do bạn viết bằng SDK.</li>
+                <li><strong>MCP Client - thành phần kết nối:</strong> chạy trong host và nối 1-1 với từng MCP server.</li>
+                <li><strong>MCP Server - máy chủ công cụ:</strong> chứa logic thật của tool, resource hoặc prompt.</li>
+                <li><strong>Stdio - giao tiếp qua standard input/output:</strong> cách phổ biến nhất cho local server.</li>
+                <li><strong>SSE - Server-Sent Events:</strong> phù hợp hơn với remote/hosted server.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>Misconception dễ gặp</h3>
+              <p>
+                Từ “server” khiến nhiều người tưởng MCP server luôn chạy remote. Nguồn bài học nhấn mạnh điều ngược lại:
+                <strong>đa số MCP server trong trải nghiệm developer hiện tại chạy local trên máy bạn</strong>, rồi từ đó có thể gọi web hoặc API ra ngoài.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Quan hệ giữa các phần</h3>
+              <p>
+                Framework như OpenAI Agents SDK lo phần agent loop, model call, trace, và orchestration.
+                MCP lo phần “cắm thêm năng lực”. Nói ngắn gọn:
+                <strong>framework xây agent; MCP trang bị tool cho agent</strong>.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - điểm khó nhất cần hiểu thật chắc</summary>
+            <p>
+              “MCP makes tool integration frictionless” không có nghĩa là MCP làm mọi thứ đơn giản hơn trong mọi trường hợp.
+              Nếu bạn chỉ cần một tool nội bộ rất nhỏ, <code>@function_tool</code> hoặc function call thuần thường còn nhẹ hơn.
+              MCP bắt đầu có lợi rõ rệt khi giá trị nằm ở <strong>chia sẻ, tái sử dụng, và chuẩn hóa tool metadata</strong>:
+              description, parameters, transport, lifecycle. Đây là lý do giảng viên nhấn rất mạnh vào adoption hơn là novelty.
+            </p>
+          </details>
+          <details>
+            <summary>Knowledge extension - phần ngoài nguồn cần tách riêng</summary>
+            <p>
+              Bản tổng hợp có nhắc rằng spec công khai của MCP phổ biến hơn hẳn ở phần <strong>Tools</strong>, còn
+              <strong>Resources</strong> và <strong>Prompts</strong> chưa được nhắc kỹ trong lab ngày 1. Khi tự học tiếp,
+              bạn nên hiểu Day 1 này đang xây nền cho cách nghĩ “tool interoperability” trước, chưa phải bức tranh full spec.
+            </p>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day1_summary.md</span>
+              <span class="source code">1_lab1.ipynb</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Luồng học tập của Day 1</h3>
+              <ol class="list">
+                <li><strong>109:</strong> chốt rằng MCP là protocol và vì sao nó được gọi là “USB-C of Agentic AI”.</li>
+                <li><strong>110:</strong> dựng sơ đồ Host → Client → Server và phân biệt local/remote, Stdio/SSE.</li>
+                <li><strong>111:</strong> dùng <code>MCPServerStdio</code> để spawn fetch server và gọi <code>list_tools()</code>.</li>
+                <li><strong>112:</strong> chuyển sang server Node-based như Playwright và file system, làm quen <code>npx</code>.</li>
+                <li><strong>113:</strong> gắn nhiều MCP server vào một agent để làm task thật.</li>
+                <li><strong>114:</strong> nhìn ra bức tranh ecosystem qua marketplace và security trade-off.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Luồng kỹ thuật khi agent dùng MCP</h3>
+              <ol class="list">
+                <li>Chuẩn bị <strong>params</strong> mô tả command + args để spawn MCP server.</li>
+                <li>Dùng <code>MCPServerStdio(params=...)</code> để tạo client session với server local.</li>
+                <li>SDK có thể gọi <code>list_tools()</code> để biết server cung cấp tool nào.</li>
+                <li>Tạo <code>Agent(..., mcp_servers=[...])</code> để agent nhìn thấy tập tool được gom từ các server.</li>
+                <li><code>Runner.run()</code> vận hành agent loop: model nghĩ, chọn tool, nhận kết quả, rồi quyết định bước kế tiếp.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="dark-card card">
+              <h3>Data / control flow - luồng dữ liệu / điều khiển</h3>
+              <p>
+                <strong>User request</strong> vào host app → host agent suy nghĩ → MCP client gọi đúng server →
+                server thực thi tool thật → kết quả quay về agent → agent tổng hợp câu trả lời hoặc ghi file.
+                Trong lab, Playwright lo lấy thông tin web; file system server lo ghi markdown xuống thư mục sandbox.
+              </p>
+            </article>
+            <article class="card">
+              <h3>3 cấu hình nên phân biệt</h3>
+              <ul class="list">
+                <li><strong>Local server qua Stdio:</strong> phổ biến nhất trong dev workflow.</li>
+                <li><strong>Remote server qua SSE:</strong> ít gặp hơn trong bài, nhưng quan trọng về mặt kiến trúc.</li>
+                <li><strong>Local server nhưng gọi internet:</strong> dễ bị nhầm là “remote MCP server”, trong khi server vẫn chạy trên máy local.</li>
+              </ul>
+            </article>
+          </div>
+          <details>
+            <summary>Từ góc nhìn phỏng vấn: nên kể luồng này như thế nào?</summary>
+            <p>
+              Câu trả lời gọn nhất là: “Tôi dùng OpenAI Agents SDK làm host orchestration, dùng <code>MCPServerStdio</code>
+              để spawn từng local MCP server, rồi truyền chúng vào agent qua <code>mcp_servers</code>. Model không cần biết
+              tool đến từ server nào; SDK expose chúng như năng lực mà agent có thể dùng trong runtime.”
+            </p>
+          </details>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3><code>MCPServerStdio</code></h3>
+              <p><strong>Purpose:</strong> spawn local MCP server và mở client session qua <code>stdin/stdout</code>.</p>
+              <p><strong>When to use:</strong> default choice cho local MCP workflows trong lab.</p>
+              <p><strong>Trade-off:</strong> đơn giản và rõ vòng đời, nhưng không phải transport cho remote server.</p>
+            </article>
+            <article class="card">
+              <h3><code>list_tools()</code> inspection</h3>
+              <p><strong>Purpose:</strong> xem server thực sự expose tool nào trước khi đưa vào agent.</p>
+              <p><strong>When to use:</strong> lúc học server mới, debug integration, hoặc kiểm tra metadata tool.</p>
+              <p><strong>Trade-off:</strong> thêm một bước kiểm tra, đổi lại giảm mơ hồ đáng kể.</p>
+            </article>
+            <article class="card">
+              <h3>Node server discovery</h3>
+              <p><strong>Purpose:</strong> dùng <code>npx</code> để chạy Playwright hoặc file system server từ ecosystem JavaScript.</p>
+              <p><strong>When to use:</strong> khi server chuẩn cộng đồng nằm ở npm thay vì Python package.</p>
+              <p><strong>Trade-off:</strong> cần môi trường Node/Playwright phù hợp, đổi lại tool ecosystem rất lớn.</p>
+            </article>
+            <article class="card">
+              <h3>Multi-server composition</h3>
+              <p><strong>Purpose:</strong> kết hợp nhiều năng lực, ví dụ browse web + write file trong cùng một task.</p>
+              <p><strong>When to use:</strong> tác vụ end-to-end cần nhiều tool domains khác nhau.</p>
+              <p><strong>Trade-off:</strong> tăng complexity của runtime và security surface.</p>
+            </article>
+            <article class="card">
+              <h3>Instruction shaping</h3>
+              <p><strong>Purpose:</strong> hướng agent xử lý cookie banner, retry, persistence khi automation web.</p>
+              <p><strong>When to use:</strong> bất cứ khi nào tool có tính không ổn định như browser navigation.</p>
+              <p><strong>Trade-off:</strong> prompt dài hơn, nhưng tỉ lệ hoàn thành task tốt hơn nhiều.</p>
+            </article>
+            <article class="card">
+              <h3>Security vetting</h3>
+              <p><strong>Purpose:</strong> xem publisher, GitHub, community, rating trước khi chạy server.</p>
+              <p><strong>When to use:</strong> luôn luôn, nhất là khi tool đến từ bên thứ ba ít tên tuổi.</p>
+              <p><strong>Trade-off:</strong> tốn thời gian ban đầu, giảm nguy cơ chạy code độc hại.</p>
+            </article>
+          </div>
+          <details>
+            <summary>So với <code>@function_tool</code>, MCP khác ở “kỹ thuật sử dụng” nào?</summary>
+            <p>
+              <code>@function_tool</code> tối ưu cho tool bạn tự viết trong codebase của mình. MCP tối ưu cho
+              <strong>tool portability - tính di động của công cụ</strong> và <strong>shared metadata - siêu dữ liệu dùng chung</strong>.
+              Nếu bạn không cần share hay reuse tool ecosystem, MCP có thể là thêm overhead.
+            </p>
+          </details>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source code">1_lab1.ipynb</span>
+              <span class="source">day1_summary.md</span>
+            </div>
+          </div>
+          <div class="callout">
+            Buổi học có code được cung cấp, nên section này tập trung vào các block thật sự xuất hiện trong notebook:
+            fetch server, Node-based servers, và multi-server agent.
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 1 - Imports và primitive chính</h3>
+              <p>Đây là khối xác định “mình sẽ dùng host framework nào và dùng MCP ở lớp nào”.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: khai báo Agent SDK + MCP bridge</span>
+              <span>Key names: <code>Agent</code>, <code>Runner</code>, <code>trace</code>, <code>MCPServerStdio</code></span>
+            </div>
+            <pre><code>from dotenv import load_dotenv
+from agents import Agent, Runner, trace
+from agents.mcp import MCPServerStdio
+import os
+
+load_dotenv(override=True)
+
+# Ý chính:
+# - Agent / Runner / trace đến từ OpenAI Agents SDK
+# - MCPServerStdio là điểm nối sang MCP server local
+# - load_dotenv() chỉ chuẩn bị môi trường, không phải logic MCP</code></pre>
+            <p class="inline-note">
+              Ghi nhớ rằng MCP ở đây không thay vai trò của SDK. SDK vẫn là nơi quản lý agent loop;
+              <code>MCPServerStdio</code> chỉ mang tool capability vào loop đó.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 2 - Spawn fetch server và inspect tools</h3>
+              <p>Lab không đẩy thẳng tool vào agent ngay, mà cho bạn nhìn tool inventory trước bằng <code>list_tools()</code>.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: tạo local MCP client/session cho fetch server</span>
+              <span>Key functions: <code>MCPServerStdio()</code>, <code>list_tools()</code></span>
+            </div>
+            <pre><code>fetch_params = {"command": "uvx", "args": ["mcp-server-fetch"]}
+
+async with MCPServerStdio(
+    params=fetch_params,
+    client_session_timeout_seconds=60
+) as server:
+    fetch_tools = await server.list_tools()
+
+# Ý nghĩa:
+# - params mô tả lệnh cần chạy để spawn server
+# - dùng timeout 60s để tránh mặc định quá ngắn
+# - list_tools() giúp nhìn rõ server cấp cho agent những gì</code></pre>
+            <p class="inline-note">
+              Điểm hay ở đây là metadata của tool đã được chuẩn bị sẵn bởi người viết server.
+              Bạn không chỉ nhận “một hàm”, mà nhận cả mô tả giúp LLM biết khi nào nên dùng tool đó.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 3 - Node-based MCP servers: Playwright và file system</h3>
+              <p>Đây là đoạn cho thấy ecosystem MCP không bị giới hạn trong Python.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: gọi server từ npm ecosystem</span>
+              <span>Key details: <code>npx</code>, sandbox path, scoped file access</span>
+            </div>
+            <pre><code>playwright_params = {
+    "command": "npx",
+    "args": ["@playwright/mcp@latest"]
+}
+
+sandbox_path = os.path.abspath(os.path.join(os.getcwd(), "sandbox"))
+files_params = {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem", sandbox_path]
+}
+
+# Ý nghĩa:
+# - Playwright server cho browser automation
+# - file system server bị giới hạn vào sandbox_path
+# - đây là ví dụ rõ của principle "least privilege - đặc quyền tối thiểu"</code></pre>
+            <p class="inline-note">
+              Phần file system rất đáng chú ý: thay vì cho agent đụng toàn bộ máy, notebook giới hạn nó vào
+              thư mục <code>sandbox</code>. Đây là một security pattern nên giữ lại khi tự xây demo sau này.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 4 - Multi-server agent chạy task thật</h3>
+              <p>Đây là “aha moment” của lab: agent dùng browser tools để tìm nội dung và file tools để ghi kết quả.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: compose nhiều MCP server trong một agent</span>
+              <span>Key functions: <code>Agent()</code>, <code>Runner.run()</code>, <code>trace()</code></span>
+            </div>
+            <pre><code>instructions = """
+You browse the internet to accomplish your instructions.
+You are highly capable at browsing the internet independently to accomplish your task,
+including accepting all cookies and clicking 'not now' as appropriate.
+If one website isn't fruitful, try another. Be persistent.
+"""
+
+async with MCPServerStdio(params=files_params, client_session_timeout_seconds=60) as mcp_server_files:
+    async with MCPServerStdio(params=playwright_params, client_session_timeout_seconds=60) as mcp_server_browser:
+        agent = Agent(
+            name="investigator",
+            instructions=instructions,
+            model="gpt-4.1-mini",
+            mcp_servers=[mcp_server_files, mcp_server_browser]
+        )
+        with trace("investigate"):
+            result = await Runner.run(
+                agent,
+                "Find a great recipe for Banoffee Pie, then summarize it in markdown to banoffee.md"
+            )</code></pre>
+            <p class="inline-note">
+              Hai ý phải nhớ:
+              <strong>(1)</strong> agent và <code>Runner.run()</code> nằm <em>bên trong</em> context manager của server,
+              nếu không server có thể đã đóng trước lúc tool được gọi;
+              <strong>(2)</strong> instructions đóng vai trò cực lớn khi tool có tính thực nghiệm như browser automation.
+            </p>
+          </article>
+
+          <details>
+            <summary>Notebook này dạy ta điều gì ngoài cú pháp?</summary>
+            <p>
+              Quan trọng nhất là tư duy composition: bạn không “attach tool từng cái” như với ví dụ nhỏ của function calling,
+              mà đang attach <strong>server capability bundles</strong>. Một server có thể mang nhiều tool; một agent có thể mang nhiều server;
+              và SDK là lớp điều phối việc model chọn dùng tool nào vào lúc nào.
+            </p>
+          </details>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs nếu phù hợp</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>@function_tool</code></strong></td>
+                <td>Bạn tự viết tool nội bộ, scope hẹp, không cần chia sẻ ecosystem.</td>
+                <td>Nhẹ và trực tiếp hơn MCP.</td>
+                <td>Khó tái sử dụng tool từ cộng đồng; tự gánh metadata và mô tả tool.</td>
+              </tr>
+              <tr>
+                <td><strong>MCP server cộng đồng</strong></td>
+                <td>Cần nhanh chóng thêm browser, file system, search, data access, v.v.</td>
+                <td>Nhanh hơn tự xây, nhưng phụ thuộc server bên ngoài.</td>
+                <td>Security review và môi trường runtime trở thành phần bắt buộc.</td>
+              </tr>
+              <tr>
+                <td><strong>Stdio</strong></td>
+                <td>Local-first development, lab, server chạy trên máy bạn.</td>
+                <td>Triển khai đơn giản nhất.</td>
+                <td>Không phải lựa chọn cho remote-hosted server.</td>
+              </tr>
+              <tr>
+                <td><strong>SSE</strong></td>
+                <td>Remote/hosted MCP server, cần stream qua network.</td>
+                <td>Phù hợp kiến trúc phân tán hơn.</td>
+                <td>Phức tạp hơn về auth, network, reliability.</td>
+              </tr>
+              <tr>
+                <td><strong>mcp.so / Glama / Smithery</strong></td>
+                <td>Khám phá marketplace từ nhiều góc: volume, rating, params.</td>
+                <td>Cần cross-reference thay vì chỉ tin một nguồn.</td>
+                <td>Nếu chỉ nhìn 1 marketplace, bạn dễ bỏ sót security signal hoặc quality signal.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Knowledge extension - kiến thức mở rộng:</strong> bản tổng hợp gợi ý thêm Docker isolation
+            như một lựa chọn khi server chưa đủ tin cậy. Đây là hướng tốt để nghĩ về production hardening,
+            nhưng không phải trọng tâm thực hành của Day 1.
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Nhầm MCP là framework:</strong> dẫn đến kỳ vọng sai, nghĩ nó thay orchestration layer.</li>
+                <li><strong>Hiểu “server” là remote mặc định:</strong> bỏ lỡ fact quan trọng rằng phần lớn lab chạy local.</li>
+                <li><strong>Tạo agent ngoài context manager:</strong> server đóng sớm, tool call vỡ ở runtime.</li>
+                <li><strong>Prompt quá sơ sài cho browser automation:</strong> agent bỏ cuộc khi gặp popup, cookie banner hoặc site đầu tiên không tốt.</li>
+                <li><strong>Tin marketplace như app store an toàn mặc định:</strong> vô tình chạy code chưa vet kỹ.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - cách tránh</h3>
+              <ul class="list">
+                <li>Luôn diễn đạt MCP là <strong>protocol bổ sung cho framework</strong>.</li>
+                <li>Phân biệt rõ <strong>server chạy local</strong> với <strong>server gọi internet</strong>.</li>
+                <li>Đặt <code>Agent()</code> và <code>Runner.run()</code> bên trong các khối <code>async with MCPServerStdio(...)</code>.</li>
+                <li>Viết instructions cụ thể về retry, cookies, persistence và behavior mong muốn.</li>
+                <li>Check publisher, repo, stars, community, security rating và phạm vi quyền truy cập trước khi chạy.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&amp;A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: MCP là gì trong một câu?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> MCP là <strong>Model Context Protocol - giao thức ngữ cảnh mô hình</strong>,
+                một chuẩn kết nối để host hoặc agent dùng tool/resource/prompt bên ngoài theo cách nhất quán.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao gọi là “USB-C of Agentic AI”?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì nó nhấn mạnh vai trò <strong>connectivity - khả năng kết nối</strong> giữa agent và tool,
+                chứ không phải bản thân MCP tạo ra năng lực agent mới.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: <code>Stdio</code> thường dùng cho trường hợp nào?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Cho <strong>local MCP server</strong>, nơi host spawn process ngay trên máy local và nói chuyện qua standard input/output.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Điểm học được lớn nhất từ block multi-server agent là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Agent có thể dùng nhiều MCP server trong một nhiệm vụ thống nhất; SDK sẽ gom năng lực công cụ và để model quyết định lúc nào dùng cái nào.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card quiz-block">
+              <h3>Quick quiz 1</h3>
+              <p>Câu nào mô tả đúng nhất về quan hệ giữa OpenAI Agents SDK và MCP?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. MCP thay hoàn toàn vai trò của Agents SDK.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Agents SDK lo orchestration; MCP lo chuẩn hóa kết nối tool bên ngoài.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. MCP chỉ là tên khác của function calling.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+            <article class="card quiz-block">
+              <h3>Quick quiz 2</h3>
+              <p>Vì sao marketplace không loại bỏ nhu cầu security review?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Vì tất cả marketplace đều chỉ liệt kê tool giả lập, không chạy code thật.</button>
+              <button class="button quiz-option" type="button" data-answer="false">B. Vì security chỉ cần quan tâm khi tool là Python package.</button>
+              <button class="button quiz-option" type="button" data-answer="true">C. Vì chạy MCP server thường vẫn là chạy code bên thứ ba trên máy bạn, nên phải due diligence.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>MCP là <strong>protocol</strong>, không phải agent framework.</li>
+                <li>“USB-C of Agentic AI” nói về <strong>connectivity</strong>, không nói về intelligence.</li>
+                <li>Kiến trúc lõi là <strong>Host → Client → Server</strong>.</li>
+                <li><strong>Stdio</strong> là đường local phổ biến nhất; <strong>SSE</strong> hợp với remote hơn.</li>
+                <li><code>MCPServerStdio</code> là primitive thực hành trung tâm của lab ngày 1.</li>
+                <li><code>list_tools()</code> là cách nhìn rõ server cung cấp năng lực gì.</li>
+                <li>Multi-server agent cho thấy một task có thể dùng browser tool rồi file tool trong cùng loop.</li>
+                <li>Marketplace giúp discovery, nhưng không thay thế security review.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được vì sao MCP không thay thế OpenAI Agents SDK không?</li>
+                <li>Bạn có mô tả lại được sự khác nhau giữa local MCP server, remote MCP server, và local server gọi internet không?</li>
+                <li>Bạn có viết lại được skeleton của một đoạn <code>async with MCPServerStdio(...)</code> để spawn server và đưa nó vào agent không?</li>
+                <li>Bạn có nêu được ít nhất 3 bước due diligence trước khi chạy một MCP server lạ không?</li>
+                <li>Bạn có so sánh được lúc nào nên dùng <code>@function_tool</code> và lúc nào nên dùng MCP ecosystem không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3>Kết luận nhanh</h3>
+          <p>
+            Nếu Day 1 có một ý duy nhất cần mang sang Day 2, thì đó là:
+            <strong>MCP đáng học không phải vì nó “huyền bí”, mà vì nó biến việc trang bị tool cho agent thành một bài toán ecosystem.</strong>
+          </p>
+          <p>
+            Study note: phần có nhãn <span class="mini-pill extended">Kiến thức mở rộng</span> được tách riêng khỏi phần grounding chính.
+            File này cố ý không nhắc tới secrets, tokens hay nội dung nhạy cảm.
+          </p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0] ? sections[0].id : "";
+      const offset = window.scrollY + 180;
+
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = progress + "%";
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.textContent = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-block").forEach((block) => {
+      const result = block.querySelector(".quiz-result");
+      const buttons = block.querySelectorAll(".quiz-option");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          buttons.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const correct = button.dataset.answer === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          result.textContent = correct
+            ? "Đúng. Bạn đã nắm đúng logic cốt lõi của phần này."
+            : "Chưa đúng. Xem lại section liên quan rồi thử giải thích lại bằng lời của bạn.";
+        });
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

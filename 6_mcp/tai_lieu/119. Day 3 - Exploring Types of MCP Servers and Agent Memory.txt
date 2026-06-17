@@ -1,0 +1,127 @@
+And welcome to week six, day three, and I've been looking forward to today for a long time, because
+this is the day when we go crazy exploring what MCP has to offer first.
+As usual, a quick recap of the core concepts behind MCP.
+Looking at the architecture diagram that we've got here, we're going to be looking at the three different
+configurations of MCP servers.
+First of all, and the simplest of all is when you use an MCP server that's simply is created, runs
+on your local computer, only, uses stuff on your computer, and is something that you're using right
+there, just like the accounts MCP server that we just used, which was actually one that we hand wrote
+ourselves, and also one like the local file system.
+Okay.
+And then secondly, and this is perhaps the most common of all, we're going to look at MCP servers
+that are run locally on your computer, but make remote calls to APIs that take advantage of stuff that
+can be available online.
+And that's number two on this diagram.
+And that is of course super common.
+And then thirdly, and we're not going to do this too much.
+We're just going to have a look at what it means to have a managed MCP server or a hosted MCP server,
+which is running remotely, as I say, not a common architecture, but we'll just look at it and see
+some examples and understand it.
+And it's worth pointing out that even numbers one and two, while it's possible to write your own most
+of the time when we're talking about MCP, these are MCP servers that have been made available online,
+and that through commands like like you are downloading it from an online public place and you are then
+running it locally on your box.
+So it's running on your box, but it's still something that's been shared online, made available for
+everyone to use.
+All right, that's enough.
+Intro.
+Let's go to the lab.
+Here we are back in cursor and we're going into the week six.
+Of course.
+Which other week would we want to be in and into the third lab, and we're going to be experimenting
+with a bunch more MCP servers.
+And yes, it's warning me I can actually take this out because we're not going to be using an MCP server.
+SS uh, okay.
+So the first type of MCP server that I mentioned is one that you run locally and everything it does
+is local.
+Again, remembering we have downloaded it from, from a public repo from somewhere public.
+But we're going to run it.
+The server will be applied locally and we're going to pick another JavaScript one, a node one.
+And I want to pick this one, which is great.
+It is a way to give our agent memory and to give it knowledge.
+Graph based memory, a special kind of memory that understands about entities and observations about
+those entities and relationships between those entities.
+It's worth memory is a is a hot topic, and people often ask me questions about memory, and they think
+of memory like it's kind of one construct, perhaps because Lang Chain thinks of it that way, but like
+there is one memory.
+But in this MCP age, we think of memory just as being another set of tools that we can equip our LM
+with.
+And in fact, it could have many different types of tools relating to memory.
+This in particular is giving it the ability to store information about things, observations and relationships.
+We could give it this and we could give it other kinds of context.
+All of this ends up just being information that it can request by tools, or that becomes available
+in its prompts.
+And so they're just different techniques to give the LM more context.
+Anyway, so these are the parameters.
+Remember you always start by specifying the parameters of your MCP server.
+And in this case it's mpc's because we're running a node version.
+And it's uh, we're going to be running this version called lib SQL, which is a version, a memory
+that stores to a SQLite database.
+I've actually I've given a link here to to one that this is closely based off, which is one that,
+uh, gives you access to a JSON file.
+Um, but doesn't actually store it to SQL.
+And I found that this is a little bit less stable.
+This is a better version of it that that I prefer.
+It also allows you to specify a directory and a name for your memory.
+And this allows you to have different memory stores for different agents.
+So I find that quite handy.
+So I'm saying that looking looking somewhere called memory and look for database called Ed.
+And I believe it might already exist.
+It does.
+So why don't we just delete this so that it doesn't have any memory to start with?
+We'll move that to trash starting from nothing.
+So if you have Ed in in a folder there, then delete it.
+If you don't have a folder then then create one called memory.
+All right.
+So first of all let's just find out what tools do we have uh associated with this.
+We have tools create entities search nodes read graph create Relations, delete entity and delete relation.
+So we're allowing it to build this kind of connectivity between the things it wants to remember.
+All right let's see this in action.
+Okay.
+So now we have instructions.
+You use your entity tools as persistent memory to store and recall information about your conversations.
+My name is Edgar.
+I'm an LLM engineer.
+I'm teaching a course about agents, including the incredible MCP protocol.
+And I say something about MCP and I give it a model and let's see how this gets on.
+So as before, this is hopefully a pattern that you're quite familiar with.
+We use this context manager with MCP Server Studio, which we know is going to create the MCP client.
+We pass in the parameters.
+We give this timeout of 30s.
+And then as usual, we create our agent with instructions with the model and now with the MCP server.
+And now we call runner run with the agent and our request.
+And let's see what happens.
+Armed with these tools is it able to take this piece of information about me and do something with it?
+So it says, nice to meet you, editor.
+It's great to know you're teaching a course about AI agents and amqp protocol, blah blah blah, blah
+blah.
+And if you look over on the left, it has created a file editor.
+So now for the follow up question.
+We're coming back.
+We're creating an agent.
+We're giving it instructions.
+We're giving it the same asking for the same model, and we're giving it the same MCP server with access
+to the memory.
+And we're saying, my name is Ed.
+What do you know about me?
+And we'll see what this MCP server is able to do.
+I know that you're ed an LM engineer.
+You're teaching a course about AI agents, and in this course, you're teaching about the MCP protocol.
+So there you go.
+It's a quick, simple example, but it shows you how we were so easily able to equip our agent with
+a memory that's able to handle relationships between things.
+And so this is just a great starting example, and we'll be using this memory in the future as well.
+And it could be handy for any of your projects too.
+And of course, it's always a good idea to check the trace, which we should do.
+Come on in and conversation with our agent is right here and you will see that it it called the search
+nodes.
+It looked it did a query for Ed and it got back here JSON structure that reflects the entity type,
+the observations and and so on.
+And so you can look through this and get a sense for how the memory works.
+And you can use this to try and build up some more sophisticated memory about the different, uh, parts
+of your conversation that you want your agent to remember.
+Okay.
+Now we're going to go on to another MCP tool, and this time it's going to be the second type, which
+is the type that runs locally but uses the internet, which we've already done with, with, with fetch
+and with playwright.
+But but let's do another and and a handy one.

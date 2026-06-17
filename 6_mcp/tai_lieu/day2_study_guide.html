@@ -1,0 +1,1499 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 2 MCP (115-118) - Study Guide</title>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1220px;
+      --shadow-soft: 0 8px 24px rgba(20, 20, 19, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--body);
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.08), transparent 26%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--canvas) 22%, var(--canvas) 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.66;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 2.7vw, 2.7rem);
+    }
+
+    h3 {
+      font-size: 1.24rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    strong {
+      color: var(--body-strong);
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.92em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(245, 240, 232, 0.95));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.06rem;
+    }
+
+    .tag-row,
+    .source-row,
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source,
+    .mini-pill {
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.64);
+      color: var(--muted);
+    }
+
+    .source.extended,
+    .mini-pill.extended {
+      border-color: rgba(204, 120, 92, 0.36);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .source.code,
+    .mini-pill.code {
+      border-color: rgba(93, 184, 166, 0.28);
+      background: rgba(93, 184, 166, 0.1);
+      color: #2f7d71;
+    }
+
+    .hero-panel,
+    .code-panel,
+    .footer {
+      border-radius: var(--radius-xl);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(204, 120, 92, 0.18), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero-panel>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3,
+    .footer h3,
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li,
+    .footer p,
+    .footer li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #e4a489);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(250, 249, 245, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 10px;
+      transition: 0.18s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      color: var(--ink);
+      background: var(--surface-card);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: 0.18s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.58);
+      padding: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .section-intro {
+      margin-top: 10px;
+      max-width: 74ch;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details,
+    .timeline-item {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    .card table,
+    details p,
+    details ul,
+    details ol,
+    details table,
+    .timeline-item p,
+    .timeline-item ul,
+    .timeline-item ol {
+      margin-top: 10px;
+    }
+
+    .dark-card {
+      background: var(--surface-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark-soft);
+    }
+
+    .dark-card h3,
+    .dark-card h4,
+    .dark-card strong {
+      color: var(--on-dark);
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    .dense-list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 750;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      float: right;
+      color: var(--primary-active);
+      font-size: 1.1rem;
+      font-weight: 700;
+      transform: translateY(-1px);
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .callout.extended {
+      border-left-color: var(--accent-amber);
+      background: rgba(232, 165, 90, 0.11);
+    }
+
+    .callout.success {
+      border-left-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.1);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 82px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .timeline-item .slot {
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 8px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--on-dark-soft);
+    }
+
+    .inline-note {
+      border-left: 3px solid rgba(204, 120, 92, 0.65);
+      margin-top: 12px;
+      padding-left: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(93, 184, 114, 0.45);
+      background: rgba(93, 184, 114, 0.14);
+    }
+
+    .quiz-option.incorrect {
+      border-color: rgba(198, 69, 69, 0.36);
+      background: rgba(198, 69, 69, 0.08);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      font-weight: 700;
+      color: var(--primary-active);
+    }
+
+    .footer {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .footer code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .hero {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-inline: 14px;
+      }
+
+      .section,
+      .hero,
+      .hero-panel,
+      .footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & thực hành</span>
+        <h1>Day 2 MCP (115-118)</h1>
+        <p class="lead">
+          Day 2 chuyển góc nhìn từ <strong>consumer mindset - tư duy người dùng server có sẵn</strong> sang
+          <strong>producer mindset - tư duy người tạo và đóng gói capability</strong>. Trọng tâm không chỉ là
+          viết được một MCP server với <code>FastMCP</code>, mà còn hiểu vì sao nên viết, khi nào không nên viết,
+          cách bọc business logic hiện có, và vì sao handwritten client chỉ là bài học về plumbing chứ không phải
+          mặc định production.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Week 6 • Day 2</span>
+          <span class="tag">Custom MCP Server + Client</span>
+        </div>
+        <div class="source-row">
+          <span class="source">day2_summary.md</span>
+          <span class="source code">2_lab2.ipynb</span>
+          <span class="source code">accounts.py / accounts_server.py / accounts_client.py</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus</h2>
+        <ul class="list dense-list">
+          <li><strong>MCP server</strong> có giá trị nhất khi bạn cần <strong>shareability - khả năng chia sẻ</strong>.</li>
+          <li><strong>Business logic</strong> nằm ở <code>accounts.py</code>; server chỉ là lớp đóng gói chuẩn hóa.</li>
+          <li><strong>FastMCP</strong> giúp expose cả <strong>tools</strong> lẫn <strong>resources</strong>.</li>
+          <li><strong>Handwritten client</strong> giúp hiểu lifecycle và schema bridge, nhưng native SDK integration vẫn là đường mặc định.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px;">Reading progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+        <div class="callout success">
+          <strong>Big picture:</strong> Day 2 dạy bạn nhìn MCP như một <strong>packaging layer - lớp đóng gói</strong>
+          cho capability, không phải như một “mẹo code tool cho nhanh”.
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Q&amp;A</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+              <p class="section-intro">
+                File này bám chính vào <code>day2_summary.md</code> cho cụm 115-118, sau đó kiểm tra lại bằng notebook và code Python thật.
+                Vì Day 2 có phần code đậm hơn Day 1, phần walkthrough bên dưới sẽ dựa trực tiếp vào cấu trúc file hơn là chỉ bám transcript.
+              </p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Summary chính:</strong> <code>day2_summary.md</code> cho toàn bộ cụm 115-118.</li>
+                <li><strong>Notebook:</strong> <code>2_lab2.ipynb</code> để xác nhận mạch demo và các cell quan trọng.</li>
+                <li><strong>Code lõi:</strong> <code>accounts.py</code>, <code>accounts_server.py</code>, <code>accounts_client.py</code>.</li>
+                <li><strong>Code phụ trợ:</strong> <code>database.py</code>, <code>market.py</code> để hiểu persistence và pricing flow khi cần.</li>
+                <li><strong>Previous context:</strong> <code>day1_study_guide.html</code> dùng để giữ continuity từ Day 1 sang Day 2.</li>
+                <li><strong>Slide:</strong> không có.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Lesson 115 là bài định hướng lý thuyết, nên không ép viết walkthrough giả cho nó. Phần code thật bắt đầu phát sáng từ lesson 116 và đặc biệt rõ ở lesson 117.
+              </p>
+              <p>
+                Vì user yêu cầu “đọc hết và bám chính xác vào summary + code”, guide này ưu tiên diễn giải:
+                <strong>ý tưởng nào đến từ summary</strong> và <strong>logic nào được code chứng minh</strong>.
+              </p>
+            </article>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="slot">115</div>
+              <div>
+                <h4>Why build your own server?</h4>
+                <p>Chốt tiêu chí: khi nào MCP là đúng abstraction, khi nào chỉ cần function tool nội bộ.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">116</div>
+              <div>
+                <h4>Wire business logic into server</h4>
+                <p>Dùng <code>FastMCP</code> để bọc <code>accounts.py</code> thành tools và resources qua <code>stdio</code>.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">117</div>
+              <div>
+                <h4>Create client code</h4>
+                <p>So sánh native SDK integration với handwritten client, rồi bridge MCP tools sang <code>FunctionTool</code>.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">118</div>
+              <div>
+                <h4>Wrap-up</h4>
+                <p>Khóa mental model: hiểu internals một lần, rồi quay lại abstraction và ecosystem leverage.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong>
+            cụm technical term viết dạng <code>English - nghĩa tiếng Việt</code>;
+            từ đơn phổ biến viết dạng <code>cost (chi phí)</code>.
+            Ví dụ: <code>packaging layer - lớp đóng gói</code>,
+            <code>schema bridge - lớp nối schema</code>.
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet / Executive Summary</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Day 2 dạy rằng <strong>MCP server không làm business logic của bạn tốt hơn</strong>; nó làm logic đó
+                <strong>dễ công bố, dễ chia sẻ, và dễ dùng lại</strong> hơn. Vì vậy, quyết định viết MCP server trước hết là
+                một quyết định về <strong>abstraction và distribution</strong>, không phải về “code cho xịn”.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list dense-list">
+                <li><strong>115:</strong> shareability là lý do số 1 để chọn MCP.</li>
+                <li><strong>116:</strong> <code>accounts.py</code> mới là lõi domain; server chỉ bọc nó ra ngoài.</li>
+                <li><strong>117:</strong> native MCP integration là đường hiện đại; handwritten client chủ yếu để học internals.</li>
+                <li><strong>118:</strong> sau khi hiểu plumbing, nên quay lại dùng abstraction và ecosystem cho đúng đích.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Khi bạn có capability đủ đáng giá để nhiều host hoặc nhiều agent cùng cần, việc đóng gói bằng MCP giúp nó
+                reusable hơn. Ngược lại, nếu tool chỉ sống trong đúng một app, <code>@function_tool</code> thường kinh tế hơn.
+              </p>
+            </article>
+          </div>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Knowledge extension - kiến thức mở rộng:</strong> summary Day 2 có nhắc hybrid strategy:
+            giữ một số tool ở local function, còn capability nào muốn plug-and-play hoặc chia sẻ thì mới nâng lên MCP.
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 1 của bạn vừa tập trung vào <strong>consumer mindset - tư duy người dùng server có sẵn</strong>:
+            fetch, Playwright, file system, marketplace và security. Day 2 không bỏ nền đó mà xoay chiều:
+            “Nếu mình có business logic tốt, mình có thể đóng gói nó thành MCP server như thế nào?”
+            Vì vậy, mạch học rất tự nhiên:
+            <strong>Day 1 học cách gắn external capabilities vào agent; Day 2 học cách biến capability của mình thành thứ người khác gắn vào agent.</strong>
+          </div>
+          <details>
+            <summary>Điểm nối tư duy quan trọng nhất</summary>
+            <p>
+              Day 1 giúp bạn thấy sức mạnh của ecosystem. Day 2 buộc bạn trả lời câu hỏi ngược:
+              “Nếu chính mình là người đóng góp vào ecosystem, mình phải cung cấp những gì?”
+              Câu trả lời nằm ở tools, resources, metadata, lifecycle và transport.
+            </p>
+          </details>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day2_summary.md</span>
+              <span class="source code">accounts*.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Producer mindset - tư duy người tạo capability</h3>
+              <ul class="list">
+                <li><strong>Packaging layer - lớp đóng gói:</strong> server bọc business logic hiện có để công bố ra ngoài theo chuẩn MCP.</li>
+                <li><strong>Shareability - khả năng chia sẻ:</strong> lý do mạnh nhất để chấp nhận thêm process, metadata, transport và lifecycle.</li>
+                <li><strong>Internal tool vs shared tool - tool nội bộ vs tool chia sẻ:</strong> tiêu chí quyết định có nên dùng MCP hay không.</li>
+                <li><strong>Extra plumbing - phần tích hợp bổ sung:</strong> process riêng, session/client setup, schema, transport, resources, spawning.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Server và client theo Day 2</h3>
+              <ul class="list">
+                <li><strong>FastMCP server:</strong> cách nhanh để expose tool/resource từ Python code.</li>
+                <li><strong>Tool - công cụ:</strong> các hành động có side effect hoặc trả về dữ liệu, ví dụ <code>buy_shares</code>, <code>get_balance</code>.</li>
+                <li><strong>Resource - tài nguyên:</strong> dữ liệu đọc theo URI, ví dụ <code>accounts://accounts_server/{name}</code>.</li>
+                <li><strong>Handwritten client - client viết tay:</strong> giúp hiểu lifecycle như <code>initialize()</code>, <code>list_tools()</code>, <code>call_tool()</code>, <code>read_resource()</code>.</li>
+              </ul>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>Business logic mới là tài sản chính</h3>
+              <p>
+                Day 2 nhấn mạnh rằng phần khó và phần giá trị không nằm ở decorator <code>@mcp.tool()</code>.
+                Giá trị thật nằm ở domain model và hành vi:
+                balance, holdings, transaction, strategy, persistence, pricing.
+                MCP chỉ biến phần đó thành capability có thể dùng bởi host khác.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Abstraction choice - chọn mức trừu tượng</h3>
+              <p>
+                Nếu mục tiêu là tốc độ cho một app đơn lẻ, native tool call thường hợp lý hơn.
+                Nếu mục tiêu là consistency, portability hoặc multi-host reuse, MCP trở nên hấp dẫn.
+                Đây là “build vs wrap” decision trọng tâm của Day 2.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - điều khó nhất của Day 2</summary>
+            <p>
+              Cái bẫy lớn nhất là tưởng “viết MCP server” đồng nghĩa với “đang nâng cấp tool của mình”.
+              Thực ra bạn đang thay đổi <strong>cách công bố tool</strong>, không tự động nâng cấp chất lượng của bản thân tool đó.
+              Nếu logic domain nghèo nàn, MCP chỉ giúp bạn chia sẻ một capability nghèo nàn ra ngoài theo chuẩn đẹp hơn.
+              Vì vậy Day 2 cố tình tái dùng code tài khoản/chứng khoán đã có sẵn thay vì viết toy example từ đầu.
+            </p>
+          </details>
+          <details>
+            <summary>Knowledge extension - phần ngoài nguồn cần tách riêng</summary>
+            <p>
+              Summary gợi ý rằng nhiều team production sẽ không “all-in MCP” hay “all-in local function”.
+              Họ dùng chiến lược lai: các tool rất nội bộ để local, còn capability cần tái sử dụng giữa IDE assistant,
+              backend agent và desktop host thì mới bọc thành MCP server.
+            </p>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day2_summary.md</span>
+              <span class="source code">2_lab2.ipynb</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Luồng học của Day 2</h3>
+              <ol class="list">
+                <li><strong>115:</strong> đặt câu hỏi chiến lược “có nên bọc logic này thành MCP server không?”.</li>
+                <li><strong>116:</strong> lấy account domain logic có sẵn và expose thành tools/resources qua <code>FastMCP</code>.</li>
+                <li><strong>117:</strong> dùng server đó theo 2 cách: native SDK integration và handwritten client.</li>
+                <li><strong>118:</strong> recap lại giá trị giáo dục của plumbing, rồi chuẩn bị quay về ecosystem leverage ở Day 3.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Luồng kỹ thuật trong code</h3>
+              <ol class="list">
+                <li><code>accounts.py</code> giữ domain model và persistence behavior.</li>
+                <li><code>accounts_server.py</code> ánh xạ domain methods sang <code>@mcp.tool()</code> và <code>@mcp.resource()</code>.</li>
+                <li><code>mcp.run(transport="stdio")</code> biến module thành local MCP server có thể được spawn.</li>
+                <li><code>2_lab2.ipynb</code> hoặc dùng <code>MCPServerStdio</code> trực tiếp trong SDK, hoặc viết client thủ công bằng <code>mcp.ClientSession</code>.</li>
+                <li><code>accounts_client.py</code> còn có một bước bridge để đổi MCP tool definitions thành OpenAI <code>FunctionTool</code>.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="dark-card card">
+              <h3>Control flow - luồng điều khiển</h3>
+              <p>
+                Host hoặc notebook cell spawn server qua <code>uv run accounts_server.py</code> →
+                session được initialize →
+                client list tools hoặc read resources →
+                agent hoặc client gọi tool →
+                tool thực thi trên <code>Account</code> domain object →
+                database và market layer được dùng khi cần →
+                kết quả quay ngược lên.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Điểm khác biệt giữa tool và resource</h3>
+              <p>
+                <strong>Tool</strong> thường là “làm gì đó” hoặc “trả kết quả của một hành động” như mua bán cổ phiếu.
+                <strong>Resource</strong> thường là “đọc một context có địa chỉ” như account report hoặc strategy qua URI.
+                Day 2 rất hữu ích vì cho thấy cả hai trong cùng một server đơn giản.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Day 2 dạy pipeline kiểu production hay kiểu giáo dục?</summary>
+            <p>
+              Về tinh thần là kiểu giáo dục. Day 2 cố ý lột mở các lớp internals để bạn hiểu rõ. Nhưng chính summary cũng nói rõ:
+              sau khi hiểu internals, phần lớn use case hiện đại nên quay lại dùng abstraction cao hơn của SDK.
+            </p>
+          </details>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Problem framing before implementation</h3>
+              <p><strong>Purpose:</strong> quyết định xem tool này cần shareability hay chỉ cần local function call.</p>
+              <p><strong>When to use:</strong> trước khi bọc bất kỳ business logic nào thành server.</p>
+              <p><strong>Trade-off:</strong> tốn thêm bước suy nghĩ, đổi lại tránh overengineering.</p>
+            </article>
+            <article class="card">
+              <h3>Expose domain via <code>FastMCP</code></h3>
+              <p><strong>Purpose:</strong> công bố các method/domain behaviors thành MCP tools và resources.</p>
+              <p><strong>When to use:</strong> khi bạn đã có domain model đủ tốt và muốn bọc nó theo protocol.</p>
+              <p><strong>Trade-off:</strong> API viết nhanh, nhưng vẫn cần business logic chất lượng phía sau.</p>
+            </article>
+            <article class="card">
+              <h3>URI-based resources</h3>
+              <p><strong>Purpose:</strong> phục vụ context đọc được qua địa chỉ chuẩn, ví dụ account report hoặc strategy.</p>
+              <p><strong>When to use:</strong> khi dữ liệu phù hợp kiểu “readable context” hơn là action tool.</p>
+              <p><strong>Trade-off:</strong> agent không phải lúc nào cũng tự tận dụng resource tốt như tool nếu client layer không hỗ trợ rõ.</p>
+            </article>
+            <article class="card">
+              <h3>Native SDK integration</h3>
+              <p><strong>Purpose:</strong> để OpenAI Agents SDK lo phần client/tool aggregation thay cho bạn.</p>
+              <p><strong>When to use:</strong> mặc định trong đa số use case ngày nay.</p>
+              <p><strong>Trade-off:</strong> nhanh và gọn, nhưng bạn thấy ít internals hơn.</p>
+            </article>
+            <article class="card">
+              <h3>Handwritten client</h3>
+              <p><strong>Purpose:</strong> học lifecycle, custom integration, resource-centric flows và schema bridge.</p>
+              <p><strong>When to use:</strong> debug, học protocol, hoặc cần adapter layer đặc thù.</p>
+              <p><strong>Trade-off:</strong> nhiều plumbing code, dễ lặp lại những gì SDK làm sẵn.</p>
+            </article>
+            <article class="card">
+              <h3>Schema bridge to <code>FunctionTool</code></h3>
+              <p><strong>Purpose:</strong> chuyển MCP tool metadata sang interface tools mà OpenAI agent đã quen dùng.</p>
+              <p><strong>When to use:</strong> khi bạn cần compatibility với tooling flow cũ hoặc custom wrappers.</p>
+              <p><strong>Trade-off:</strong> phải xử lý schema shape và invocation mapping bằng tay.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Technique đáng nhớ nhất của Day 2 là gì?</summary>
+            <p>
+              Không phải một decorator cụ thể, mà là cách nghĩ:
+              <strong>“MCP server as a packaging layer - MCP server như lớp đóng gói”</strong>.
+              Khi tư duy này rõ, bạn sẽ biết lúc nào cần server, lúc nào chỉ cần local function.
+            </p>
+          </details>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+            </div>
+            <div class="source-row">
+              <span class="source code">2_lab2.ipynb</span>
+              <span class="source code">accounts.py</span>
+              <span class="source code">accounts_server.py</span>
+              <span class="source code">accounts_client.py</span>
+            </div>
+          </div>
+          <div class="callout">
+            Day 2 có code thật và code này rất quan trọng. Walkthrough dưới đây đi theo đúng mạch:
+            <strong>domain logic → server wrapper → native SDK use → handwritten client + schema bridge</strong>.
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 1 - <code>accounts.py</code>: domain model và persistence behavior</h3>
+              <p>Đây là business logic thật, không phải “MCP code” trước tiên. Server chỉ có giá trị khi phía sau nó là logic có ích.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: quản lý account, holdings, transactions, strategy</span>
+              <span>Key names: <code>Account.get()</code>, <code>buy_shares()</code>, <code>sell_shares()</code>, <code>report()</code></span>
+            </div>
+            <pre><code>class Account(BaseModel):
+    name: str
+    balance: float
+    strategy: str
+    holdings: dict[str, int]
+    transactions: list[Transaction]
+
+    @classmethod
+    def get(cls, name: str):
+        fields = read_account(name.lower())
+        if not fields:
+            fields = {
+                "name": name.lower(),
+                "balance": INITIAL_BALANCE,
+                "strategy": "",
+                "holdings": {},
+                "transactions": [],
+                "portfolio_value_time_series": []
+            }
+            write_account(name, fields)
+        return cls(**fields)
+
+    def buy_shares(self, symbol: str, quantity: int, rationale: str) -> str:
+        price = get_share_price(symbol)
+        buy_price = price * (1 + SPREAD)
+        total_cost = buy_price * quantity
+        ...
+        self.save()
+        write_log(self.name, "account", f"Bought {quantity} of {symbol}")
+        return "Completed. Latest details:\n" + self.report()</code></pre>
+            <p class="inline-note">
+              Điểm quan trọng: <code>Account.get()</code> lấy và tạo state có persistence qua SQLite, còn
+              <code>buy_shares()</code> / <code>sell_shares()</code> không chỉ đổi dữ liệu trong RAM mà còn save và write log.
+              Nói cách khác, capability đã có ý nghĩa nghiệp vụ trước khi chạm vào MCP.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 2 - <code>accounts_server.py</code>: bọc domain thành tools và resources</h3>
+              <p>Đây là chỗ Day 2 biến domain logic thành capability chia sẻ được qua protocol.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: expose actions và context theo chuẩn MCP</span>
+              <span>Key names: <code>FastMCP</code>, <code>@mcp.tool()</code>, <code>@mcp.resource()</code>, <code>mcp.run()</code></span>
+            </div>
+            <pre><code>from mcp.server.fastmcp import FastMCP
+from accounts import Account
+
+mcp = FastMCP("accounts_server")
+
+@mcp.tool()
+async def get_balance(name: str) -> float:
+    return Account.get(name).balance
+
+@mcp.tool()
+async def buy_shares(name: str, symbol: str, quantity: int, rationale: str) -> float:
+    return Account.get(name).buy_shares(symbol, quantity, rationale)
+
+@mcp.resource("accounts://accounts_server/{name}")
+async def read_account_resource(name: str) -> str:
+    account = Account.get(name.lower())
+    return account.report()
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre>
+            <p class="inline-note">
+              Hai điểm cần chốt:
+              <strong>(1)</strong> tool wrapper rất mỏng, cho thấy MCP server nên reuse domain layer thay vì nhồi logic vào handler;
+              <strong>(2)</strong> resources được address bằng URI pattern, giúp client đọc context theo tên tài khoản hoặc strategy.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 3 - <code>2_lab2.ipynb</code>: native SDK integration với <code>MCPServerStdio</code></h3>
+              <p>Đây là “đường mặc định hiện đại” mà lesson 117 nhấn mạnh.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: để SDK tự lo discovery và tool use</span>
+              <span>Key names: <code>params</code>, <code>MCPServerStdio</code>, <code>Agent(..., mcp_servers=[...])</code></span>
+            </div>
+            <pre><code>params = {"command": "uv", "args": ["run", "accounts_server.py"]}
+
+async with MCPServerStdio(params=params, client_session_timeout_seconds=30) as mcp_server:
+    agent = Agent(
+        name="account_manager",
+        instructions=instructions,
+        model=model,
+        mcp_servers=[mcp_server]
+    )
+    with trace("account_manager"):
+        result = await Runner.run(agent, request)</code></pre>
+            <p class="inline-note">
+              Cốt lõi ở đây là:
+              bạn không cần tự viết lifecycle client, tự list tool hay tự map schema.
+              SDK đã làm phần đó giúp bạn, đúng với tinh thần “học internals xong thì quay lại abstraction”.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 4 - <code>accounts_client.py</code>: handwritten client và schema bridge</h3>
+              <p>Đây là block giàu giá trị học tập nhất của Day 2 vì nó lộ rõ protocol plumbing.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: tự list tools, call tool, read resource, và bridge sang OpenAI tools</span>
+              <span>Key names: <code>stdio_client</code>, <code>ClientSession</code>, <code>initialize()</code>, <code>FunctionTool</code></span>
+            </div>
+            <pre><code>async def list_accounts_tools():
+    async with stdio_client(params) as streams:
+        async with mcp.ClientSession(*streams) as session:
+            await session.initialize()
+            tools_result = await session.list_tools()
+            return tools_result.tools
+
+async def read_accounts_resource(name):
+    async with stdio_client(params) as streams:
+        async with mcp.ClientSession(*streams) as session:
+            await session.initialize()
+            result = await session.read_resource(f"accounts://accounts_server/{name}")
+            return result.contents[0].text
+
+async def get_accounts_tools_openai():
+    openai_tools = []
+    for tool in await list_accounts_tools():
+        schema = {**tool.inputSchema, "additionalProperties": False}
+        openai_tool = FunctionTool(
+            name=tool.name,
+            description=tool.description,
+            params_json_schema=schema,
+            on_invoke_tool=lambda ctx, args, toolname=tool.name:
+                call_accounts_tool(toolname, json.loads(args))
+        )
+        openai_tools.append(openai_tool)
+    return openai_tools</code></pre>
+            <p class="inline-note">
+              Đây là chỗ bạn thấy rõ 4 việc mà summary đã nhắc:
+              <strong>initialize</strong>, <strong>list tools</strong>, <strong>call tool</strong>, và <strong>read resource</strong>.
+              Thêm nữa, <code>get_accounts_tools_openai()</code> là một <strong>schema bridge - lớp nối schema</strong>
+              giữa thế giới MCP và interface <code>FunctionTool</code> của OpenAI Agents SDK.
+            </p>
+          </article>
+
+          <details>
+            <summary>Code phụ trợ đóng vai trò gì?</summary>
+            <p>
+              <code>database.py</code> chứng minh rằng account state được lưu bền vững qua SQLite chứ không chỉ tồn tại trong runtime tạm.
+              <code>market.py</code> cho thấy giá cổ phiếu được lấy từ Polygon khi có key, còn fallback sang random khi không có.
+              Hai file này giúp bạn hiểu Day 2 không phải toy example thuần protocol mà là protocol bọc quanh một domain service có behavior thực.
+            </p>
+          </details>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs nếu phù hợp</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>@function_tool</code> / local tools</strong></td>
+                <td>Tool chỉ dùng nội bộ cho agent hoặc app của chính bạn.</td>
+                <td>Đơn giản, ít plumbing, debug dễ hơn.</td>
+                <td>Khó chuẩn hóa và chia sẻ lại như một capability độc lập.</td>
+              </tr>
+              <tr>
+                <td><strong>Custom MCP server</strong></td>
+                <td>Muốn công bố logic có giá trị ra nhiều host hoặc nhiều agent.</td>
+                <td>Cần process, metadata, transport, lifecycle và setup nhiều hơn.</td>
+                <td>Dễ overengineer nếu capability không cần shareability.</td>
+              </tr>
+              <tr>
+                <td><strong>Native SDK integration</strong></td>
+                <td>Dự án hiện tại dùng OpenAI Agents SDK và chỉ cần dùng server gọn nhất có thể.</td>
+                <td>Tốc độ triển khai tốt hơn, ít code hơn.</td>
+                <td>Bạn thấy ít internals hơn nếu cần debug sâu.</td>
+              </tr>
+              <tr>
+                <td><strong>Handwritten client</strong></td>
+                <td>Muốn học protocol, cần custom bridge, hoặc cần xử lý resources rõ ràng hơn.</td>
+                <td>Chủ động hơn nhưng tốn nhiều plumbing code.</td>
+                <td>Dễ tái tạo thủ công những gì SDK đã hỗ trợ sẵn.</td>
+              </tr>
+              <tr>
+                <td><strong>Build vs buy sau Day 2</strong></td>
+                <td>Cân nhắc giữa custom domain logic và ecosystem servers ở Day 3 trở đi.</td>
+                <td>Tự xây cho kiểm soát; dùng sẵn cho tốc độ.</td>
+                <td>Cực đoan theo một hướng sẽ làm giảm hiệu quả hệ thống.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Knowledge extension - kiến thức mở rộng:</strong> summary Day 2 nhấn rằng state trưởng thành thường nằm ở
+            <strong>abstraction-first after learning internals</strong>: hiểu plumbing đủ sâu để debug, rồi quay lại đường triển khai gọn hơn.
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Bọc mọi function thành MCP server:</strong> bị cuốn theo hype, quên hỏi có thật sự cần chia sẻ không.</li>
+                <li><strong>Đặt logic vào wrapper thay vì domain:</strong> server nhìn “đúng giao thức” nhưng business layer yếu.</li>
+                <li><strong>Quên <code>session.initialize()</code>:</strong> client lỗi vì lifecycle chưa sẵn sàng.</li>
+                <li><strong>Dùng handwritten client như pattern mặc định:</strong> tăng chi phí code không cần thiết.</li>
+                <li><strong>Nhầm schema MCP và schema OpenAI tools là một:</strong> wrapper invocation hoặc args shape bị sai.</li>
+                <li><strong>Quên resources là primitive riêng:</strong> chỉ nghĩ MCP = tool calling.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - cách tránh</h3>
+              <ul class="list">
+                <li>Luôn hỏi trước: <strong>tool này cần shareability hay chỉ cần internal speed?</strong></li>
+                <li>Giữ domain logic ở module riêng như <code>accounts.py</code>, để server wrapper mỏng.</li>
+                <li>Với client viết tay, coi <code>initialize()</code> là bước lifecycle bắt buộc.</li>
+                <li>Ưu tiên native SDK path khi framework đã hỗ trợ MCP đủ tốt.</li>
+                <li>Viết bridge rõ ràng như <code>get_accounts_tools_openai()</code> nếu cần compatibility.</li>
+                <li>Nhớ rằng resources có thể hữu ích cho context preload hoặc read-only workflows.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&amp;A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Lý do số 1 để viết MCP server là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> <strong>Shareability - khả năng chia sẻ</strong>, tức là biến capability của bạn thành thứ host hoặc agent khác dùng lại được theo chuẩn chung.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Phần nào mới là giá trị thật trong Day 2, protocol hay business logic?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Business logic vẫn là giá trị thật; protocol chỉ là cách đóng gói và công bố logic đó ra ngoài.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: <code>accounts_server.py</code> minh họa thêm primitive nào ngoài tools?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> <strong>Resources - tài nguyên</strong>, qua các URI như <code>accounts://accounts_server/{name}</code> và <code>accounts://strategy/{name}</code>.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao handwritten client không phải lựa chọn mặc định?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì nó lặp lại nhiều plumbing mà SDK hiện đại đã hỗ trợ, nên chủ yếu có giá trị cho học tập, debug hoặc custom bridge.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card quiz-block">
+              <h3>Quick quiz 1</h3>
+              <p>Tuyên bố nào đúng nhất về quan hệ giữa <code>accounts.py</code> và <code>accounts_server.py</code>?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. <code>accounts_server.py</code> mới là nơi chứa toàn bộ business logic thật.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. <code>accounts_server.py</code> chủ yếu bọc và công bố logic có sẵn trong <code>accounts.py</code>.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Hai file này không liên quan đến nhau, chỉ cùng nằm trong thư mục.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+            <article class="card quiz-block">
+              <h3>Quick quiz 2</h3>
+              <p>Khi nào handwritten MCP client là hợp lý hơn native SDK integration?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Luôn luôn, vì nó hiện đại hơn.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Khi cần học internals, custom bridge hoặc xử lý resource/client behavior đặc thù.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Chỉ khi server không chạy bằng Python.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>MCP server có ý nghĩa nhất khi capability của bạn cần được <strong>chia sẻ và chuẩn hóa</strong>.</li>
+                <li><code>accounts.py</code> là <strong>domain layer</strong>; <code>accounts_server.py</code> là <strong>packaging layer</strong>.</li>
+                <li><code>FastMCP</code> cho phép expose cả <strong>tools</strong> và <strong>resources</strong>.</li>
+                <li><code>mcp.run(transport="stdio")</code> biến module server thành local MCP server spawn được.</li>
+                <li>Native SDK path qua <code>MCPServerStdio</code> là đường mặc định gọn nhất cho OpenAI Agents SDK.</li>
+                <li><code>accounts_client.py</code> minh họa rõ lifecycle client: initialize, list, call, read.</li>
+                <li><code>get_accounts_tools_openai()</code> là ví dụ điển hình của <strong>schema bridge</strong>.</li>
+                <li>Sau khi học internals, Day 2 khuyên bạn quay lại abstraction và ecosystem leverage thay vì tự viết plumbing mọi nơi.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có phân biệt được “viết MCP server vì chia sẻ” với “viết MCP server vì hype” không?</li>
+                <li>Bạn có giải thích được vai trò riêng của <code>accounts.py</code>, <code>accounts_server.py</code> và <code>accounts_client.py</code> không?</li>
+                <li>Bạn có mô tả lại được vì sao <code>initialize()</code> là bước bắt buộc của client lifecycle không?</li>
+                <li>Bạn có nêu được khi nào nên chọn native SDK integration thay vì handwritten client không?</li>
+                <li>Bạn có giải thích được resource khác tool ở điểm nào bằng ví dụ Day 2 không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3>Kết luận nhanh</h3>
+          <p>
+            Nếu Day 1 dạy bạn cách tận dụng MCP ecosystem, thì Day 2 dạy bạn điều kiện để chính mình đóng góp vào ecosystem đó.
+            Ý quan trọng nhất cần mang sang Day 3 là:
+            <strong>hãy hiểu plumbing đủ sâu để chọn abstraction đúng, chứ không phải để tái tạo plumbing ở mọi dự án.</strong>
+          </p>
+          <p>
+            Study note: phần có nhãn <span class="mini-pill extended">Kiến thức mở rộng</span> được tách riêng khỏi phần grounding chính.
+            File này không hiển thị secrets, tokens hay nội dung nhạy cảm.
+          </p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0] ? sections[0].id : "";
+      const offset = window.scrollY + 180;
+
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = progress + "%";
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.textContent = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-block").forEach((block) => {
+      const result = block.querySelector(".quiz-result");
+      const buttons = block.querySelectorAll(".quiz-option");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          buttons.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const correct = button.dataset.answer === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          result.textContent = correct
+            ? "Đúng. Bạn đang nắm đúng abstraction và ý nghĩa của phần này."
+            : "Chưa đúng. Hãy xem lại phần lý thuyết hoặc walkthrough rồi giải thích lại bằng lời của bạn.";
+        });
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

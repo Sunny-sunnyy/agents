@@ -1,0 +1,5 @@
+Well.
+I hope you enjoyed our adventure into the plumbing's and internals of MCP servers and clients.
+Next time we are going to now do what MCP is famous for, we are going to explore tons of MCP servers
+out there and just have fun equipping our agents with these new capabilities.
+I will see you then.

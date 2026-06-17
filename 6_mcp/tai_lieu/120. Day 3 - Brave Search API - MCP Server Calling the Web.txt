@@ -1,0 +1,131 @@
+So there's been many times in the last few weeks that we have used tools that do internet searches.
+You probably remember the hosted tool with OpenAI that we used right back in week two, which was quite
+expensive.
+Was it two and a half cents for every single web search?
+And we've used, I think, Tavileh and we've used, uh, Serpa.
+Well, we're going to do another one.
+So sorry to make you set up another key, but this one's a really great one.
+It's called Brave Search, and it's a company that specializes in an API driven search, including for
+use with AI.
+And it's free again, at least I think you get 2000 free searches a month.
+Uh, so it's very generous.
+And I have set it up.
+I've actually got a paid account because I've been using it a lot, but, uh, you very much can stay
+on the free version.
+I've got a link here for where you go to set up your account.
+If I go up here, uh, it brings up the brave search.
+You sign up, you go through and get an API key super easily without needing any credit card or anything
+like that.
+So once you've done that, you come back, you take your brave API key and you put it in your EMV file
+as usual, and then you'll have to rerun load MV up at the top.
+Okay.
+So then what we do is we collect our brave API key.
+And this time you'll notice that when we specify the params for our MCP server, we're passing in these
+environment variables, these settings as well.
+So that's a new twist for this one so that we can tell brave about our API key.
+And it's another node another JavaScript MCP server.
+So we run it this way.
+And in fact this is one of Anthropic's out of the box reference implementations.
+So this is part of Anthropic's offerings, the brave search.
+And so again even though we're running online searches, the MCP server is going to be running on my
+box.
+So the code for this is is remote is online.
+We are downloading that code and running it locally using npm.
+So it starts online, we bring it locally, we run it locally.
+And then of course, what that code actually does is it makes a call to a web service offered by the
+company brave, and it passes in our key to that service.
+So that's why this is architecture two MCP server running locally calling out to the cloud.
+And I'm probably belaboring this.
+You're probably like, yeah I get it I get it enough.
+Okay.
+So MCP server studio again is how we do this.
+We pass in the parameters.
+Let's just see what tools we get with this.
+Um, we get a brave web search tool which performs a web search with the API.
+Um, and then a local search searches for local businesses.
+I think I only get that because I'm paying the paid plan.
+I don't think that comes with the free plan, actually.
+Um, so again, the key difference with something like fetch is that with fetch, we're running a browser
+locally and we're just going to a web address.
+We're brave.
+We're making a web call to brave, to ask it to run like a Google search.
+But it's not using Google.
+It's using its own search engine and return the results of that query.
+Um, and so, uh, we're going to ask a question.
+You're able to search the web for information, research the latest news on the Amazon stock price and
+give it the current date.
+And then we run the server right here.
+Okay.
+Here we go.
+Running that you'll see.
+As usual we're passing in the MCP server.
+We've got the timeout set and we're calling run and run and back.
+We get of course, the results of running this web search with the current price of Amazon apparently
+217 and more information about it.
+And as always, we should go in and check out the trace.
+Let's have a look here and make sure that we're happy.
+Yep, it's calling a brave web search.
+The query was Amazon Stock Price News May 2025.
+And it got back these results.
+And so it seems to be working nicely end to end.
+That is another.
+That is an example of type two of the calling out to the web.
+And so now to talk about the type three of the MCP servers, the ones where the server itself, the
+MCP server, is running remotely.
+And you must connect to it using the SSC approach.
+And now here's the thing.
+As I say, it's not that common.
+And it's also quite flaky because there's no guarantees that the people that you're connecting with
+are going to keep their server running.
+I used to have an example in here of an MCP server that I found, a hosted MCP server that you could
+connect to remotely, but it went down and now you can't connect to it.
+And that's why I had to take out that code at the top.
+So it's no longer running.
+So that example didn't work.
+And so I tried to look for some other examples.
+And the other examples that I found are all for paid business services where you are already paying
+for something, and it tends to be from sort of professional business plans.
+So let me show you that, that the anthropic docs have a section on remote MCP servers.
+That's what we're talking about here.
+And it says several companies have deployed remote servers that developers can connect to.
+Um, and so here are some examples of them.
+And you'll see why I'm not able to demo one of these because I'd have to be a paying client.
+So asana, if you are a client of asana, asana like project management tool, then you could interact
+with asana workspace by by using this remote, uh, MCP server at MCP.
+Uh, and then similarly for these others like intercom, like, uh, PayPal, if you use not not just
+PayPal for your personal, uh, PayPal, I have one of them, but I don't have commerce capabilities.
+I don't I'm not I'm not a seller.
+Um, and and the others at Square and Waikato and Zapier.
+I was going to try and set something up to show it, but you have to have a paid account.
+So it's it's it's honestly not common to be seeing this.
+It's only in these cases of, like, paid, uh, enterprise accounts where you don't want to run the
+MCP server yourself.
+You want to connect to it running on the cloud.
+And as I say, I really I haven't seen much traction with this in the community.
+It's not like this is something that you come across often.
+Um, and for many of these, uh, for many of those commercial examples, you can run an MCP server
+locally as well, which is what people typically do.
+Cloudflare, which was actually on that list, has some tools for you to create and run your own remote
+servers.
+If you're a Cloudflare Cloudflare customer and you use Cloudflare for your own website, your own deployments,
+uh, they have some really interesting sheets here which allow you to deploy, uh, a remote server
+that other people could connect to, and they actually make it really quite easy.
+They walk you through the code here and how you can check in their, uh, screens that it's running.
+And then they give you, of course, the way that you would then connect to it from, say, your desktop
+or indeed from your OpenAI agents SDK.
+Um, and this is then where you can add authentication, which is one of the hot new areas of MCP.
+If you are going to provide a hosted tool, then you would want to have a way that people can authenticate
+with it so that they can demonstrate that they are who they say they are.
+Um, but as I say one more time, then I'll shut up because you're fed up of me saying this.
+But but it's not a common way of doing things.
+And indeed, uh, if you're if you're running something like the brave search that we just did, it
+would be more common for you to set up an API key with something like brave and then pass in that API
+key when you call your local MCP server.
+That's the more common configuration.
+And of course, this might change any day that maybe, maybe managed hosted MCP servers will take off
+big time.
+And and I'll be eating my words.
+But but as of right now, uh, it's not terribly common, but you certainly could follow the Cloudflare
+instructions and set up your own should you wish.
+So that wraps up the third type.
+And we're now going to go back to the second type for a really cool example.

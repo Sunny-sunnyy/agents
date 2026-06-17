@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 1: LangGraph Explained & Core Components - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, Garamond, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.15rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.08rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 12px;
+      transition: background 0.15s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 14px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      font-weight: 600;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: "Inter", sans-serif;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .badge-extended {
+      display: inline-block;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(204, 120, 92, 0.4);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết</span>
+        <h1>LangGraph Day 1: Kiến trúc đồ thị & Thành phần cốt lõi</h1>
+        <p class="lead">
+          Nội dung ôn tập toàn diện ngày học đầu tiên về LangGraph. Tìm hiểu lý do ra đời của framework đồ thị, phân biệt ba thành phần chính (Framework, Studio, Platform), và nắm vững các khái niệm cơ bản (Graph, State, Node, Edge) để đặt nền móng vững chắc trước khi bước vào lập trình thực tế.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Day 1 Theory</span>
+          <span class="tag">Week 4: LangGraph</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day1_summary.md)</span>
+          <span class="source">Slide (Không có)</span>
+          <span class="source">Code (Không có)</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus • Tiêu điểm nhanh</h2>
+        <ul class="list">
+          <li><strong>Ba cột trụ giá trị:</strong> <code>stability - ổn định</code>, <code>resiliency - khả năng chịu lỗi</code>, và <code>repeatability - khả năng lặp lại nhất quán</code>.</li>
+          <li><strong>Phân biệt rõ:</strong> <code>LangGraph framework - thư viện lập trình</code> là cốt lõi để viết code, phân biệt với Studio (UI trực quan) và Platform (cloud runtime).</li>
+          <li><strong>Mô hình thực thi 2 pha:</strong> Định nghĩa cấu trúc đồ thị trước (Build phase) rồi mới chạy đồ thị (Execution/Invoke phase).</li>
+          <li><strong>Cập nhật trạng thái an toàn:</strong> Thiết kế State theo hướng không thay đổi trực tiếp (immutable-style updates), trả về dict thay đổi thay vì mutate trực tiếp đối tượng state.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Đã dùng toàn bộ nội dung file [day1_summary.md](file:///G:/Agent2026Win/agents/4_langgraph/tai_lieu/day1_summary.md) làm bối cảnh chính.</li>
+                <li><strong>Slide:</strong> Không có slide chính thức đi kèm cho buổi học này.</li>
+                <li><strong>Code:</strong> Không có code đi kèm trong bài học lý thuyết Day 1.</li>
+                <li><strong>Transcript:</strong> Đã được tích hợp và tóm tắt trực tiếp trong tài liệu Docx LLM.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Bài học Day 1 hoàn toàn mang tính định hình tư duy lý thuyết và làm rõ thuật ngữ. Không có mã nguồn chính thức hay slide đi kèm. Phần <strong>Code Walkthrough</strong> được bổ sung dựa trên <span class="badge-extended">Kiến thức mở rộng</span> để minh họa trực quan 5 bước lý thuyết xây dựng graph bằng code Python tối giản.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm technical term viết dưới dạng <code>English term - nghĩa tiếng Việt</code>. Từ đơn phổ biến viết dưới dạng <code>term (nghĩa tiếng Việt)</code>. Các nội dung bổ sung ngoài tài liệu gốc được đánh dấu nhãn <strong>[Kiến thức mở rộng]</strong> rõ ràng.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                <code>LangGraph</code> là một framework đồ thị chuyên dụng trong hệ sinh thái LangChain, thiết kế để xây dựng các <code>agentic workflows - luồng tác vụ tác tử</code> phức tạp có vòng lặp (loops). Nó mang lại tính ổn định, chịu lỗi và khả năng tái lập cho hệ thống agent ở cấp độ vận hành thực tế (production).
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Tránh nhầm lẫn:</strong> Platform chỉ là hạ tầng deploy trả phí; việc lập trình thực tế được thực hiện hoàn toàn trên thư viện mã nguồn mở Framework.</li>
+                <li><strong>Khái niệm cốt lõi:</strong> Graph = State (bộ nhớ chung) + Nodes (hàm thực thi logic) + Edges (đường nối điều phối luồng).</li>
+                <li><strong>Hoài nghi lành mạnh:</strong> Abstraction frameworks giúp tăng tốc phát triển ban đầu nhưng có thể che giấu logic sâu bên dưới, làm tăng <code>debugging cost (chi phí debug)</code>.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Nên chọn LangGraph khi hệ thống cần: vòng lặp phản hồi (feedback loops), khả năng lưu trạng thái để khôi phục khi lỗi (checkpointing/persistence), hoặc có bước phê duyệt từ con người (human-in-the-loop). Đối với luồng tuần tự đơn giản, gọi API trực tiếp là baseline tốt nhất.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Nối tiếp các tuần học trước về <strong>OpenAI Agents SDK</strong>, <strong>CrewAI</strong> và các <code>design patterns - mẫu thiết kế</code> cho AI Agents. Các framework trước tập trung vào các chuỗi bước khá tuyến tính (chains) hoặc để các agent tự do hội thoại mà không có cấu trúc kiểm soát chặt chẽ. 
+            <br><br>
+            <strong>LangGraph</strong> yêu cầu một bước chuyển đổi tư duy quan trọng: chuyển từ tư duy tuyến tính sang <strong>kiến trúc dựa trên đồ thị (graph-based architecture)</strong>. Việc định nghĩa rõ ràng cấu trúc luồng chạy và quản lý trạng thái tập trung giúp đưa kỷ luật kỹ thuật (engineering discipline) vào phát triển Agent.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>LangChain - framework trừu tượng hóa cho ứng dụng LLM:</strong> Hệ sinh thái cung cấp các abstractions cho model calls, prompt templates, memory và RAG.</li>
+                <li><strong>LangGraph - framework đồ thị cho agent workflows:</strong> Thư viện mã nguồn mở giúp tổ chức workflow agent dưới dạng đồ thị có trạng thái.</li>
+                <li><strong>LangSmith - công cụ quan sát và debug:</strong> Sản phẩm độc lập để theo dõi reasoning traces, logs gọi model và debug lỗi hệ thống agent.</li>
+                <li><strong>State - trạng thái:</strong> Snapshot dữ liệu sống dùng chung chảy qua toàn bộ graph, là chất mang dữ liệu trung tâm.</li>
+                <li><strong>Node (nút):</strong> Python function nhận trạng thái hiện tại, thực thi logic (gọi LLM, chạy tool), và trả về một phần trạng thái được cập nhật.</li>
+                <li><strong>Edge (cạnh):</strong> Định nghĩa đường nối giữa các Node để điều phối luồng chạy (gồm cạnh thường và cạnh có điều kiện).</li>
+                <li><strong>Reducer - bộ hợp nhất cập nhật trạng thái:</strong> Cơ chế định nghĩa cách gộp các bản cập nhật mới từ Node vào State chung.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ giữa các khái niệm</h3>
+              <p>
+                <strong>State (Trạng thái)</strong> là trái tim của Graph. Khi một <strong>Node (Nút)</strong> được kích hoạt, nó nhận <code>current state (trạng thái hiện tại)</code> làm tham số đầu vào. Sau khi thực hiện logic, Node trả về các thông tin mới cần cập nhật. 
+                <br><br>
+                Thông tin này đi qua <strong>Reducer (Bộ hợp nhất)</strong> để cập nhật một cách an toàn vào State chung. <strong>Edges (Cạnh)</strong> sẽ đọc dữ liệu từ State sau khi cập nhật để đưa ra quyết định kích hoạt Node tiếp theo (điều hướng).
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về tư duy State Immutable</summary>
+            <p>
+              LangGraph nhấn mạnh việc thiết kế và cập nhật trạng thái theo kiểu <strong>không thay đổi trực tiếp (immutable-style updates)</strong>. Thay vì viết mã để sửa đổi trực tiếp các thuộc tính của đối tượng State bên trong node, các Node luôn nhận một snapshot của state cũ và trả về một dictionary mô tả những phần cần thay đổi. 
+              <br><br>
+              Framework sẽ tự chịu trách nhiệm áp dụng các thay đổi này thông qua Reducer. Cách tiếp cận này giúp:
+            </p>
+            <ul class="list" style="margin-top: 8px;">
+              <li>Ngăn chặn triệt để lỗi <code>side effects (tác dụng phụ)</code> do các node vô tình ghi đè dữ liệu của nhau.</li>
+              <li>Hỗ trợ tính năng <code>time-travel debug (quay ngược thời gian debug)</code> - cho phép xem lại chính xác snapshot của State tại từng bước chạy trong lịch sử đồ thị.</li>
+              <li>Tạo cơ sở cho cơ chế khôi phục lỗi (checkpointing) khi có sự cố mạng hoặc lỗi API trong quá trình gọi LLM.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình xây dựng Graph</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level flow - Luồng 5 bước xây dựng</h3>
+              <ol class="list">
+                <li><strong>Định nghĩa State Class:</strong> Xác định schema dữ liệu dùng chung (ví dụ: dùng <code>TypedDict</code> chứa danh sách messages).</li>
+                <li><strong>Khởi tạo Graph Builder:</strong> Tạo đối tượng builder (ví dụ: <code>StateGraph(StateClass)</code>) để bắt đầu vẽ đồ thị.</li>
+                <li><strong>Tạo các Nodes:</strong> Viết các hàm Python logic (nhận state, trả về cập nhật) rồi đăng ký vào builder qua <code>add_node()</code>.</li>
+                <li><strong>Tạo các Edges:</strong> Nối các nút lại bằng <code>add_edge()</code> cho các luồng cố định hoặc <code>add_conditional_edges()</code> cho rẽ nhánh điều kiện.</li>
+                <li><strong>Biên dịch (Compile) Graph:</strong> Gọi <code>builder.compile()</code> để chuyển khai báo đồ thị thành một executable (thực thể có thể chạy được).</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data / control flow - Luồng dữ liệu và điều khiển</h3>
+              <p>
+                Khi bắt đầu chạy ứng dụng graph bằng lệnh <code>graph.invoke(initial_state)</code>:
+                <br><br>
+                1. Dữ liệu ban đầu (initial state) đi vào điểm khởi đầu <code>START</code>.
+                <br>
+                2. Framework chuyển tiếp dữ liệu đến Node đầu tiên theo cấu hình của Edge kết nối với START.
+                <br>
+                3. Node chạy logic, trả về dữ liệu cập nhật, State chung được cập nhật thông qua Reducer.
+                <br>
+                4. Edge tiếp theo được đánh giá. Nếu là conditional edge, một hàm router sẽ được gọi để phân tích State hiện tại và chọn tên Node đích tiếp theo.
+                <br>
+                5. Quy trình lặp lại cho đến khi luồng điều khiển đi vào điểm kết thúc <code>END</code>.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>State-first design<br>(Thiết kế ưu tiên State)</h3>
+              <p><strong>Purpose:</strong> Xác định trước cấu trúc dữ liệu chung mà toàn bộ hệ thống Agent cần sử dụng trước khi viết bất kỳ code xử lý logic nào.</p>
+              <p><strong>When to use:</strong> Bắt buộc áp dụng ngay từ pha thiết kế ban đầu của mọi dự án LangGraph để tránh phá vỡ kiến trúc dữ liệu về sau.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi thời gian phân tích và lập kế hoạch kỹ lưỡng trước khi bắt tay vào gõ code logic node.</p>
+            </article>
+            <article class="card">
+              <h3>Functional nodes<br>(Xây dựng nút dạng hàm)</h3>
+              <p><strong>Purpose:</strong> Giữ cho mã nguồn của từng bước xử lý độc lập, dễ viết unit test và không gây ra tác dụng phụ ngầm lên biến toàn cục.</p>
+              <p><strong>When to use:</strong> Áp dụng cho mọi hàm đăng ký làm Node. Hàm chỉ nên tương tác với thế giới bên ngoài thông qua State đầu vào và trả về.</p>
+              <p><strong>Trade-off:</strong> Yêu cầu kỷ luật lập trình cao, tránh thói quen thay đổi trực tiếp (mutate) các biến bên ngoài hoặc đối tượng truyền vào.</p>
+            </article>
+            <article class="card">
+              <h3>Conditional routing<br>(Định tuyến có điều kiện)</h3>
+              <p><strong>Purpose:</strong> Cho phép hệ thống Agent tự đưa ra quyết định rẽ nhánh luồng chạy linh hoạt dựa trên phân tích ngữ cảnh của LLM.</p>
+              <p><strong>When to use:</strong> Khi quy trình làm việc có các điểm quyết định (ví dụ: LLM phân tích xem code có lỗi không, nếu có thì rẽ sang node sửa code, nếu không thì trả kết quả).</p>
+              <p><strong>Trade-off:</strong> Làm tăng độ phức tạp của đồ thị, đòi hỏi viết thêm các hàm router phụ trợ để phân tích State.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code <span class="badge-extended">Kiến thức mở rộng</span></h2>
+            </div>
+            <div class="source-row">
+              <span class="source extended">Knowledge extension</span>
+            </div>
+          </div>
+          <div class="callout" style="margin-bottom: 16px;">
+            <strong>Lưu ý:</strong> Buổi học lý thuyết Day 1 không cung cấp code mẫu. Đoạn mã dưới đây được xây dựng bổ sung để minh họa trực quan quy trình 5 bước xây dựng đồ thị cơ bản trong thực tế.
+          </div>
+          <article class="code-panel">
+            <div>
+              <h3>Tạo Đồ Thị Có Vòng Lặp Cơ Bản (Minimal Stateful Graph)</h3>
+              <p>Mã nguồn dưới đây xây dựng một đồ thị LangGraph đơn giản gồm: một State chứa tin nhắn, một Node chatbot phản hồi, một Node đánh giá kết quả, và một Edge có điều kiện để mô phỏng vòng lặp sửa lỗi.</p>
+            </div>
+            <div class="code-meta">
+              <span>Python 3.10+</span>
+              <span>Library: langgraph >= 0.1.0</span>
+              <span>Key concepts: StateGraph, Reducer, Router</span>
+            </div>
+            <pre><code>from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+
+# Định nghĩa hàm reducer để chỉ rõ cách cập nhật danh sách tin nhắn (nối thêm vào danh sách cũ)
+def append_messages(left: list[str], right: list[str]) -> list[str]:
+    return left + right
+
+# Bước 1: Define state class (Định nghĩa cấu trúc trạng thái chung)
+class AgentState(TypedDict):
+    # Sử dụng Annotated để khai báo reducer append_messages cho trường messages
+    messages: Annotated[list[str], append_messages]
+    needs_review: bool
+
+# Bước 2: Start graph builder (Khởi tạo bộ dựng đồ thị với State class)
+builder = StateGraph(AgentState)
+
+# Bước 3: Create nodes (Viết các Python function đóng vai trò là các nút xử lý)
+def chatbot_node(state: AgentState):
+    print("--- CHẠY NODE: Chatbot xử lý câu hỏi ---")
+    # Lấy tin nhắn cuối cùng để xử lý (giả lập kết quả gọi LLM)
+    user_msg = state["messages"][-1]
+    bot_response = f"Bot: Đã nhận phản hồi cho câu hỏi '{user_msg}'"
+    
+    # Trả về dictionary chứa các trường muốn cập nhật vào State chung
+    # LangGraph sẽ tự dùng reducer để nối bot_response vào messages
+    return {
+        "messages": [bot_response],
+        "needs_review": True # Kích hoạt cờ kiểm tra đánh giá ở bước sau
+    }
+
+def review_node(state: AgentState):
+    print("--- CHẠY NODE: Đánh giá chất lượng câu trả lời ---")
+    # Giả lập logic kiểm tra: Nếu đây là phản hồi thứ hai của bot, duyệt thông qua. 
+    # Nếu là phản hồi đầu tiên, yêu cầu bot tạo lại (giả lập feedback loop)
+    bot_responses = [m for m in state["messages"] if m.startswith("Bot:")]
+    
+    if len(bot_responses) < 2:
+        print("   -> Đánh giá: Câu trả lời chưa đủ sâu. Yêu cầu làm lại.")
+        return {"needs_review": True, "messages": ["System: Hãy cải thiện câu trả lời"]}
+    else:
+        print("   -> Đánh giá: Đạt chất lượng. Kết thúc.")
+        return {"needs_review": False}
+
+# Đăng ký các Node vào builder
+builder.add_node("chatbot", chatbot_node)
+builder.add_node("reviewer", review_node)
+
+# Bước 4: Create edges (Thiết lập các kết nối và điều phối luồng)
+# START kết nối trực tiếp vào chatbot
+builder.add_edge(START, "chatbot")
+
+# Từ chatbot đi thẳng tới reviewer (unconditional edge)
+builder.add_edge("chatbot", "reviewer")
+
+# Viết hàm Router để quyết định rẽ nhánh dựa trên trạng thái (State)
+def route_after_review(state: AgentState):
+    # Nếu cờ review vẫn bằng True, quay lại chatbot để sửa (tạo vòng lặp)
+    # Nếu cờ review bằng False, kết thúc đồ thị (đi tới END)
+    if state["needs_review"]:
+        return "chatbot"
+    return END
+
+# Khai báo conditional edge từ node reviewer sang các node đích tiếp theo dựa trên router
+builder.add_conditional_edges(
+    "reviewer",
+    route_after_review,
+    {
+        "chatbot": "chatbot",
+        END: END
+    }
+)
+
+# Bước 5: Compile graph (Biên dịch đồ thị thành thực thể thực thi)
+graph = builder.compile()
+
+# Chạy thử nghiệm Graph với trạng thái khởi tạo
+if __name__ == "__main__":
+    initial_input = {
+        "messages": ["User: Giải thích về LangGraph"],
+        "needs_review": False
+    }
+    
+    print("=== BẮT ĐẦU CHẠY ĐỒ THỊ ===")
+    final_output = graph.invoke(initial_input)
+    print("\n=== KẾT QUẢ CUỐI CÙNG TRONG STATE ===")
+    for idx, msg in enumerate(final_output["messages"]):
+        print(f" Bước {idx + 1}: {msg}")
+</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 10px;">So sánh kiến trúc điều phối Agent</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Phù hợp nhất - Best for</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm & Đánh đổi - Cons & Trade-off</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Direct API usage<br>(Gọi API trực tiếp)</strong></td>
+                <td>Hệ thống đơn giản, workflow tuyến tính, hoặc khi cần tối ưu hóa độ trễ tuyệt đối.</td>
+                <td>Minh bạch, dễ debug prompt, kiểm soát 100% từng dòng code và model calls mà không bị che khuất.</td>
+                <td>Tự quản lý thủ công toàn bộ memory, logic rẽ nhánh, cơ chế retry khi lỗi và tracing hoạt động.</td>
+              </tr>
+              <tr>
+                <td><strong>LangChain (Glue code)</strong></td>
+                <td>Xây dựng nhanh các ứng dụng LLM tiêu chuẩn (RAG, Chatbot hỏi đáp dữ liệu nội bộ).</td>
+                <td>Rất nhiều abstractions dựng sẵn (prompt templates, vector store connectors, memory modules).</td>
+                <td>Thiết kế thiên về chuỗi tuyến tính, rất khó để cấu trúc các vòng lặp (loops) phức tạp một cách sạch sẽ.</td>
+              </tr>
+              <tr>
+                <td><strong>LangGraph</strong></td>
+                <td>Hệ thống Agent phức tạp có vòng lặp, human-in-the-loop, checkpointing, và nhiều nhánh xử lý.</td>
+                <td>Kiểm soát control flow tuyệt đối, quản lý state tập trung, tích hợp sẵn lưu trữ trạng thái để phục hồi lỗi.</td>
+                <td>Phải học mô hình tư duy đồ thị (State/Node/Edge), thêm một lớp abstraction orchestration làm tăng nhẹ độ phức tạp.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh các cấu phần của hệ sinh thái LangGraph</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Thành phần</th>
+                <th>Mục đích sử dụng</th>
+                <th>Môi trường chạy</th>
+                <th>Chi phí & Bản chất</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>LangGraph Framework</strong></td>
+                <td>Thư viện code cốt lõi để lập trình định nghĩa Node, Edge, State và biên dịch Graph.</td>
+                <td>Local (máy cá nhân) hoặc bất kỳ server nào của bạn.</td>
+                <td>Mã nguồn mở (Open Source), hoàn toàn miễn phí. Đây là phần duy nhất bạn cần để viết code Agent.</td>
+              </tr>
+              <tr>
+                <td><strong>LangGraph Studio</strong></td>
+                <td>Giao diện UI trực quan hóa cấu trúc đồ thị, hỗ trợ test tương tác trực quan với các Node.</td>
+                <td>Local (chạy kèm Docker Desktop) hoặc kết nối Cloud.</td>
+                <td>Công cụ hỗ trợ trực quan hóa (Visual Tool). Hữu ích cho việc debug và làm việc nhóm.</td>
+              </tr>
+              <tr>
+                <td><strong>LangGraph Platform</strong></td>
+                <td>Hạ tầng máy chủ được tối ưu hóa để deploy, quản lý và scale các ứng dụng LangGraph.</td>
+                <td>Hosted Runtime Cloud (Hạ tầng do LangChain quản lý).</td>
+                <td>Thương mại (Commercial). Có chi phí vận hành. Thích hợp cho doanh nghiệp cần hạ tầng scale tự động.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Nhầm lẫn thương mại:</strong> Cho rằng phải trả phí cho <code>LangGraph Platform</code> thì mới sử dụng được LangGraph.</li>
+                <li><strong>Over-abstraction (Trừu tượng hóa quá mức):</strong> Ép buộc sử dụng LangGraph cho mọi tác vụ gọi LLM, kể cả những luồng tuyến tính cực kỳ đơn giản chỉ có 1-2 bước.</li>
+                <li><strong>Mutate state trực tiếp trong Node:</strong> Thay đổi trực tiếp các giá trị trong đối tượng <code>State</code> nhận vào thay vì trả về dictionary thay đổi.</li>
+                <li><strong>Tư duy tuyến tính ẩn:</strong> Khai báo cấu trúc graph đồ thị nhưng thực chất chỉ nối các node chạy một lèo từ đầu đến cuối mà không có rẽ nhánh hay lặp lại.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh</h3>
+              <ul class="list">
+                <li><strong>Hiểu rõ bối cảnh:</strong> Khóa học và việc lập trình thực tế chạy trên thư viện mã nguồn mở <code>LangGraph Framework</code> hoàn toàn miễn phí.</li>
+                <li><strong>Giữ sự tối giản:</strong> Bắt đầu dự án bằng cách gọi trực tiếp API (Direct API usage) để kiểm soát prompt. Chỉ chuyển dịch sang LangGraph khi độ phức tạp của luồng (vòng lặp, human approval) đòi hỏi.</li>
+                <li><strong>Tuân thủ tính Immutable:</strong> Luôn viết node nhận state cũ, thực hiện tính toán và trả về dict chứa giá trị thay đổi. Để framework tự gộp qua Reducer.</li>
+                <li><strong>Vẽ sơ đồ luồng trước:</strong> Vẽ nháp sơ đồ hoạt động của agent ra giấy để xác định rõ các điều kiện rẽ nhánh (conditional edges) và điểm lặp (feedback loops) trước khi code.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: LangGraph giải quyết vấn đề cốt lõi nào của LangChain?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> LangChain được thiết kế cho các chuỗi bước tuyến tính (chains), rất khó tổ chức vòng lặp (loops) một cách ổn định. LangGraph giải quyết vấn đề này bằng cách đưa ra <code>graph-based architecture - kiến trúc dựa trên đồ thị</code> có trạng thái, giúp quản lý tốt các vòng lặp phản hồi (feedback loops) và lưu trạng thái để khôi phục khi lỗi (checkpointing).
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác nhau cơ bản giữa Node và Edge trong LangGraph là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> 
+                <ul>
+                  <li><strong>Node (Nút):</strong> Là Python function chứa logic xử lý thực tế (ví dụ: gọi LLM, lưu file). Nhận state và trả về bản cập nhật.</li>
+                  <li><strong>Edge (Cạnh):</strong> Là kết nối điều hướng, quyết định luồng chạy sẽ đi từ Node nào sang Node nào tiếp theo dựa trên dữ liệu trong State.</li>
+                </ul>
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao LangGraph yêu cầu cập nhật State theo kiểu không thay đổi trực tiếp (immutable-style updates)?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Để tránh các tác dụng phụ ngầm (side effects) khi các node ghi đè dữ liệu lên nhau, đồng thời lưu trữ lịch sử các trạng thái phục vụ cho việc quay lại các bước trước (time-travel debug) và khôi phục lỗi (resiliency) qua checkpointing.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: 5 bước cơ bản để định nghĩa và thực thi một Graph trong LangGraph là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> 
+                <ol>
+                  <li>Định nghĩa <code>State class</code> (schema dữ liệu chung).</li>
+                  <li>Khởi tạo <code>Graph Builder</code> (đối tượng StateGraph).</li>
+                  <li>Tạo các <code>Nodes</code> (hàm logic) và đăng ký vào builder.</li>
+                  <li>Tạo các <code>Edges</code> (kết nối giữa các node).</li>
+                  <li>Biên dịch (<code>Compile</code>) đồ thị để sẵn sàng thực thi qua phương thức <code>invoke()</code>.</li>
+                </ol>
+              </div>
+            </article>
+          </div>
+
+          <div class="card" style="margin-top: 14px;">
+            <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+            <p>Theo triết lý phát triển của Anthropic được trích dẫn trong bài học, đối với một ứng dụng Agent đơn giản, phương pháp tiếp cận nào được khuyến nghị ưu tiên hàng đầu?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Sử dụng ngay LangGraph Platform để triển khai lên cloud để đảm bảo tính sẵn sàng cao.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Sử dụng API trực tiếp (Direct API usage) nhằm giữ code tối giản, minh bạch và dễ debug prompt.</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Dùng một framework trừu tượng hóa mạnh như LangChain để che giấu hoàn toàn các lời gọi API cấp thấp.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>LangGraph giúp đảm bảo ba tiêu chuẩn: <code>stability - ổn định</code>, <code>resiliency - khả năng chịu lỗi</code>, và <code>repeatability - khả năng lặp lại nhất quán</code>.</li>
+                <li>LangGraph Framework là mã nguồn mở, miễn phí chạy local; Studio là công cụ trực quan; Platform là dịch vụ chạy cloud có phí.</li>
+                <li>Mô hình chạy gồm hai pha riêng biệt: Khai báo cấu trúc (Build) và Biên dịch chạy thực tế (Compile & Invoke).</li>
+                <li>Tránh thay đổi trực tiếp (mutate) state trong node. Hãy để framework gộp thông qua Reducer.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể phân biệt rạch ròi giữa vai trò của LangChain, LangGraph và LangSmith không?</li>
+                <li>Tại sao Anthropic lại tỏ ra dè chừng với các thư viện trừu tượng hóa (abstraction frameworks) quá mức?</li>
+                <li>Một Node trong LangGraph nhận gì làm đầu vào và cần trả về kiểu dữ liệu gì làm đầu ra?</li>
+                <li>Sự khác nhau giữa unconditional edge và conditional edge là gì?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Tài liệu học tập cá nhân. Nội dung lý thuyết tổng hợp từ nguồn học liệu chính thức và mã nguồn minh họa bổ sung từ kiến thức mở rộng.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Chính xác! Anthropic khuyến khích lập trình viên bắt đầu bằng Direct API usage để hiểu rõ bản chất prompts và responses, chỉ sử dụng framework khi độ phức tạp thực sự yêu cầu.";
+          result.style.color = "var(--success, #5db872)";
+        } else {
+          result.innerHTML = "Chưa chính xác. Hãy xem lại phần bối cảnh phản biện của Anthropic đối với các abstraction framework ở Section 4 hoặc Section 8.";
+          result.style.color = "var(--error, #c64545)";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

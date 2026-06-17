@@ -1,0 +1,46 @@
+So there are several of these marketplaces.
+One other I wanted to show you is called Smithery and it is very popular.
+Lots of people do use Smithery, and you'll notice that you probably see already many familiar NCP servers.
+Most popular NCP servers are installed in all of the marketplaces, but Smithery also allows you to
+come in.
+There's playwright again from Microsoft.
+Come into here.
+Read about the MSP server itself.
+You can see the way that you could run it directly from the command line with NPM.
+And you can see by logging in, if I if I were to log in, I'll be able to get the parameters right
+there.
+And you can see things like the tools that it offers as well.
+Similar to the other marketplaces, Smithery is quite popular.
+And then I also wanted to point you at a couple of blog posts that I think are really great.
+This is this is one that's been posted on Huggingface that has a bunch of libraries that you can look
+at or marketplaces, really, and it starts with them.
+So that we already saw and smithery that we just saw as well.
+And then there are some more.
+There are so many to look at.
+Awesome MCP servers and cursor has a directory.
+If you want to integrate MCP servers directly into cursor to arm your cursor agent so that it's equipped
+with this kind of functionality and many, many more.
+The official MCP open source project that's hosted by anthropic has a bunch of the reference servers,
+including fetch, one that we looked at, which some of the most robust that you can.
+You can start with and Klein for sure.
+So this is a good resource to look at with some great marketplaces.
+And then I found this article on hugging face as really nicely put, very accurate and thoughtful about
+again, what is it that's so great about MCP, but also a reality check of of what it's not, and making
+sure that people are clear on distinguishing the hype from reality, what it is that's genuinely exciting
+about it.
+So very much worth taking a look at these articles, looking through the marketplaces and getting your
+own sense of what's going on in the MCP landscape.
+And so I know we covered a lot of material today.
+Hopefully it's all settling in.
+MCP hosts, clients, servers.
+The fact that MCP servers can be written in Python and launch with UV or in JavaScript through Mpcs,
+and they can also run in other ways as well.
+But those are the main two.
+The fact that there is studio and ZK is the two transport mechanisms for MCP servers.
+And most importantly, the fact that the reason MCP servers are so exciting is that it makes it so easy
+and frictionless to be hooking up your agent to many tools that have been written by people all over
+the world, and there are thousands of them to pick from.
+That's the so what?
+And in fact, next time we're actually going to make our own MCP server and client so that we could
+contribute to this.
+I will see you then.

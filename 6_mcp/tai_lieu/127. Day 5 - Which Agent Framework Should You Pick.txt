@@ -1,0 +1,142 @@
+While it's all been leading up to this.
+Welcome to the grand finale.
+Welcome to week six, day five, the conclusion of our capstone project, and also the time when we
+wrap up and answer the question of, okay, so which framework should I use for my project?
+But first, the capstone project, autonomous trading.
+We have some ingredients to add to the mix.
+We're going to turn it into a trading floor of four traders.
+We're going to give the traders autonomy to evolve their strategy.
+We're going to expand the number of models.
+You've already seen a little teaser of this, and we're going to build a user interface, which is going
+to have a surprise extra component, which is a super important piece of functionality extensibility
+that we can get through OpenAI agents SDK.
+So without further ado, let's go back to the lab for the final time.
+And here we are once more in cursor for the last time.
+We go into the sixth folder and we go to lab five, which is really more of a text thing, but let's
+just talk about what we have here.
+So we've, uh, actually now we've already taken a look at all of the MCP servers that we're going to
+be playing with, but it includes, of course, things like the push notification and the memory and
+everything else.
+But I want to be adding more in time.
+And I would like you to as well.
+And so if you go in there and you look in the MCP servers, you might find that there are more there
+already.
+Uh, because I do plan to be adding more and if not, you should keep adding them in.
+As of the time I record this, there are currently, as we just saw, six MCP servers with 44 different
+tools and two resources, and I do hope to be adding to them in time.
+Okay, so now to introduce you to the four traders that we have set up in our trading floor, we have
+four traders that are now known.
+They are named Warren, George, Ray and Cathy, and they are paying homage to four luminaries of the
+industry Warren to the legend that is Warren Buffett, George to George Soros.
+Ray for Ray Dalio and Kathy, perhaps an odd one out for a more modern investor for Cathie Wood of Ark
+Investments.
+And they each have investment strategies inspired by their namesakes.
+Uh, but also I've given them autonomy to be changing their strategy in time.
+So let's look at this.
+So first of all, we need to go to a Python module called Reset Pi.
+And this is where the strategies are laid out.
+There is a Warren strategy.
+Uh, you are Warren.
+You are named in homage to your role model, Warren Buffett, a value oriented investor prioritizing
+long term wealth creation.
+George is named for George Soros, an aggressive macro trader.
+Ray.
+Of course, systematic principles based approach, uh, with macro economic insights.
+And Kathy, who pursues disruptive innovation, particularly crypto.
+But I focused on crypto ETFs because this is all meant to be about equity trading.
+So ETFs is what we do.
+Um, and reset traders will reset these for people to have this strategy.
+Now I'm not going to run that reset method myself because I've already had this running for a couple
+of weeks.
+And I don't want to delete all that history.
+I want you to see how these traders have done for the last couple of weeks, because that's going to
+be fun.
+Um, so I won't reset, but you, of course should, so that you have the right strategies if you're
+looking at this.
+So you should uncomment this line right here and run reset traders so that everything is ready to begin.
+And then I need to talk to you about traces.
+Okay.
+So I now want to tell you about traces.
+One of the things you might have thought about OpenAI agents SDK is that whilst it is quite lightweight
+and simple, which is nice, it perhaps doesn't have the same level of resiliency and plumbing that
+something like Landgrave has with its connectivity to Lang Smith.
+The trace functionality in OpenAI.
+It's a little bit sort of cheap and cheerful.
+You have to log in to your OpenAI screen and then see the tracing in there.
+Well, it happens that they thought of that.
+They've made the tracing functionality in OpenAI agents SDK very extensible.
+You can, in fact connect it to Lang Smith to be able to look at your data in Lang Smith, you can also
+connect it to things like weights and biases, which I teach in my other course, which is super useful.
+And indeed, you can extend it yourself to record trace information however you would like, so that
+you can programmatically handle that with your agent flow and take actions as a result of tracing.
+And that is really cool and it's very easy to do.
+And I've done it here in this traces module.
+So you essentially make a subclass of an OpenAI class called Tracing Processor.
+And in that subclass you have to override four methods on trace start on trace end on span start and
+on span end, and you get passed in an object that describes what's going on, and you can then choose
+to do what you want, record it in any way.
+And what gets passed in could be one of a number of different types of data, and you can pluck out
+relevant information and decide what to do with it.
+And so what did I use this for?
+What have I decided to do with it?
+I've decided to have my own little logging mechanism.
+And so I write this to my own log with a name and a type and a message, and I actually store this in
+SQLite.
+I have this write log, just writes it to a database based on this person's name, so that I can keep
+track of these logs, and that allows me to take some actions as a result of the tracing activity happening
+in my agent framework.
+And what would I like to do with that?
+Well, I'd like to display it.
+I'd like to be able to see on the user interface, what are our traders actually doing?
+What are they thinking, what's going on?
+And I'd like to be able to reflect what is effectively being recorded in OpenAI's traces on the user
+interface, and that is what we will be doing.
+Okay, so we've talked about the user interface.
+Let's see what it is.
+Well this is the code for it.
+It's a Gradio app.
+And you probably know that I love Gradio.
+Now the purpose of this course is not to teach you about Gradio.
+So I'm not going to go through this in a lot of detail, but it is very simplistic.
+Uh, I've got like a class trader, which is going to to wrap my various calls to, to organize the
+business rules around a trader for this screen.
+And then I've got a sort of companion class, trader view, which deals with the visual elements associated
+with any trader.
+And it has something that periodically refreshes the screen.
+And then this ends with just the create UI that has the final gradio code to to create it, and something
+that launches the screen.
+So you can look at the UI code if you wish.
+It's not super important.
+What's important is what information it shows us.
+And let's take a look at that right now.
+So I press control and Backtick to open a terminal.
+I go into the sixth folder and now I type.
+You've run app Dot Pi to launch our Gradio app for our autonomous traders.
+And here it is.
+Here in a nutshell is the UI for our traders.
+And I gotta tell you, I love this.
+So the four columns here represent our four traders.
+This is the trader view object with the trader behind it Warren.
+And in this case Warren is controlled by GPT four one.
+Mini George is deep seek V3, Ray is Gemini two five flash and Cathie is using appropriately for crypto
+investor grok three mini.
+Um, and one thing that's kind of fun is to see that this has been running for a few weeks, and all
+four of my traders are profitable.
+They all started with $10,000.
+That is what happens when you call reset, and none of them have made a fortune, but they have all
+made a little bit of money.
+And the winner right now is Cathy.
+Uh, the, uh, Cathy seems to be doing quite well with her portfolio.
+And it does look like three out of the four have Nvidia stock in their portfolios.
+Um, and you can see here some fun looking stuff that we're seeing the trace information about these
+traders.
+And of course we're seeing this chart here that shows what's been going on with their portfolios.
+Um, and I haven't actually run them for a few days, which is why there's been this sort of jump down
+of, of their performance.
+Uh, so this is pretty cool.
+This is the user interface that's looking at our traders.
+But if you're following, you'll realize that we're not actually seeing anything dynamic here.
+We're just seeing a snapshot of the data in the database that reflects our.
+For traders, what we really want to see is what happens when they start trading, when we actually
+kick this off and run it.
+And that is what we're going to do right now.

@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3: Super Steps, Checkpointing & SQLite Persistent Memory - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, Garamond, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.15rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.08rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 12px;
+      transition: background 0.15s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 14px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      font-weight: 600;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: "Inter", sans-serif;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & Thực hành</span>
+        <h1>LangGraph Day 3: Siêu bước (Super Steps), Tích hợp Công cụ & Bộ nhớ bền vững SQLite</h1>
+        <p class="lead">
+          Nội dung ôn tập toàn diện ngày học thứ ba về LangGraph. Tìm hiểu khái niệm <code>super-step - siêu bước</code>, cơ chế <code>checkpointing - chụp điểm khôi phục trạng thái</code>, cách tích hợp các công cụ tự viết hoặc có sẵn, xây dựng đồ thị gọi tools phức tạp, và nâng cấp bộ nhớ từ RAM lên database SQLite lưu trữ bền vững.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Day 3 Practice</span>
+          <span class="tag">Observability & SQLite Memory</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day3_summary.md)</span>
+          <span class="source">Code (2_lab2.ipynb)</span>
+          <span class="source">Slide (Không có)</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus • Tiêu điểm nhanh</h2>
+        <ul class="list">
+          <li><strong>super-step (siêu bước):</strong> Đơn vị một lần invoke hoàn chỉnh của đồ thị. Reducer chỉ xử lý merge state trong một super-step, không duy trì bộ nhớ xuyên super-steps.</li>
+          <li><strong>Checkpointing:</strong> Cơ chế chụp lại State snapshot sau mỗi super-step, là chìa khóa để khôi phục và duy trì ngữ cảnh dài hạn.</li>
+          <li><strong>SqliteSaver:</strong> Bộ lưu checkpoint bền vững giúp khôi phục toàn bộ lịch sử trò chuyện của một <code>thread_id</code> ngay cả khi restart server/process.</li>
+          <li><strong>LangSmith:</strong> Cung cấp <code>observability - khả năng quan sát</code> toàn diện các bước chạy, token, chi phí và lỗi bên trong đồ thị.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng file tóm tắt lý thuyết chi tiết [day3_summary.md](file:///G:/Agent2026Win/agents/4_langgraph/tai_lieu/day3_summary.md) bao gồm các bài 76, 77, 78, 79, 80.</li>
+                <li><strong>Code:</strong> Đã phân tích trực tiếp mã nguồn trong file Jupyter Notebook thực hành [2_lab2.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/2_lab2.ipynb).</li>
+                <li><strong>Slide:</strong> Không có slide đi kèm cho buổi học này.</li>
+                <li><strong>Transcript:</strong> Đã được tích hợp và tóm tắt trực tiếp trong tài liệu Docx LLM.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Mã nguồn trong [2_lab2.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/2_lab2.ipynb) khớp hoàn toàn với các phần lý thuyết được trình bày trong file tóm tắt. Phần <strong>Code Walkthrough</strong> sẽ trích dẫn và phân tích trực tiếp các khối code tích hợp LangSmith, Serper search tool, custom push tool, ToolNode, MemorySaver, và SqliteSaver.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm technical term viết dưới dạng <code>English term - nghĩa tiếng Việt</code>. Từ đơn phổ biến viết dưới dạng <code>term (nghĩa tiếng Việt)</code>. Ví dụ: <code>super-step - siêu bước</code>, <code>checkpointing - chụp điểm khôi phục trạng thái</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Day 3 giải quyết hai rào cản lớn nhất của Agent sơ khởi: <strong>Kết nối thế giới thực</strong> (qua bọc Tools và conditional edge điều hướng) và <strong>Bộ nhớ bền vững</strong> (qua checkpointing sử dụng SQLite lưu file <code>memory.db</code>).
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Super-step boundary:</strong> Reducer chỉ merge state bên trong một lần chạy đồ thị. Giữa nhiều lượt tương tác chat, bắt buộc phải dùng <code>checkpointer</code>.</li>
+                <li><strong>Cấu hình SQLite:</strong> Khởi tạo <code>SqliteSaver(conn)</code> và truyền vào khi compile graph: <code>compile(checkpointer=sql_memory)</code>.</li>
+                <li><strong>Thread ID:</strong> Là khoá logic phân vùng hội thoại cho từng người dùng.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Sử dụng SQLite checkpointer cho bất kỳ dự án chatbot thực tế nào cần tính năng <code>durability - độ bền dữ liệu</code> qua restart server, khôi phục lịch sử hoặc hỗ trợ tính năng quay lui trạng thái (time travel).
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Trong [Day 2](file:///G:/Agent2026Win/agents/4_langgraph/tai_lieu/day2_study_guide.html), chúng ta đã viết mã nguồn StateGraph chatbot đầu tiên kết nối với Gradio, sử dụng <code>add_messages</code>. Tuy nhiên, chatbot đó bị "stateless" (mất trí nhớ) qua từng lượt chat.
+            <br><br>
+            <strong>Day 3</strong> mở rộng và khắc phục hoàn toàn điểm yếu này bằng cách giải thích khái niệm <code>super-step</code>, giới thiệu cơ chế <code>checkpointing</code> để snapshot dữ liệu, tích hợp các công cụ tìm kiếm serper và gửi tin nhắn đẩy Pushover, giúp chatbot phát triển thành một <strong>Agent thực thụ có phản xạ và trí nhớ bền vững</strong>.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>super-step - siêu bước:</strong> Một chu trình invocation chạy hoàn chỉnh của đồ thị (một lần gọi <code>invoke()</code>).</li>
+                <li><strong>invocation boundary - ranh giới invocation:</strong> Đường phân tách giữa các lần chạy đồ thị khác nhau. Reducer chỉ hoạt động bên trong ranh giới này.</li>
+                <li><strong>checkpointing - chụp điểm khôi phục trạng thái:</strong> Cơ chế tự động ghi lại trạng thái của đồ thị vào database sau mỗi super-step.</li>
+                <li><strong>state snapshot - ảnh chụp trạng thái:</strong> Bản ghi trạng thái tĩnh được lưu trữ để có thể nạp lại hoặc xem lịch sử.</li>
+                <li><strong>LangSmith - công cụ quan sát và debug:</strong> Dịch vụ đám mây giúp theo dõi log chạy, latency (độ trễ), cost (chi phí) của LLM.</li>
+                <li><strong>Tool - đối tượng công cụ:</strong> Lớp bọc của LangChain chuẩn hóa một hàm Python thông thường thành một capability mà LLM hiểu và gọi được.</li>
+                <li><strong>ToolNode - nút công cụ dựng sẵn:</strong> Nút được LangGraph cung cấp sẵn để tự động thực thi các yêu cầu gọi tool từ LLM.</li>
+                <li><strong>tools_condition:</strong> Hàm router điều hướng có sẵn để kiểm tra xem LLM có yêu cầu chạy tool hay không.</li>
+                <li><strong>SqliteSaver - bộ lưu checkpoint SQLite:</strong> Checkpoint backend lưu State vào database SQLite giúp bền vững hóa dữ liệu.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ giữa các khái niệm</h3>
+              <p>
+                <strong>Super-step</strong> là đơn vị bao quát một lượt trò chuyện. Khi người dùng gửi tin nhắn, đồ thị thực thi một super-step mới. Reducer gộp tin nhắn mới và cũ bên trong lần invoke đó. 
+                <br><br>
+                Sau khi super-step hoàn thành, **Checkpointer** (như <code>SqliteSaver</code>) sẽ chụp một **State snapshot** và lưu vào file <code>memory.db</code> kèm theo định danh **thread_id**. 
+                <br><br>
+                Khi super-step tiếp theo bắt đầu, đồ thị sẽ tự tìm nạp lại checkpoint tương ứng với <code>thread_id</code> đó để khôi phục bối cảnh trò chuyện. Nếu LLM yêu cầu gọi tool, **tools_condition** sẽ điều hướng sang **ToolNode** để chạy tool, sau đó quay trở lại chatbot để LLM tổng hợp câu trả lời trước khi kết thúc super-step.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về Time Travel và State History</summary>
+            <p>
+              Nhờ cơ chế lưu trữ checkpoint bền vững của LangGraph, mỗi lần đồ thị thay đổi trạng thái, một bản ghi mới với một mã số định danh duy nhất <code>checkpoint_id</code> được tạo ra trong database. Điều này cho phép thực hiện kỹ thuật <strong>time travel (quay lui trạng thái)</strong>:
+            </p>
+            <ul class="list" style="margin-top: 8px;">
+              <li><strong>Truy vấn lịch sử:</strong> Sử dụng phương thức <code>graph.get_state_history(config)</code> để lấy ra toàn bộ danh sách các snapshot từ mới nhất đến cũ nhất.</li>
+              <li><strong>Quay lui và rẽ nhánh:</strong> Khi truyền một cấu hình chứa cả <code>thread_id</code> và một <code>checkpoint_id</code> cụ thể vào lệnh <code>graph.invoke(None, config)</code>, đồ thị sẽ tự động phục hồi về đúng thời điểm đó. Bạn có thể cho chatbot chạy tiếp từ bối cảnh quá khứ theo một hướng đi mới (branching) mà không ảnh hưởng đến các checkpoints mới hơn, rất hữu ích cho việc tự động khôi phục sau lỗi hoặc cho phép người dùng thử các lựa chọn khác nhau.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình và luồng dữ liệu</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level flow - Các bước tích hợp Tools & Memory</h3>
+              <ol class="list">
+                <li><strong>Bọc Tools:</strong> Khai báo các function Python (như Serper Search, Pushover custom tool) và bọc lại bằng lớp <code>Tool(name, func, description)</code>.</li>
+                <li><strong>Ràng buộc Tools vào LLM:</strong> Sử dụng <code>llm.bind_tools(tools)</code> để tạo đối tượng <code>llm_with_tools</code> gửi schema cho LLM.</li>
+                <li><strong>Đăng ký Nodes:</strong> Đăng ký node chatbot thông thường và nút thực thi công cụ prebuilt <code>ToolNode(tools=tools)</code>.</li>
+                <li><strong>Thiết lập Cạnh điều kiện:</strong> Nối <code>START -> chatbot</code>; sử dụng <code>add_conditional_edges("chatbot", tools_condition)</code> để rẽ nhánh sang "tools" hoặc "END"; nối cạnh phản hồi bắt buộc <code>tools -> chatbot</code>.</li>
+                <li><strong>Compile với Checkpointer:</strong> Khởi tạo <code>SqliteSaver</code> từ SQLite connection và compile đồ thị: <code>compile(checkpointer=sql_memory)</code>.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data / control flow - Luồng điều phối khi chạy</h3>
+              <p>
+                Khi thực hiện cuộc gọi: <code>graph.invoke(..., config={"configurable": {"thread_id": "3"}})</code>:
+                <br><br>
+                1. <strong>Đọc Checkpoint:</strong> LangGraph tìm trong database SQLite snapshot trạng thái gần nhất của thread_id "3" để khôi phục.
+                <br>
+                2. <strong>Chatbot node:</strong> Nhận tin nhắn mới, gửi cho LLM kèm danh sách tool schemas.
+                <br>
+                3. <strong>Conditional Edge:</strong> Nếu LLM trả về cờ yêu cầu gọi tool (<code>finish_reason=="tool_calls"</code>), <code>tools_condition</code> điều hướng luồng chạy sang node "tools".
+                <br>
+                4. <strong>ToolNode:</strong> Unpack tham số và thực thi tool (tìm kiếm web hoặc gửi push notification), trả về kết quả vào State dưới dạng tin nhắn của Tool.
+                <br>
+                5. <strong>Loop:</strong> Quay lại node chatbot để LLM đọc câu trả lời của tool và sinh câu trả lời cuối cùng.
+                <br>
+                6. <strong>Ghi Checkpoint:</strong> Đồ thị đi tới <code>END</code>, checkpointer lưu lại snapshot State mới nhất vào database SQLite trước khi trả kết quả cho UI.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Two-point tool integration<br>(Tích hợp tools tại hai điểm)</h3>
+              <p><strong>Purpose:</strong> Hoàn thiện chu trình tích hợp tool: vừa khai báo schema để LLM biết cách gọi (qua bind_tools), vừa thực thi code khi LLM yêu cầu (qua ToolNode).</p>
+              <p><strong>When to use:</strong> Bắt buộc sử dụng cho mọi đồ thị LangGraph có tính năng gọi công cụ ngoài.</p>
+              <p><strong>Trade-off:</strong> Tách biệt khai báo và thực thi làm tăng số lượng nodes, đòi hỏi kết nối conditional edge phức tạp hơn.</p>
+            </article>
+            <article class="card">
+              <h3>Prebuilt tool routing<br>(Định tuyến công cụ dựng sẵn)</h3>
+              <p><strong>Purpose:</strong> Sử dụng các helper dựng sẵn của LangGraph (<code>tools_condition</code> và <code>ToolNode</code>) để giảm thiểu mã nguồn boilerplate xử lý rẽ nhánh thủ công.</p>
+              <p><strong>When to use:</strong> Phù hợp cho hầu hết các use cases gọi tool tiêu chuẩn của OpenAI/LangGraph.</p>
+              <p><strong>Trade-off:</strong> Che giấu chi tiết xử lý nội bộ, khó tùy biến sâu các điều kiện rẽ nhánh đặc thù.</p>
+            </article>
+            <article class="card">
+              <h3>SQLite persistent checkpoints<br>(SQLite checkpoints bền vững)</h3>
+              <p><strong>Purpose:</strong> Bền vững hóa bộ nhớ của chatbot thông qua lưu trữ tệp tin vật lý <code>memory.db</code>, bảo toàn lịch sử hội thoại qua các lần restart.</p>
+              <p><strong>When to use:</strong> Khi phát triển ứng dụng chatbot thực tế cần triển khai lên server hoặc môi trường thử nghiệm nâng cao.</p>
+              <p><strong>Trade-off:</strong> Yêu cầu quản lý kết nối SQLite, mở rộng tệp tin database và dọn dẹp các checkpoint cũ khi dung lượng tăng lớn.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code thực tế</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <div class="callout" style="margin-bottom: 16px;">
+            Dưới đây là các khối mã nguồn chính thức trích xuất từ Jupyter Notebook [2_lab2.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/2_lab2.ipynb).
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Phần 1: Thiết lập LangSmith & Bọc Serper Search Tool</h3>
+              <p>Cấu hình tracing để LangSmith theo dõi chi tiết các cuộc gọi và bọc công cụ tìm kiếm Google Serper của LangChain Community thành một đối tượng Tool chuẩn.</p>
+            </div>
+            <div class="code-meta">
+              <span>Notebook Cell 1-7</span>
+              <span>GoogleSerperAPIWrapper</span>
+              <span>Tool Abstraction</span>
+            </div>
+            <pre><code>from dotenv import load_dotenv
+from langchain_community.utilities import GoogleSerperAPIWrapper
+from langchain.agents import Tool
+
+# Nạp các biến môi trường (bao gồm cả LANGCHAIN_TRACING_V2, LANGCHAIN_API_KEY để bật LangSmith)
+# Không in hoặc tiết lộ các giá trị khoá bí mật ra màn hình log
+load_dotenv(override=True)
+
+# Khởi tạo bộ máy tìm kiếm Serper API
+serper = GoogleSerperAPIWrapper()
+
+# Bọc hàm serper.run thành đối tượng Tool chuẩn của LangChain
+# Cung cấp name và description rõ ràng để mô hình LLM hiểu khi nào nên gọi công cụ này
+tool_search = Tool(
+    name="search",
+    func=serper.run,
+    description="Useful for when you need more information from an online search"
+)
+
+# Chạy thử công cụ độc lập
+result = tool_search.invoke("What is the capital of France?")
+print("Kết quả test search tool:", result)
+</code></pre>
+          </article>
+
+          <article class="code-panel" style="margin-top: 20px;">
+            <div>
+              <h3>Phần 2: Xây dựng công cụ gửi tin nhắn đẩy Pushover (Custom Tool)</h3>
+              <p>Tạo một hàm gửi tin nhắn đẩy qua ứng dụng Pushover và bọc lại thành đối tượng Tool để đăng ký cho Agent sử dụng.</p>
+            </div>
+            <div class="code-meta">
+              <span>Notebook Cell 11-13</span>
+              <span>Pushover API</span>
+              <span>Custom push tool</span>
+            </div>
+            <pre><code>import os
+import requests
+from langchain.agents import Tool
+
+# Lấy khoá bảo mật Pushover từ môi trường
+pushover_token = os.getenv("PUSHOVER_TOKEN")
+pushover_user = os.getenv("PUSHOVER_USER")
+pushover_url = "https://api.pushover.net/1/messages.json"
+
+# Định nghĩa hàm Python gửi yêu cầu POST tới API của Pushover
+def push(text: str):
+    # Docstring ở đây đóng vai trò cực kỳ quan trọng giúp LLM nhận diện mục đích của hàm
+    """Send a push notification to the user"""
+    requests.post(pushover_url, data={"token": pushover_token, "user": pushover_user, "message": text})
+
+# Bọc hàm push thành đối tượng Tool chuẩn
+tool_push = Tool(
+    name="send_push_notification",
+    func=push,
+    description="useful for when you want to send a push notification"
+)
+
+# Chạy thử công cụ push độc lập
+tool_push.invoke("Hello, me")
+</code></pre>
+          </article>
+
+          <article class="code-panel" style="margin-top: 20px;">
+            <div>
+              <h3>Phần 3: Xây dựng Đồ Thị Gọi Tools có rẽ nhánh (Tool-Calling Graph)</h3>
+              <p>Sử dụng State kiểu <code>TypedDict</code>, ràng buộc danh sách tools vào LLM và cấu hình cạnh điều kiện rẽ nhánh sử dụng <code>tools_condition</code> và nút prebuilt <code>ToolNode</code>.</p>
+            </div>
+            <div class="code-meta">
+              <span>Notebook Cell 14-27</span>
+              <span>TypedDict State</span>
+              <span>ToolNode & tools_condition</span>
+            </div>
+            <pre><code>from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
+from langchain_openai import ChatOpenAI
+
+# Gom các công cụ đã tạo thành một danh sách
+tools = [tool_search, tool_push]
+
+# Bước 1: Khai báo State kiểu TypedDict (thay thế cho BaseModel của Pydantic)
+class State(TypedDict):
+    messages: Annotated[list, add_messages]
+
+# Bước 2: Khởi tạo Graph Builder
+graph_builder = StateGraph(State)
+
+# Khởi tạo mô hình LLM gpt-4o-mini
+llm = ChatOpenAI(model="gpt-4o-mini")
+
+# RÀNG BUỘC TOOLS: Gửi định nghĩa schema các công cụ cho LLM
+llm_with_tools = llm.bind_tools(tools)
+
+# Bước 3: Đăng ký Nodes
+def chatbot(state: State):
+    # Invoke mô hình đã được bind tools
+    return {"messages": [llm_with_tools.invoke(state["messages"])]}
+
+# Đăng ký node chatbot chính thức
+graph_builder.add_node("chatbot", chatbot)
+
+# Đăng ký nút thực thi tools prebuilt (ToolNode)
+graph_builder.add_node("tools", ToolNode(tools=tools))
+
+# Bước 4: Thiết lập các Edges liên kết
+# Khai báo cạnh điều kiện: Từ chatbot, sử dụng tools_condition để kiểm tra rẽ nhánh sang node "tools" hoặc kết thúc
+graph_builder.add_conditional_edges("chatbot", tools_condition, "tools")
+
+# QUAN TRỌNG: Cạnh phản hồi bắt buộc quay từ node tools về node chatbot để LLM đọc kết quả chạy tool
+graph_builder.add_edge("tools", "chatbot")
+
+# Cạnh bắt đầu
+graph_builder.add_edge(START, "chatbot")
+
+# Bước 5: Biên dịch đồ thị tiêu chuẩn (chưa có memory)
+graph = graph_builder.compile()
+</code></pre>
+          </article>
+
+          <article class="code-panel" style="margin-top: 20px;">
+            <div>
+              <h3>Phần 4: Tích hợp Bộ Nhớ Bền Vững SQLite (SqliteSaver Checkpointer)</h3>
+              <p>Chuyển đổi đồ thị sang runtime có hỗ trợ lưu trữ checkpoints bền vững thông qua SQLite saver, giúp duy trì bộ nhớ qua nhiều lượt invoke và qua các lần restart process.</p>
+            </div>
+            <div class="code-meta">
+              <span>Notebook Cell 28-49</span>
+              <span>sqlite3 connection</span>
+              <span>SqliteSaver compile</span>
+            </div>
+            <pre><code>import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
+
+# Khởi tạo kết nối vật lý tới database sqlite
+# check_same_thread=False cho phép kết nối được chia sẻ an toàn trong Jupyter/Web Server
+db_path = "memory.db"
+conn = sqlite3.connect(db_path, check_same_thread=False)
+
+# Khởi tạo bộ lưu trữ checkpoint SQLite
+sql_memory = SqliteSaver(conn)
+
+# Tái xây dựng đồ thị giống như phần 3...
+graph_builder = StateGraph(State)
+graph_builder.add_node("chatbot", chatbot)
+graph_builder.add_node("tools", ToolNode(tools=tools))
+graph_builder.add_conditional_edges("chatbot", tools_condition, "tools")
+graph_builder.add_edge("tools", "chatbot")
+graph_builder.add_edge(START, "chatbot")
+
+# BƯỚC QUAN TRỌNG: Biên dịch đồ thị có gắn checkpointer SQLite
+graph = graph_builder.compile(checkpointer=sql_memory)
+
+# Khởi tạo cấu hình chạy với thread_id để phân định bối cảnh hội thoại
+config = {"configurable": {"thread_id": "3"}}
+
+# Hàm chạy tích hợp giao diện Gradio
+def chat(user_input: str, history):
+    # Mỗi lần gọi invoke(), truyền kèm config chứa thread_id để đồ thị tự nạp lại checkpoint cũ từ database
+    result = graph.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
+    
+    # Trả về phản hồi cuối cùng sau khi LLM đã xử lý
+    return result["messages"][-1].content
+
+# Khởi chạy chatbot Gradio có bộ nhớ bền vững SQLite
+gr.ChatInterface(chat, type="messages").launch()
+</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 10px;">So sánh phương thức bọc Tools</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Phương thức</th>
+                <th>Phù hợp nhất</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Community Wrapper (Công cụ viết sẵn)</strong></td>
+                <td>Khi cần tích hợp nhanh các công cụ phổ biến đã được kiểm chứng (tìm kiếm web, API thời tiết).</td>
+                <td>Tiết kiệm thời gian lập trình, hoạt động ổn định và có sẵn trong hệ sinh thái.</td>
+                <td>Khó tuỳ biến sâu cấu trúc trả về hoặc can thiệp sâu vào logic bên dưới.</td>
+              </tr>
+              <tr>
+                <td><strong>Custom Tool (Công cụ tự viết)</strong></td>
+                <td>Khi thao tác liên quan trực tiếp đến nghiệp vụ riêng biệt (gửi tin nhắn thông báo nội bộ, truy vấn DB riêng).</td>
+                <td>Kiểm soát 100% logic, định dạng dữ liệu đầu vào và đầu ra, dễ dàng mở rộng.</td>
+                <td>Tự chịu trách nhiệm viết mã, kiểm thử, xử lý ngoại lệ và tối ưu hoá hiệu năng.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh các bộ lưu trữ Checkpoint (Checkpointer Backends)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Bộ lưu trữ</th>
+                <th>Phù hợp nhất</th>
+                <th>Cơ chế lưu trữ</th>
+                <th>Độ bền dữ liệu - Durability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>MemorySaver</strong></td>
+                <td>Thử nghiệm nhanh local, viết unit tests, chạy demo ngắn trong file Jupyter Notebook.</td>
+                <td>Lưu snapshot trực tiếp trong RAM của process.</td>
+                <td><strong>Không bền vững.</strong> Dữ liệu hội thoại biến mất hoàn toàn ngay khi restart app/kernel.</td>
+              </tr>
+              <tr>
+                <td><strong>SqliteSaver</strong></td>
+                <td>Prototype nâng cao, ứng dụng local cần giữ lịch sử hội thoại ổn định qua các phiên chạy.</td>
+                <td>Ghi snapshot vào tệp tin SQLite vật lý (ví dụ: <code>memory.db</code>).</td>
+                <td><strong>Bền vững trung bình.</strong> Bảo toàn dữ liệu qua restart process. Thích hợp chạy local/server nhỏ.</td>
+              </tr>
+              <tr>
+                <td><strong>PostgresSaver (Mở rộng)</strong></td>
+                <td>Hệ thống Agent quy mô sản xuất lớn (production) phục vụ hàng nghìn người dùng đồng thời.</td>
+                <td>Ghi snapshot vào PostgreSQL database chạy độc lập.</td>
+                <td><strong>Bền vững cao.</strong> Hỗ trợ phân tán, an toàn dữ liệu doanh nghiệp và scale tải tự động.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Thiếu cạnh quay lại chatbot từ tools:</strong> Chỉ định cấu hình cạnh điều hướng <code>chatbot -> tools</code> nhưng quên không khai báo cạnh quay lại <code>tools -> chatbot</code>. Điều này khiến đồ thị chạy xong tool rồi dừng lại đột ngột mà không đưa kết quả cho LLM sinh câu trả lời cuối cùng.</li>
+                <li><strong>Quên truyền config chứa thread_id khi gọi invoke():</strong> Nghĩ rằng checkpointer sẽ tự động nhận dạng lịch sử. Hậu quả là chatbot tiếp tục hoạt động stateless (mất trí nhớ) do framework không tìm được session key.</li>
+                <li><strong>Sử dụng in-memory checkpoint và kỳ vọng duy trì sau restart:</strong> Sử dụng <code>MemorySaver</code> và ngạc nhiên khi toàn bộ lịch sử biến mất sau khi khởi động lại server.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh</h3>
+              <ul class="list">
+                <li><strong>Vẽ sơ đồ và kiểm tra cạnh (Edges):</strong> Luôn đảm bảo sơ đồ Mermaid hiển thị vòng lặp khép kín <code>chatbot -> tools -> chatbot</code> trước khi chạy.</li>
+                <li><strong>Thiết lập config chuẩn mực:</strong> Tạo thói quen đóng gói config runtime: <code>config = {"configurable": {"thread_id": "session_1"}}</code> và luôn truyền kèm vào hàm <code>invoke(state, config=config)</code>.</li>
+                <li><strong>Đổi sang SqliteSaver sớm:</strong> Đối với mọi demo cần giữ ngữ cảnh lâu dài để trình bày, hãy cấu hình SQLite saver và file <code>memory.db</code> vật lý ngay từ đầu.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Siêu bước (super-step) là gì trong mô hình thực thi của LangGraph?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Là một đơn vị thực thi hoàn chỉnh của toàn bộ đồ thị cho một lượt tương tác (một cuộc gọi <code>invoke()</code>). Reducers chỉ quản lý và gộp các thay đổi trạng thái bên trong phạm vi của một super-step, không tự động mang dữ liệu sang super-step tiếp theo.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải sử dụng checkpointing thay vì chỉ phụ thuộc vào add_messages reducer?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Reducer chỉ merge tin nhắn trong một lần invoke đồ thị (một super-step). Giữa các lượt tương tác chat khác nhau (các super-steps khác nhau), LangGraph cần checkpointing để chụp lại snapshot và khôi phục State từ database, giúp tạo ra bộ nhớ hội thoại dài hạn.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: thread_id đóng vai trò gì trong cơ chế lưu trữ checkpoint?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Là định danh logic dùng để phân nhóm và cô lập lịch sử checkpoints của các cuộc hội thoại hoặc người dùng khác nhau. Cùng <code>thread_id</code> sẽ dùng chung bộ nhớ; khác <code>thread_id</code> sẽ hoàn toàn độc lập và không nhìn thấy dữ liệu của nhau.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Làm thế nào để thực hiện Time Travel (quay lui trạng thái) trong LangGraph?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Lấy mã số <code>checkpoint_id</code> từ lịch sử thông qua phương thức <code>graph.get_state_history(config)</code>, sau đó truyền cấu hình chứa cả <code>thread_id</code> và <code>checkpoint_id</code> đó vào lệnh <code>graph.invoke(None, config)</code> để khôi phục đồ thị về đúng thời điểm quá khứ.
+              </div>
+            </article>
+          </div>
+
+          <div class="card" style="margin-top: 14px;">
+            <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+            <p>Trong cấu trúc đồ thị gọi tool tiêu chuẩn, tại sao cạnh nối từ node "tools" quay trở về node "chatbot" lại là bắt buộc?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Để kết thúc lượt chạy đồ thị ngay sau khi công cụ thực thi xong nhiệm vụ.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Để chuyển kết quả trả về của công cụ cho mô hình LLM đọc, giúp LLM có dữ liệu sinh câu trả lời cuối cùng.</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Để giải phóng bộ nhớ RAM và dọn dẹp các checkpoint trung gian trong database SQLite.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Một <code>invoke()</code> = Một <code>super-step</code>.</li>
+                <li>Reducer hoạt động trong super-step; Checkpointer hoạt động xuyên super-steps.</li>
+                <li><code>llm.bind_tools(tools)</code> để LLM biết tool; <code>ToolNode(tools)</code> để framework chạy tool.</li>
+                <li>Cạnh quay lại <code>tools -> chatbot</code> là bắt buộc để LLM tổng hợp thông tin.</li>
+                <li>Đổi từ RAM sang SQLite (SqliteSaver) giúp bộ nhớ bền vững qua restart mà không cần sửa logic đồ thị.</li>
+                <li>Time Travel được thực hiện nhờ chỉ định <code>checkpoint_id</code> khi gọi invoke.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể vẽ sơ đồ Mermaid mô tả đầy đủ luồng chạy có vòng lặp gọi tool của Lab 2 không?</li>
+                <li>Tại sao in-memory checkpointer (`MemorySaver`) lại không bảo toàn được dữ liệu khi bạn restart kernel Jupyter?</li>
+                <li>Làm thế nào để lấy ra danh sách toàn bộ lịch sử các checkpoint đã lưu cho một `thread_id`?</li>
+                <li>Mô tả cách thức hoạt động của `tools_condition` và `ToolNode` dựng sẵn của LangGraph.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 3. Phân tích chi tiết mã nguồn Lab 2 và tích hợp bộ nhớ SQLite dựa trên học liệu chính thức.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Chính xác! Mô hình LLM sau khi yêu cầu gọi tool và nhận được kết quả từ ToolNode cần phải được gọi lại (quay về node chatbot) để đọc kết quả đó và tổng hợp thành câu trả lời tự nhiên cho người dùng.";
+          result.style.color = "#5db872";
+        } else {
+          result.innerHTML = "Chưa chính xác. Hãy xem lại phần giải thích chi tiết luồng chạy của Tool Calling ở phần lý thuyết hoặc Section 5.";
+          result.style.color = "#c64545";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,178 @@
+Okay, so we've gathered up our parameters into these params lists.
+What we're now going to do is create MCP servers.
+We're going to instantiate MCP servers with each of those params and with the 32nd timeout.
+And so we do all of that.
+And we've just built a bunch of these MCP servers ready to go okay.
+So we're going to have two different agents that we're going to define.
+We're going to have a trader that's able to make trading decisions, and a researcher that does market
+research, and the trader will use that researcher.
+And you may remember from week two in OpenAI agents SDK that when you want to have that kind of collaboration
+where one agent uses another, the best way to do it is to have that other agent, the research agent,
+be like a tool, convert it into a tool so that that agent can just be used as a tool by the trader
+agent.
+And that's exactly what we're going to do now.
+So we start by defining our researcher agent.
+So here's the system prompt the instruction.
+You're a financial researcher, you search the web for interesting news, and then you carry out deeper
+research and respond with your findings.
+And we tell it the current date.
+And you remember I said, it's better to do this than to have a tool to look up the date, because you
+might as well always pass it on and not and not add extra complexity to the agent to force it to come
+back and run a tool.
+So we just provide the current date right in there, and then we pass in, of course, our MCP servers
+and that defines our researcher.
+And then you'll remember this construct.
+This is how we say we want to use this as a tool.
+We simply call as tool on that researcher.
+And we give the tool a name and a description.
+And that means that this agent will be available for use by other agents that want to be able to treat
+this like it's a tool.
+And that is a very common pattern with open AI agents SDK.
+Well, before we use the research agent as a tool, let's just try calling it directly to check it works.
+Uh, so we're going to ask the question, what's the latest news on Amazon?
+And we're going to, first of all, go through and connect with all of our MCP servers.
+Now you'll notice this is a bit different.
+I normally have like with MCP studio uh ads.
+And then I do it that way with a context manager.
+So why am I doing it differently this time?
+Because if you've got a bunch of these, we'd have to have lots of widths all nested, and that would
+be quite clunky.
+And so this is just another way of doing it.
+You should also clean up if you if you do this.
+But because we're just running in a Jupyter lab anyway, it doesn't really matter.
+So we're connecting to the server here.
+Uh, we're then getting our research agent and then we're calling runner run for the research agent
+passing in the agent.
+And the question and this is new.
+I'm also passing in something called Max turns in here.
+And that's because if I the default is ten, which means that that it can by default do up to ten sets
+of tool calls.
+But if we wanted to do deep research, we might want it to take longer than that.
+So we might want to give it up to 30.
+Possible maximum turns.
+So that's why I'm I'm setting it that way.
+And it's good to know that that's another another thing that you can control.
+And you can also of course have that be a smaller number if you don't want to let your agents go off
+and potentially get into a loop of overthinking about things.
+But 30 seems to have done the trick for us, and probably we didn't need anything like that.
+And we got back a bunch of information about Amazon.
+Let's go in and look at the trace to see what happened behind the scenes.
+So if we come in to the trace and we come into the researcher, you'll see that it did a brave search.
+It did a bunch of fetching of web pages.
+It did another brave search and some more fetching of web pages before responding with its answer.
+And you should do this and go back and have a look and see what it does and what kind of searching and
+fetching the agent is doing as part of its research into Amazon.
+Okay.
+So now let's look at our trader.
+So I'm going to start by giving our trader a strategy because that's something that we store in the
+account.
+And the reason that I give the trader a strategy which is stored is that I want traders to be able to
+change that strategy, should they wish.
+We're going to give each of our traders a unique strategy to set them going, but we want to give them
+some autonomy to choose to evolve their strategy if they want to.
+But for me, Ed's initial strategy, I'm going to be a day trader that aggressively buys and sells shares
+based on news and market conditions.
+And I'm going to call this this, uh, this reset, uh, function to get Ed off to a, to a good start.
+And that's that read use these resources to read my account and my strategy at this starting position.
+So here we go.
+My starting position is I have $10,000 ready to invest there.
+There is my description and I have empty transactions and nothing in my portfolio and everything is,
+uh, ready, ready for business.
+It's now time to create our trader agent that is going to take this persona and be able to make trades
+as a result.
+Okay, so this is our trader agent right here.
+It's called editor.
+And, uh, the account details, it's reading in a resource.
+And the strategy, it's reading a resource.
+What is this reading a resource.
+This is of course, calling the MCP client that we created ourselves a couple of days ago.
+It's calling an MCP client that then calls the MCP server that provides the resource by calling our
+business logic.
+So it's kind of cool.
+We're using this, uh, resource side of MCP.
+The fact that you don't just need to use MCP for tools, you can use it for resources as well.
+And so what does it mean to use MCP for resources?
+What do you do with these resources?
+Well, it's just text that you shove in the prompt.
+You just add it to the prompt to give your agent more context to be able to make its decisions.
+And that's exactly what we do here.
+So we call these two resources.
+And then we put together our system prompt.
+You're a trader that manages a portfolio of shares.
+Your name's ed your accounts under your name.
+You have access to tools to do your job.
+Your investment strategy is and then we shove in the strategy from from this this call here your account,
+your current holdings and balance is and we just shove in the account details right here.
+And then we tell it to make decisions based on its tools.
+So if we run that and we print the instructions, we'll see that when it prints out, we get things
+like the current holdings and balance included in our prompt.
+This is our resource.
+And you can see I'm just shoving JSON in there because Llms love JSON.
+It's going to be great with this.
+It'll make total sense to it.
+And so with that we can kick off our trader.
+So set this running while I speak.
+So we connect to each of the MCP servers.
+We then turn our research agent into a tool, and we get our research agent as a tool.
+We then create our trader agent.
+We give it its instructions.
+We pass in as tools.
+We pass in our researcher tool, which is a wrapper around the agent for MCP servers.
+We pass in the full set of MCP servers.
+We're using GPT for our mini in here.
+You might want to update that to GPT for one mini if you're looking at that now.
+And then we call runner Dot run and we pass in the trader and the prompt.
+And again I'm adding to max turns.
+I'm not going with the default of ten.
+I'm giving it up to 30 turns to really go to town and be requesting across things.
+And now typically this takes a minute.
+So I'm drawing out this explanation as long as I possibly can in the hope that it finishes before.
+And it may well observe that the markets are closed right now so it can't make trading decisions.
+It's possible that it will do that, or it might decide that it wants to make some trading decisions
+anyway, even though the markets are closed.
+But we will soon find out.
+Uh, so here we go.
+It's.
+No, it has decided that it has.
+We gave it the tool to do it, and so it's decided to do it.
+It's got a bunch of different summary actions, the results of the research and the trades that were
+executed, that it bought shares and sold shares.
+And that's the current portfolio status.
+And it's got some next steps at the bottom.
+So that is the result of our trader agent running using the research agent and being able to execute
+its tools, and also being armed with the resources that we included in the prompt.
+And I wouldn't be doing my job if I didn't say that.
+We have to go and look at the at the traces.
+You always have to go and check out the traces and make sure you're happy with what's going on.
+And it shows here that this was Ed, the trader agent going to the researcher, the researcher agent
+that we're using as a tool.
+You can see that about half the time is spent in research mode.
+It used the tool that green shows it's using a tool called researcher.
+That's that's then using our agent we're listing the MCP tools.
+And we're then doing a brave search.
+We're doing the fetches.
+This is like before and that's coming back.
+We have to press load more because it's such a long, uh, thing here.
+We're then getting some tickers.
+We're getting the last trades, we're getting some quotes, we're getting some close of market prices.
+It's doing plenty.
+It's getting the previous close prices.
+Uh, and then it ends up buying some shares and selling some shares just like it told us it did.
+If we click here we can see that it's it's bought Disney.
+And uh, it's also sold 25 shares of Disney.
+So it's not hugely intelligent of it to buy shares and sell so quickly.
+But I guess we did tell it that I'm an aggressive trader that likes to buy and sell.
+I mean, that's super fast to do it instantly like that, but I guess that is what it wants to do.
+So it bought 50 and then it sold, and then it bought 30 Tesla and it sold 25 of the Disney shares that
+it just bought.
+So there you have it.
+That is our trace that is showing our trader in action.
+It's showing the collaboration between two different agents.
+One of them is a tool and it's showing the use of the MCP servers.
+Well let's just quickly look at the results of the trading by reading the resource again using the MCP
+client.
+And you can see that I've got less in my cash balance, uh, and that I have my remaining 25 shares
+of Disney.
+And that is the, uh, the various details we, we have there about what's going on.
+All right.
+We're now going to look at some Python modules.

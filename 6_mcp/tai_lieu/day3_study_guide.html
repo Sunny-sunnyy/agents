@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 3 MCP (119-122) - Study Guide</title>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1220px;
+      --shadow-soft: 0 8px 24px rgba(20, 20, 19, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--body);
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.08), transparent 26%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--canvas) 22%, var(--canvas) 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.66;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 2.7vw, 2.7rem);
+    }
+
+    h3 {
+      font-size: 1.24rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    strong {
+      color: var(--body-strong);
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.92em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(245, 240, 232, 0.95));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.06rem;
+    }
+
+    .tag-row,
+    .source-row,
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source,
+    .mini-pill {
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.64);
+      color: var(--muted);
+    }
+
+    .source.extended,
+    .mini-pill.extended {
+      border-color: rgba(204, 120, 92, 0.36);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .source.code,
+    .mini-pill.code {
+      border-color: rgba(93, 184, 166, 0.28);
+      background: rgba(93, 184, 166, 0.1);
+      color: #2f7d71;
+    }
+
+    .hero-panel,
+    .code-panel,
+    .footer {
+      border-radius: var(--radius-xl);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(204, 120, 92, 0.18), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero-panel>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3,
+    .footer h3,
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li,
+    .footer p,
+    .footer li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #e4a489);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(250, 249, 245, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 10px;
+      transition: 0.18s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      color: var(--ink);
+      background: var(--surface-card);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: 0.18s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.58);
+      padding: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .section-intro {
+      margin-top: 10px;
+      max-width: 74ch;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details,
+    .timeline-item {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    .card table,
+    details p,
+    details ul,
+    details ol,
+    details table,
+    .timeline-item p,
+    .timeline-item ul,
+    .timeline-item ol {
+      margin-top: 10px;
+    }
+
+    .dark-card {
+      background: var(--surface-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark-soft);
+    }
+
+    .dark-card h3,
+    .dark-card h4,
+    .dark-card strong {
+      color: var(--on-dark);
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    .dense-list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 750;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      float: right;
+      color: var(--primary-active);
+      font-size: 1.1rem;
+      font-weight: 700;
+      transform: translateY(-1px);
+    }
+
+    details[open] summary::after {
+      content: "-";
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .callout.extended {
+      border-left-color: var(--accent-amber);
+      background: rgba(232, 165, 90, 0.11);
+    }
+
+    .callout.success {
+      border-left-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.1);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 82px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .timeline-item .slot {
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 8px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--on-dark-soft);
+    }
+
+    .inline-note {
+      border-left: 3px solid rgba(204, 120, 92, 0.65);
+      margin-top: 12px;
+      padding-left: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(93, 184, 114, 0.45);
+      background: rgba(93, 184, 114, 0.14);
+    }
+
+    .quiz-option.incorrect {
+      border-color: rgba(198, 69, 69, 0.36);
+      background: rgba(198, 69, 69, 0.08);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      font-weight: 700;
+      color: var(--primary-active);
+    }
+
+    .footer {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .footer code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .hero {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-inline: 14px;
+      }
+
+      .section,
+      .hero,
+      .hero-panel,
+      .footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết &amp; thực hành</span>
+        <h1>Day 3 MCP (119-122)</h1>
+        <p class="lead">
+          Day 3 mở rộng tư duy MCP từ <strong>tự viết server</strong> sang <strong>phân loại hệ sinh thái capability</strong>.
+          Bài học đi qua ba lớp rất thực dụng: <strong>knowledge graph memory - bộ nhớ dạng đồ thị tri thức</strong> chạy local,
+          <strong>local server calling cloud API - server local gọi API đám mây</strong> với Brave Search, và
+          <strong>provider-native MCP - MCP chính chủ từ provider</strong> với Polygon. Điểm cần nhớ nhất là:
+          MCP cho agent nhiều capability hơn, nhưng càng nhiều capability thì bài toán chọn đúng tool, đúng plan, đúng cost (chi phí)
+          càng quan trọng.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Week 6 • Day 3</span>
+          <span class="tag">Memory + Search + Market Data</span>
+        </div>
+        <div class="source-row">
+          <span class="source">day3_summary.md</span>
+          <span class="source code">3_lab3.ipynb</span>
+          <span class="source code">market.py / market_server.py / mcp_params.py</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus</h2>
+        <ul class="list dense-list">
+          <li><strong>Memory</strong> trong MCP nên được nhìn như <strong>tools + context</strong>, không phải một khối thần bí.</li>
+          <li><strong>Brave Search MCP</strong> là ví dụ rõ nhất cho pattern server local nhưng gọi capability từ web service.</li>
+          <li><strong>Free Polygon plan</strong> hợp với custom wrapper tối giản; <strong>paid/realtime</strong> hợp với official MCP server hơn.</li>
+          <li><strong>Tool overload - quá tải công cụ</strong> là rủi ro thật khi provider expose quá nhiều APIs cho cùng một agent.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px;">Reading progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+        <div class="callout success">
+          <strong>Big picture:</strong> Day 3 dạy bạn không chỉ “gắn thêm tool”, mà còn <strong>phân loại capability theo kiến trúc</strong>,
+          theo plan, và theo mức kiểm soát mà agent thực sự cần.
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Q&amp;A</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+              <p class="section-intro">
+                Guide này bám chính vào <code>day3_summary.md</code> cho narrative 119-122, sau đó khóa lại bằng notebook và code Python thật.
+                Vì Day 3 vừa có lý thuyết kiến trúc vừa có nhiều pattern code khác nhau, phần grounding bên dưới tách rõ đâu là nội dung từ summary,
+                đâu là hành vi được code chứng minh trực tiếp.
+              </p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Nguồn chính:</strong> <code>day3_summary.md</code> cho toàn bộ cụm 119-122.</li>
+                <li><strong>Notebook:</strong> <code>3_lab3.ipynb</code> để xác nhận cấu hình memory, Brave Search, Polygon wrapper và official Polygon MCP.</li>
+                <li><strong>Code lõi:</strong> <code>market.py</code> và <code>market_server.py</code> cho phần market data free-plan path.</li>
+                <li><strong>Code nối capstone:</strong> <code>mcp_params.py</code> để xác nhận Day 3 đã được đưa vào project path thật.</li>
+                <li><strong>Previous context:</strong> <code>day1_study_guide.html</code> và <code>day2_study_guide.html</code> để giữ continuity học tập.</li>
+                <li><strong>Slide:</strong> không có.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Day 3 summary đã đủ dày để dẫn chuyện, nhưng notebook mới là nơi khóa được các chi tiết quan trọng như
+                <code>LIBSQL_URL=file:./memory/ed.db</code>, cấu hình <code>@modelcontextprotocol/server-brave-search</code>,
+                hay câu lệnh <code>uvx --from git+https://github.com/polygon-io/mcp_polygon@v0.1.0 mcp_polygon</code>.
+              </p>
+              <p>
+                Các API keys không được đọc hay hiển thị; guide chỉ nhắc tới tên biến môi trường như <code>BRAVE_API_KEY</code>,
+                <code>POLYGON_API_KEY</code>, và <code>POLYGON_PLAN</code> khi chúng là một phần của thiết kế hệ thống.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> cụm technical term viết dạng
+            <code>English - nghĩa tiếng Việt</code>, còn từ đơn phổ biến viết dạng <code>cost (chi phí)</code>.
+            Ví dụ dùng trong file này: <code>tool overload - quá tải công cụ</code>,
+            <code>persistent memory store - kho nhớ bền vững</code>,
+            <code>provider-native MCP - MCP chính chủ từ provider</code>.
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="slot">119</div>
+              <div>
+                <h4>Types of MCP servers + memory</h4>
+                <p>Phân loại ba kiểu MCP server và demo <strong>knowledge graph memory</strong> chạy local với file libSQL/SQLite.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">120</div>
+              <div>
+                <h4>Brave Search MCP</h4>
+                <p>Cho thấy pattern <strong>local server calling cloud API</strong>: local process vẫn là điểm tích hợp, nhưng capability đến từ web service.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">121</div>
+              <div>
+                <h4>Custom market wrapper</h4>
+                <p>Dùng <code>market.py</code> + <code>market_server.py</code> để bọc Polygon free plan thành một market MCP gọn và kiểm soát được.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">122</div>
+              <div>
+                <h4>Official Polygon MCP server</h4>
+                <p>Đi từ wrapper tối giản sang official provider MCP, từ đó lộ rõ trade-off giữa breadth - độ rộng capability và routing complexity.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet / Executive Summary</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Day 3 dạy rằng MCP không chỉ là “một server”. Nó là một họ pattern tích hợp: local-only, local-call-cloud,
+                và remote/provider-managed. Bài học vì thế chuyển trọng tâm từ “có tool nào?” sang “tool đó nằm ở đâu,
+                ai vận hành, plan nào mở được, và agent có đủ khôn để gọi đúng không?”.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Memory</strong> trong ví dụ được triển khai như entity tools dùng cho persistent memory - bộ nhớ bền vững.</li>
+                <li><strong>Brave Search MCP</strong> chứng minh server local vẫn có thể là gateway tới dữ liệu web mới.</li>
+                <li><strong>Polygon free plan</strong> buộc wrapper phải tiết kiệm API calls bằng EOD cache - bộ nhớ đệm cuối ngày.</li>
+                <li><strong>Polygon paid/realtime</strong> mở đường cho official MCP server nhưng làm tăng tool overload.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Khi bạn thiết kế agent thật, Day 3 giúp bạn quyết định nhanh:
+                memory nên là server local riêng theo user,
+                web research nên qua provider MCP hay tool trực tiếp,
+                và data provider nào nên dùng wrapper tối giản thay vì ném cả chục tool vào agent.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>One-sentence summary - Tóm tắt một câu</h3>
+              <p>
+                MCP làm agent mạnh hơn nhờ capability reuse - tái sử dụng năng lực, nhưng Day 3 nhắc rất rõ rằng
+                capability càng rộng thì yêu cầu về prompt, routing, feature flag và observability càng cao.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Interview angle - Góc phỏng vấn</h3>
+              <p>
+                Nếu được hỏi “khi nào nên build custom MCP, khi nào nên dùng official provider MCP?”, Day 3 cho bạn câu trả lời có chiều sâu:
+                phụ thuộc vào plan, freshness của dữ liệu, số lượng tools, mức kiểm soát mong muốn, và cost (chi phí) vận hành.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 1 cho bạn sơ đồ Host - Client - Server và ý tưởng rằng MCP là giao thức để nối agent với tools/resources.
+            Day 2 dạy bạn cách <strong>tự đóng gói capability</strong> bằng <code>FastMCP</code>.
+            Day 3 bước thêm một nấc: thay vì chỉ biết viết server, bạn phải biết <strong>chọn loại server nào phù hợp</strong>
+            và hiểu hệ quả của lựa chọn đó đối với memory, web search, market data và capstone.
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>From Day 1</h3>
+              <p>
+                Day 1 đã nói đến nhiều kiểu MCP server ở mức concept. Day 3 là lúc sơ đồ đó trở nên “sống”:
+                memory server là ví dụ local-only, Brave Search là local-call-cloud, còn official Polygon MCP chạm gần hơn tới kiểu provider-managed.
+              </p>
+            </article>
+            <article class="card">
+              <h3>From Day 2</h3>
+              <p>
+                Day 2 nhấn mạnh <strong>build vs buy</strong> và <strong>shareability - khả năng chia sẻ</strong>.
+                Day 3 chính là bản mở rộng thực chiến của ý đó: free plan thì build wrapper nhỏ; paid plan mạnh thì buy/use official integration để tận dụng hệ sinh thái.
+              </p>
+            </article>
+          </div>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Kiến thức mở rộng:</strong> <code>mcp_params.py</code> cho thấy Day 3 không phải nhánh học rời rạc.
+            Logic chọn <code>market_mcp</code> theo <code>POLYGON_PLAN</code> đã đi thẳng vào capstone multi-agent,
+            nơi trader và researcher dùng các tập MCP khác nhau.
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+              <p class="section-intro">
+                Core của Day 3 không nằm ở một API cụ thể, mà ở cách phân loại capability và ranh giới giữa local process,
+                remote data source, và hosted provider surface. Đây là nền để bạn không dùng MCP theo kiểu “có gì gắn nấy”.
+              </p>
+            </div>
+            <div class="source-row">
+              <span class="source">day3_summary.md</span>
+              <span class="source code">3_lab3.ipynb</span>
+              <span class="source code">market.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Three MCP deployment patterns - ba kiểu triển khai MCP</h3>
+              <ul class="list">
+                <li><strong>Local-only server - server local thuần:</strong> xử lý và lưu dữ liệu ngay trên máy người dùng, ví dụ memory server với file <code>./memory/ed.db</code>.</li>
+                <li><strong>Local server calling cloud API - server local gọi API đám mây:</strong> local process vẫn được spawn từ host, nhưng dữ liệu được kéo từ provider như Brave Search hoặc Polygon.</li>
+                <li><strong>Provider-managed / remote MCP - MCP từ xa do provider vận hành:</strong> capability nằm ở phía nhà cung cấp, thường đi kèm auth và account constraints.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Memory as tools/context - memory như tools và context</h3>
+              <p>
+                Một ý rất đáng nhớ của Day 3 là memory không nên bị thần thánh hóa. Trong notebook,
+                memory xuất hiện như một tập <strong>entity tools</strong> mà agent gọi khi muốn tạo entities,
+                observations hoặc relationships. Nghĩa là memory là <strong>capability có cấu trúc</strong>,
+                không phải “một hộp đen tự nhớ”.
+              </p>
+              <p>
+                Cách nhìn này khiến thiết kế agent modular - mô-đun hơn: muốn nhớ kiểu gì thì gắn tool tương ứng,
+                muốn reset hay tách người dùng thì đổi file database tương ứng.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Knowledge graph memory - bộ nhớ dạng đồ thị tri thức</h3>
+              <p>
+                Knowledge graph memory lưu facts dưới dạng nodes và relationships thay vì chỉ append thêm raw text.
+                Với dạng cấu trúc này, agent có thể truy xuất “Ed là ai”, “Ed dạy gì”, “MCP liên quan thế nào đến Ed”
+                theo quan hệ, chứ không chỉ rà lại lịch sử chat dài.
+              </p>
+              <p>
+                Trong ví dụ Day 3, điều này được lộ ra rất rõ khi agent ở lượt sau có thể trả lời lại thông tin đã lưu
+                nhờ tái dùng cùng memory store.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Plan-aware capability - capability phụ thuộc plan</h3>
+              <p>
+                Phần Polygon giới thiệu một nguyên tắc thiết kế thực tế: cùng là “market data”, nhưng tool surface thực sự dùng được
+                phụ thuộc mạnh vào plan API. Free plan phải tránh rate limit bằng cách cache EOD prices; paid hoặc realtime plan
+                mới đáng để mở official MCP server có nhiều tool hơn.
+              </p>
+              <p>
+                Vì vậy, “có official server” không tự động có nghĩa “nên dùng ngay”. Bạn vẫn phải hỏi:
+                plan của mình có mở đủ endpoint chưa, agent có dễ lạc tool không, và cost (chi phí) có xứng đáng không?
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Vì sao Day 3 quan trọng hơn chuyện cài thêm tool?</summary>
+            <p>
+              Day 3 thực chất dạy bạn <strong>architecture literacy - năng lực đọc kiến trúc</strong> cho MCP.
+              Cùng một yêu cầu “cho agent truy cập dữ liệu”, bạn có thể giải theo ít nhất ba cách khác nhau:
+              lưu local, gọi cloud từ local wrapper, hoặc dùng provider MCP nguyên bản. Mỗi cách đổi boundary về bảo mật,
+              độ mới của dữ liệu, độ khó debug, khả năng test, và hành vi routing của model. Đây là lý do Day 3 là cây cầu nối giữa
+              việc học MCP như protocol và việc dùng MCP như hệ thống production thật.
+            </p>
+          </details>
+          <div class="callout extended">
+            <strong>Kiến thức mở rộng:</strong> trong production, cùng một business capability đôi khi được expose qua
+            <strong>tiered tool surface - bề mặt công cụ theo tầng</strong>: agent rẻ dùng wrapper hẹp,
+            agent đắt tiền hơn mới được dùng provider MCP rộng. Đây là cách kiểm soát cost (chi phí) và giảm sai tool.
+          </div>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day3_summary.md</span>
+              <span class="source code">3_lab3.ipynb</span>
+              <span class="source code">mcp_params.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Flow 1 - Memory loop</h3>
+              <ol class="list">
+                <li>Notebook spawn <code>mcp-memory-libsql</code> qua <code>MCPServerStdio</code> với <code>LIBSQL_URL=file:./memory/ed.db</code>.</li>
+                <li>Agent được nhắc rõ rằng entity tools là persistent memory - bộ nhớ bền vững của nó.</li>
+                <li>User cung cấp facts về Ed, MCP, và khóa học.</li>
+                <li>Agent ghi các facts đó vào graph thông qua memory tools.</li>
+                <li>Ở lượt sau, cùng memory file được dùng lại và agent truy xuất thông tin đã lưu để trả lời “What do you know about me?”.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Flow 2 - Brave Search research loop</h3>
+              <ol class="list">
+                <li>Host spawn local Brave Search MCP server bằng <code>npx -y @modelcontextprotocol/server-brave-search</code>.</li>
+                <li>Server local nhận <code>BRAVE_API_KEY</code> từ môi trường nhưng không lộ key cho guide.</li>
+                <li>Agent nhận instructions để search web và tóm tắt ngắn.</li>
+                <li>Request về tin Amazon stock được chuyển thành search actions tới Brave Search backend.</li>
+                <li>Kết quả web được tổng hợp lại thành market outlook - góc nhìn thị trường cho câu hỏi người dùng.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>Flow 3 - Free Polygon plan path</h3>
+              <ol class="list">
+                <li>Notebook kiểm tra <code>POLYGON_API_KEY</code>.</li>
+                <li><code>market.py</code> dùng Polygon API để lấy dữ liệu market.</li>
+                <li>Vì free plan bị rate limit nặng, code không gọi snapshot liên tục mà kéo cả market EOD rồi cache vào database.</li>
+                <li><code>market_server.py</code> chỉ expose một tool hẹp: <code>lookup_share_price(symbol)</code>.</li>
+                <li>Agent vì thế có interface đơn giản, ít cơ hội gọi nhầm tool và ít phụ thuộc vào breadth của provider.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Flow 4 - Paid / realtime Polygon path</h3>
+              <ol class="list">
+                <li>Notebook cấu hình official MCP bằng <code>uvx --from git+https://github.com/polygon-io/mcp_polygon@v0.1.0 mcp_polygon</code>.</li>
+                <li>Agent được cấp một tool surface rất rộng từ provider.</li>
+                <li>Prompt phải ràng buộc rõ tool như <code>get_snapshot_ticker</code> vì plan $29 chưa mở hết mọi API.</li>
+                <li><code>mcp_params.py</code> dùng <code>POLYGON_PLAN</code> để chọn official server cho paid/realtime, hoặc local wrapper cho free.</li>
+                <li>Capstone từ đây có thể nâng cấp market intelligence mà không phải viết lại toàn bộ kiến trúc agent.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Decision points - Điểm quyết định:</strong> Day 3 liên tục buộc bạn chọn giữa
+            <strong>độ rộng capability</strong> và <strong>độ dễ kiểm soát</strong>.
+            Memory local thì đơn giản và an toàn hơn; Brave Search thêm freshness nhưng cần key;
+            official Polygon MCP mạnh hơn rất nhiều, nhưng đổi lại là plan constraints, tool overload, và due diligence.
+          </div>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+              <p class="section-intro">
+                Techniques của Day 3 phần lớn là kỹ thuật thiết kế hệ thống và điều khiển hành vi agent,
+                không chỉ là mẹo code. Mỗi kỹ thuật dưới đây đều có dấu vết trực tiếp trong summary hoặc code.
+              </p>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Memory server per identity - tách memory theo định danh</h3>
+              <p><strong>Purpose:</strong> tránh trộn facts của nhiều người dùng hoặc nhiều agent vào cùng một graph.</p>
+              <p><strong>When to use:</strong> khi app có nhiều persona, nhiều user, hoặc hội thoại dài qua nhiều phiên.</p>
+              <p><strong>Trade-off:</strong> quản lý nhiều file/db hơn, nhưng đổi lại giảm cross-contamination - lẫn ngữ cảnh.</p>
+            </article>
+            <article class="card">
+              <h3>Instructional priming - định hướng dùng tool bằng instructions</h3>
+              <p><strong>Purpose:</strong> nói rõ cho model rằng entity tools là persistent memory, không để nó tự đoán vai trò của tool.</p>
+              <p><strong>When to use:</strong> khi tool có semantics - ý nghĩa dùng cụ thể mà model dễ bỏ qua.</p>
+              <p><strong>Trade-off:</strong> prompt dài hơn, nhưng routing ổn định hơn nhiều.</p>
+            </article>
+            <article class="card">
+              <h3>EOD cache strategy - chiến lược cache cuối ngày</h3>
+              <p><strong>Purpose:</strong> né rate limit của free Polygon plan bằng cách kéo grouped market data một lần rồi tái dùng.</p>
+              <p><strong>When to use:</strong> khi dữ liệu không cần realtime và API quota hạn chế.</p>
+              <p><strong>Trade-off:</strong> freshness giảm, nhưng performance và cost (chi phí) tốt hơn.</p>
+            </article>
+            <article class="card">
+              <h3>Thin wrapper server - server bọc mỏng</h3>
+              <p><strong>Purpose:</strong> giữ business logic ở <code>market.py</code>, còn MCP server chỉ làm lớp expose tool.</p>
+              <p><strong>When to use:</strong> khi muốn wrapper dễ test, dễ đổi logic nền mà không động vào protocol nhiều.</p>
+              <p><strong>Trade-off:</strong> ít flexibility hơn server “đa năng”, nhưng dễ reason hơn.</p>
+            </article>
+            <article class="card">
+              <h3>Prompt-constrained tool selection - ràng buộc chọn tool qua prompt</h3>
+              <p><strong>Purpose:</strong> ép model dùng đúng API theo plan, ví dụ <code>get_snapshot_ticker</code>.</p>
+              <p><strong>When to use:</strong> khi provider server có quá nhiều tools hoặc plan không mở hết endpoint.</p>
+              <p><strong>Trade-off:</strong> không bảo đảm 100%, nhưng giảm đáng kể khả năng lạc tool.</p>
+            </article>
+            <article class="card">
+              <h3>Plan flagging - gắn cờ theo plan</h3>
+              <p><strong>Purpose:</strong> cho phép cùng codebase chọn đúng market path bằng <code>POLYGON_PLAN</code>.</p>
+              <p><strong>When to use:</strong> khi dự án phải chạy ở nhiều tier dữ liệu khác nhau.</p>
+              <p><strong>Trade-off:</strong> thêm một lớp branching logic, nhưng upgrade path mượt hơn hẳn.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Technique insight - kỹ thuật nào là quan trọng nhất để mang sang project thật?</summary>
+            <p>
+              Nếu chỉ chọn một, hãy mang theo <strong>thin wrapper + plan flagging</strong>. Hai kỹ thuật này cho phép bạn bắt đầu với
+              tool surface rất hẹp, kiểm soát hành vi agent tốt, rồi chỉ mở rộng khi plan hoặc nhu cầu thực sự tăng lên.
+              Đây là cách tránh bị official integrations “nuốt chửng” quá sớm.
+            </p>
+          </details>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+              <p class="section-intro">
+                Day 3 có code thật và notebook thật, nên walkthrough tập trung vào các block quyết định behavior.
+                Mục tiêu không phải chép lại toàn bộ, mà là chỉ ra <strong>mục đích</strong>, <strong>logic chính</strong>,
+                và <strong>ý nghĩa thiết kế</strong> của từng block.
+              </p>
+            </div>
+            <div class="source-row">
+              <span class="source code">3_lab3.ipynb</span>
+              <span class="source code">market.py</span>
+              <span class="source code">market_server.py</span>
+              <span class="source code">mcp_params.py</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 1 - Memory server bootstrap trong <code>3_lab3.ipynb</code> (cells 3-6)</h3>
+              <p>Đây là chỗ Day 3 biến memory từ ý niệm thành local MCP server có persistence thật.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: tạo memory server, ghi facts, rồi chứng minh agent nhớ lại được</span>
+              <span>Key names: <code>MCPServerStdio</code>, <code>LIBSQL_URL</code>, <code>Runner.run()</code></span>
+            </div>
+            <pre><code>params = {
+    "command": "npx",
+    "args": ["-y", "mcp-memory-libsql"],
+    "env": {"LIBSQL_URL": "file:./memory/ed.db"},
+}
+
+instructions = (
+    "You use your entity tools as a persistent memory "
+    "to store and recall information about your conversations."
+)
+
+async with MCPServerStdio(params=params, client_session_timeout_seconds=30) as mcp_server:
+    agent = Agent(name="agent", instructions=instructions, model=model, mcp_servers=[mcp_server])
+    result = await Runner.run(agent, "My name's Ed. What do you know about me?")</code></pre>
+            <p class="inline-note">
+              Điểm hay của block này là nó không “giả vờ thông minh”. Agent nhớ được vì có cùng <code>ed.db</code> được tái dùng,
+              và vì instructions nói rõ entity tools đóng vai trò persistent memory. Nếu bỏ một trong hai yếu tố này,
+              hành vi nhớ sẽ yếu đi đáng kể.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 2 - Brave Search MCP trong <code>3_lab3.ipynb</code> (cells 9-11)</h3>
+              <p>Block này đại diện rất chuẩn cho pattern server local nhưng capability lấy từ provider web.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: gắn web research cho agent mà vẫn qua MCP server local</span>
+              <span>Key names: <code>@modelcontextprotocol/server-brave-search</code>, <code>BRAVE_API_KEY</code></span>
+            </div>
+            <pre><code>env = {"BRAVE_API_KEY": os.getenv("BRAVE_API_KEY")}
+params = {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+    "env": env,
+}
+
+instructions = "You are able to search the web for information and briefly summarize the takeaways."
+request = (
+    "Please research the latest news on Amazon stock price and briefly summarize its outlook."
+)</code></pre>
+            <p class="inline-note">
+              Ở đây local process chỉ là gateway. Giá trị của MCP nằm ở chỗ host và agent vẫn thấy một interface thống nhất,
+              dù dữ liệu cuối cùng đến từ Brave Search API. Đây là kiểu tích hợp rất thường gặp trong agent systems thực tế.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 3 - <code>market.py</code>: logic chọn nguồn giá và cache</h3>
+              <p>File này là business logic thật cho market data free-plan path, và nó đáng học hơn wrapper server.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: chọn free/paid behavior và giảm số lần gọi API</span>
+              <span>Key names: <code>get_market_for_prior_date()</code>, <code>get_share_price_polygon_eod()</code>, <code>get_share_price_polygon_min()</code></span>
+            </div>
+            <pre><code>is_paid_polygon = polygon_plan == "paid"
+is_realtime_polygon = polygon_plan == "realtime"
+
+@lru_cache(maxsize=2)
+def get_market_for_prior_date(today):
+    market_data = read_market(today)
+    if not market_data:
+        market_data = get_all_share_prices_polygon_eod()
+        write_market(today, market_data)
+    return market_data
+
+def get_share_price_polygon(symbol) -> float:
+    if is_paid_polygon:
+        return get_share_price_polygon_min(symbol)
+    else:
+        return get_share_price_polygon_eod(symbol)</code></pre>
+            <p class="inline-note">
+              Ý tưởng rất thực dụng: free plan không đủ “sang” để gọi dữ liệu tươi liên tục, nên module này đổi chiến lược sang
+              lấy cả market EOD rồi cache. Chính quyết định này biến một API bị rate limit thành một capability còn dùng được cho agent.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 4 - <code>market_server.py</code>: lớp MCP mỏng</h3>
+              <p>Wrapper này cực kỳ mỏng, và đó là chủ ý thiết kế đúng.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: expose một tool hẹp cho agent</span>
+              <span>Key names: <code>FastMCP</code>, <code>@mcp.tool()</code>, <code>lookup_share_price()</code></span>
+            </div>
+            <pre><code>from mcp.server.fastmcp import FastMCP
+from market import get_share_price
+
+mcp = FastMCP("market_server")
+
+@mcp.tool()
+async def lookup_share_price(symbol: str) -> float:
+    return get_share_price(symbol)
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre>
+            <p class="inline-note">
+              Toàn bộ business complexity nằm ở <code>market.py</code>; server chỉ là packaging layer - lớp đóng gói.
+              Cách chia này làm Day 3 nhất quán với Day 2: wrapper mỏng, domain logic riêng, protocol không ôm việc thừa.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 5 - <code>mcp_params.py</code>: nối Day 3 vào capstone</h3>
+              <p>Đây là block quan trọng để thấy Day 3 đã chảy vào multi-agent project path.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: chọn đúng market MCP theo plan và gán bộ MCP cho trader/researcher</span>
+              <span>Key names: <code>market_mcp</code>, <code>trader_mcp_server_params</code>, <code>researcher_mcp_server_params()</code></span>
+            </div>
+            <pre><code>if is_paid_polygon or is_realtime_polygon:
+    market_mcp = {
+        "command": "uvx",
+        "args": ["--from", "git+https://github.com/polygon-io/mcp_polygon@v0.1.0", "mcp_polygon"],
+        "env": {"POLYGON_API_KEY": polygon_api_key},
+    }
+else:
+    market_mcp = {"command": "uv", "args": ["run", "market_server.py"]}
+
+def researcher_mcp_server_params(name: str):
+    return [
+        {"command": "uvx", "args": ["mcp-server-fetch"]},
+        {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-brave-search"], "env": brave_env},
+        {"command": "npx", "args": ["-y", "mcp-memory-libsql"], "env": {"LIBSQL_URL": f"file:./memory/{name}.db"}},
+    ]</code></pre>
+            <p class="inline-note">
+              Block này cho thấy rõ “học xong là dùng ngay”: trader và researcher không nhận cùng một bộ tools.
+              Researcher có fetch, Brave Search và memory; trader có accounts, push và market. Đây là tư duy capability partitioning - phân tách năng lực theo vai trò.
+            </p>
+          </article>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs nếu phù hợp</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Local memory server</strong></td>
+                <td>Cần persistent memory riêng theo user/agent và muốn kiểm soát dữ liệu local.</td>
+                <td>Dễ debug, dễ cô lập state, nhưng capability hẹp hơn so với hosted knowledge systems.</td>
+                <td>Dùng chung memory file cho nhiều identity sẽ làm agent nhớ nhầm.</td>
+              </tr>
+              <tr>
+                <td><strong>Local MCP + Brave Search</strong></td>
+                <td>Cần web freshness nhưng vẫn muốn tích hợp qua một local server thống nhất.</td>
+                <td>Đơn giản hơn hosted integration hoàn chỉnh, nhưng vẫn phụ thuộc API key và provider uptime.</td>
+                <td>Model có thể search rộng nhưng tổng hợp hời hợt nếu prompt quá lỏng.</td>
+              </tr>
+              <tr>
+                <td><strong>Custom Polygon wrapper</strong></td>
+                <td>Dùng free plan hoặc chỉ cần một market capability hẹp như giá cổ phiếu cơ bản.</td>
+                <td>Behavior dễ kiểm soát, ít tool hơn, rẻ hơn; đổi lại data cũ hơn và ít endpoint hơn.</td>
+                <td>Dễ bị giới hạn nếu sau này project cần market breadth - độ rộng dữ liệu cao hơn.</td>
+              </tr>
+              <tr>
+                <td><strong>Official Polygon MCP</strong></td>
+                <td>Đã có paid/realtime plan và cần nhiều market APIs hơn một wrapper tối giản.</td>
+                <td>Powerful hơn rất nhiều, nhưng routing khó hơn và cần plan-aware prompting.</td>
+                <td>Tool overload, gọi nhầm endpoint, hoặc dùng repo bên ngoài mà thiếu due diligence.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Kiến thức mở rộng:</strong> lựa chọn tốt nhất thường không phải “dùng tool mạnh nhất”, mà là
+            <strong>dùng tool surface hẹp nhất vẫn đủ giải bài toán</strong>. Điều này đặc biệt đúng khi agent còn yếu ở tool routing.
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Xem memory như phép màu:</strong> quên rằng agent chỉ nhớ tốt khi có đúng tools, đúng file store và đúng instructions.</li>
+                <li><strong>Gom mọi user vào một memory DB:</strong> dẫn đến lẫn facts và sai ngữ cảnh qua phiên.</li>
+                <li><strong>Dùng official MCP quá sớm:</strong> có nhiều tool nhưng model chưa đủ ổn để route đúng.</li>
+                <li><strong>Bỏ qua rate limit free plan:</strong> gọi market data kiểu naive rồi làm hệ thống chậm hoặc fail.</li>
+                <li><strong>Không gắn plan flag:</strong> code và tài khoản thực tế không khớp nhau, khiến agent dùng sai path.</li>
+                <li><strong>Tin repo GitHub là auto-safe:</strong> chạy code third-party mà thiếu review nguồn.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - cách tránh</h3>
+              <ul class="list">
+                <li>Luôn ghi rõ semantics của tool trong instructions nếu tool đó đóng vai trò đặc biệt như memory.</li>
+                <li>Tách memory theo tên hoặc identity, ví dụ <code>./memory/{name}.db</code>.</li>
+                <li>Bắt đầu với wrapper hẹp trước khi mở full provider tool surface.</li>
+                <li>Dùng cache, grouped fetch, hoặc batch strategy khi provider free tier bị quota thấp.</li>
+                <li>Biến plan thành feature flag rõ ràng như <code>POLYGON_PLAN</code>, không để logic ngầm.</li>
+                <li>Review repo, publisher, mức độ official, issues và release path trước khi chạy MCP từ GitHub.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&amp;A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Ba pattern MCP chính trong Day 3 là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Local-only server, local server calling cloud API, và provider-managed / remote MCP server.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao <code>LIBSQL_URL=file:./memory/ed.db</code> quan trọng?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì nó biến memory từ trạng thái tạm thời thành persistent memory store - kho nhớ bền vững có thể tái dùng qua nhiều lượt chạy.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Free Polygon path dùng kỹ thuật gì để né rate limit?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Kéo grouped end-of-day market data rồi cache lại, thay vì gọi snapshot liên tục cho từng symbol.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao official Polygon MCP không tự động là lựa chọn tốt nhất?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì nó mở quá nhiều tools, phụ thuộc plan, tăng cost (chi phí), và có thể làm model route sai nếu prompt/guardrails chưa đủ tốt.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card quiz-block">
+              <h3>Quick quiz 1</h3>
+              <p>Phát biểu nào đúng nhất về <code>market_server.py</code>?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. File này chứa phần lớn business logic xử lý Polygon free/paid plan.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. File này là lớp MCP mỏng, còn business logic chính nằm ở <code>market.py</code>.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. File này chỉ dùng cho Brave Search chứ không liên quan market data.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+            <article class="card quiz-block">
+              <h3>Quick quiz 2</h3>
+              <p>Khi nào prompt cần ràng buộc tool cụ thể như <code>get_snapshot_ticker</code>?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Khi server chỉ có một tool đơn giản và không có plan constraint.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Khi tool surface rộng và plan không mở hết mọi endpoint, nên cần guide agent gọi đúng API.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Chỉ khi không có API key.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Day 3 phân loại MCP theo nơi capability sống, không chỉ theo tên server.</li>
+                <li>Memory trong ví dụ được thực thi qua entity tools và một persistent file store.</li>
+                <li>Brave Search là ví dụ điển hình của local wrapper gọi cloud API.</li>
+                <li><code>market.py</code> dùng EOD cache để biến free plan bị rate limit thành capability còn usable.</li>
+                <li><code>market_server.py</code> là wrapper mỏng; <code>mcp_params.py</code> mới là chỗ nối plan logic vào capstone.</li>
+                <li>Official provider MCP mạnh hơn, nhưng mạnh hơn không đồng nghĩa dễ dùng hơn.</li>
+                <li>Prompt constraints, feature flags và due diligence là ba guardrails quan trọng nhất của Day 3.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được vì sao Day 3 phải tách ba loại MCP deployment patterns không?</li>
+                <li>Bạn có mô tả được memory server nhớ nhờ những thành phần nào, chứ không chỉ nói “LLM nhớ” không?</li>
+                <li>Bạn có so sánh được free custom market wrapper với official paid Polygon MCP bằng tiêu chí cụ thể không?</li>
+                <li>Bạn có nêu được ít nhất hai lý do vì sao nhiều tools hơn có thể làm agent tệ hơn không?</li>
+                <li>Bạn có nhìn ra chỗ nào trong code đã chuẩn bị sẵn để Day 3 chảy vào capstone multi-agent không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3>Kết luận nhanh</h3>
+          <p>
+            Day 3 là buổi học biến MCP từ “protocol mình hiểu” thành “capability system mình biết chọn”.
+            Nếu Day 2 dạy bạn cách đóng gói một tool, thì Day 3 dạy bạn cách quyết định
+            <strong>tool nào nên local, tool nào nên cloud-backed, tool nào đáng để nhận nguyên bộ từ provider</strong>.
+          </p>
+          <p>
+            Study note: các đoạn có nhãn <span class="mini-pill extended">Kiến thức mở rộng</span> được tách riêng khỏi phần grounding chính.
+            File này không hiển thị secrets, tokens hay API keys; chỉ dùng tên biến môi trường khi cần giải thích kiến trúc.
+          </p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0] ? sections[0].id : "";
+      const offset = window.scrollY + 180;
+
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = progress + "%";
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.textContent = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-block").forEach((block) => {
+      const result = block.querySelector(".quiz-result");
+      const buttons = block.querySelectorAll(".quiz-option");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          buttons.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const correct = button.dataset.answer === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          result.textContent = correct
+            ? "Đúng. Bạn đang giữ đúng abstraction và trade-off của phần này."
+            : "Chưa đúng. Hãy nối lại kiến trúc, plan và mục tiêu của tool rồi thử giải thích bằng lời của bạn.";
+        });
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

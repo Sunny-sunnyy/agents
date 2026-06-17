@@ -1,0 +1,205 @@
+So here we are back in the lab.
+And what we're looking at here are parameters being set for our very own MCP server that we just wrote.
+So the command is you've run because that's exactly what we would type at a command line to run this
+module.
+You've run account server dot Pi.
+Just run the account server.py that I just showed you.
+And we know that when that's called it's going to create an MCP server, a fast MCP.
+It's going to call run.
+And that we've got some functions decorated as MCP tools.
+All right.
+So then we use the open AI agents SDK context manager with MCP Server Studio.
+And we pass in those parameters.
+Remember this timeout.
+And we then are going to call server list tools.
+So just by running this what's going to happen.
+It's going to create an MCP client.
+It's then going to spawn our MCP server by carrying out this instruction right here.
+And it's then going to ask it, what tools do you offer us?
+And we'll print them out.
+And we're hoping to see the things that we decorated.
+Uh, let's see if this works.
+Can it be that simple?
+Off it goes.
+Took 1.4 seconds.
+Let's just print that.
+And there we go.
+These are the functions that we just decorated.
+Get balance, get holdings.
+Buy shares.
+Sell shares.
+Change strategy.
+It's available.
+Wow.
+Um, so as you can see, it's not super easy, but it's also it's pretty easy.
+Okay, let's try and put this to action.
+Let's have some instructions.
+You're able to manage an account for a client and answer questions about the account.
+My name is Ed.
+My account is under the name Ed.
+What is my balance and my holdings?
+So it's going to need to make use of these tools.
+And we'll give it the latest model.
+Why not.
+Uh, let's take that.
+And now this again is the same code as before.
+We use the context manager with MCP Server Studio.
+We pass in our parameters.
+Let's put in that timeout client session timeout is 30.
+Um, and uh, we will pass in our instructions, our model, and we will then run a run and display
+the output.
+We're hoping that it's going to spawn the server, call the tools and be able to tell me about my six
+Amazon shares, uh, and the balance and everything like that.
+So enter your current cash balance is 8000.
+Your holdings includes six shares of Amazon.
+If you need any further details then let me know.
+So that is us successfully calling our very own MCP server that then calls our business logic.
+And now it's time to show you what it's like to write an MCP client.
+But I should first explain that it's not a common task to write an MCP client.
+You don't really need to do it anymore.
+When I when I first started working on this lab, the way that you worked with OpenAI agents SDK, they
+didn't sort of natively support MCP.
+You had to write your own client and then provide the tools into OpenAI agents SDK.
+And it was the day that I finished this project and checked it into GitHub and did the push that same
+day, about about 2 or 3 hours later, they released an update to OpenAI SDK that simplified everything
+and meant that all my code was useless.
+And you can, you can, you can look at the git timestamps if you don't believe me.
+It was crazy.
+I was I was infuriated, but it is a great thing.
+And basically it means that just with this, this context manager construct, you automatically get,
+uh, OpenAI SDK creating the client for you.
+But anyway, it's a good exercise to show you what it's like to make a client.
+And also this this construct works for tools.
+But if you want to use resources, I think you still need to write a client.
+And it's not so common.
+But but but we'll do it anyway and you'll see how it works.
+Okay.
+So this is in a Python module called Accounts clients.
+And this this is where the magic happens.
+That is no longer needed really.
+Uh.
+So this is this is a this is a an MCB client for use with my accounts, MCP server.
+So at the top here I specify these are the parameters that will be used to launch the MCP server.
+Now this could be something configurable.
+You could make a sort of generic MCP client that takes this as configuration and then and then spawns
+it.
+But for now this is just a fixed client for our accounts MCP server.
+And so this is an accounts MCP client.
+And so there are a few things we need to be able to do.
+We need to be able to list the tools.
+And so this first function here is an example of the function that lists tools.
+And we're basically using a bunch of anthropic code here for our client.
+And you can see that there's some context managers that we manage a session.
+We initialize the session.
+And then we call list tools on the session and return the tools.
+And so it's just sort of plumbing stuff that that you need to know about.
+If you want to write something that will contact your server and list the tools.
+This second one is actually calling a tool.
+This is how you go about reading a one of the resources, and this is reading the other resources.
+You can see I specify the resource name right there.
+Um, and then finally the types.
+The way that MCP returns tools is very similar to the JSON, the standard JSON that you use when you
+call a tool, as we did in week one.
+But it's not identical.
+There is some couple of slight differences.
+So if you're writing your own MCP client, you also have to know how to map between the MCP description
+of a tool and the kind of JSON description of a tool that's used generally when you're calling LMS.
+And that is what this this function here does that I painstakingly wrote.
+But all of this comes for free packaged in OpenAI agents SDK.
+So you don't need to do all of this, but you could look through it should you be interested and should
+you want to understand what does it mean to have your own MCP client?
+Okay, so now it remains for us to actually run the MCP client that we just created.
+So I import from that module.
+We just looked at some of the functions we just saw.
+And the first function I call is the list account tools function, which is the one that's going to
+spawn an MCP server and ask it for its tools that will come back as MCP tools.
+I'm then going to call the other function I showed you, where I take the MCP tools, and I reconstitute
+them as open AI tools.
+I turn them into these function tools, just as if I'd had a function and decorated it with app function
+tools.
+Same thing.
+And then I'm going to print that.
+So I'll print these two separately so you can see the results side by side.
+So this first line here, this is the actual MCP tools themselves with their description, the arguments
+of all the tools.
+And you can take a look at them should you wish.
+And underneath it is the same thing but reconstituted as a function tool, which is the kind of object
+that needs to be passed in to OpenAI.
+And indeed, that's what I'm going to do right here.
+So this is the way you had to do it before OpenAI built this, so that you can now you can just pass
+in the MCP servers.
+You don't have to build a client and do all of this stuff.
+But before that, in fact, very recently this was the way to do it.
+You'd actually have to pass in the tools themselves.
+So we've used our MCP client to find the tools and then we're passing them in here.
+So as I say, you just follow along for interest to see what this is doing.
+But it's not like you'd need to do this yourself.
+So as always, I've got a trace, and then I'll pass in my instructions and I will pass in the tools
+that when these tools are called, it's actually going to call the MCP client.
+That's going to call the MCP server that's going to actually run our business logic.
+Okay.
+So now we're going to run our MCP client like this.
+So we're passing in the tools we are calling the model and it has now responded.
+I asked what's my balance?
+And it's responded with the balance.
+And so just as a recap, what's going on there, we provided it with some tools right here.
+Those tools are in fact wrappers around MCP tools, which actually created an MCP client which launched
+our MCP server and which ran our function through the business logic on the MCP server and got back
+the results to the LM.
+So quite a lot was going on there behind the scenes with this.
+And as I say, you really shouldn't need to do this yourself because open AI agents SDK does it all
+for you.
+But it's useful to see how the plumbing works behind the scenes.
+Now here's another example of using the MCP client.
+This time we're using this read accounts resource client function that I wrote.
+And I think that you do need to do it this way.
+If you want to use resources, then that doesn't come for free with the OpenAI agents SDK package.
+So this is an example of reading the resource called editor.
+So let's see what happens if we run that.
+Let's run it through our client, through our server.
+And that's what comes back.
+This is a description of my account.
+And just to show you, I could also, of course, just import the business logic directly.
+And this is ending up just calling this function report.
+So this should give exactly the same answer.
+You could see the same stuff.
+So essentially what we've done is we've taken this piece of business logic.
+We've wrapped it in an MCP server to be available at a certain resource.
+We've written an MCP client that allows you to expose that resource.
+And that is what this function is.
+And so you can call this MCP client to get this.
+You could also just call the business logic directly.
+Um, and so why would you want to do this.
+Again it's if you wanted to share this resource with other people, it gives everyone a simple, streamlined
+way to access your resources rather than having to understand how your business logic works.
+Okay, that wraps up creating MCP servers and MCP clients with most of the emphasis on the servers.
+And I would now like to give you an exercise to go and create your own.
+So one super simple one to do would be to write an MCP server that can tell you the current date, give
+the current date, and you can expose it as a tool that you can equip OpenAI agent with so that it can
+find out the current date.
+And it can make sure that what it's the the content and the questions it's answering, it's doing so
+mindful of what the current date is.
+Um, and uh, yeah.
+Then then as a harder exercise, you could not only build that MCP server, but also build an MCP client
+to accompany it.
+Taking a look at exactly how I just did that for the accounts client compared with the accounts server,
+same approach.
+And then you could actually write something that looks like a native call to OpenAI, as we did in week
+one, like a simple native call with a tool as a JSON.
+And then you're getting really bare metal and you're seeing how you can call an MLM and have an MCP
+client and an MCP server where you're writing all the nuts and bolts.
+The only real use of that is to give you some direct exposure to it.
+So only do that if you're if you're interested.
+You won't have to do that day to day.
+But but it's a it's an interesting exercise.
+It's also worth pointing out that actually answering the current date isn't a great tool isn't super
+useful in the real world, because if you need to tell your agent about the current date, it's better
+just to state it in the prompt so that it always has it available so that the model doesn't have to
+go through the extra work of knowing to call your tool to collect the date.
+So if you feel like it, try make some more interesting tools.
+Have a shot at making a calculator that can do some calculation operation on two inputs or something
+like that.
+So.
+So try and make some interesting tool that appeals to you, and then write an MCP server and perhaps
+also explore writing an MCP client should you wish and enjoy that.
+And we will then go over to wrap up for today.

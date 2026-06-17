@@ -1,0 +1,125 @@
+And I'm so happy to welcome you back to cursor for our epic week six finale.
+So we've got a nice, organized, collapsed File Explorer on the left here.
+I'm going to open up week six and you'll see there's quite a lot going on here.
+We've got a lot of work to do this week.
+And we're going to start with the first lab.
+Lab one.
+Welcome to week six.
+And remember with these labs the first thing you need to do is click up here to set the kernel something
+which, you know, back to front by now.
+So welcome to the Model Context Protocol.
+Welcome back OpenAI agents SDK, which I may have mentioned just happens to be my favorite.
+And please do note that as I go through this and you see the code here, it might look different to
+you as you go through it in the lab.
+And that's a good thing.
+That's because I'm constantly updating this.
+MCP is very much a moving target.
+It is honestly evolving so quickly.
+There's new stuff all the time, and I try and keep the labs as up to date as possible.
+If you haven't done this before, then be sure to pull the latest code.
+There's instructions how in the guides.
+If you're if you're new to this to using git and git pull.
+But then make sure you've got the latest and you're good to go.
+And I need to start with some bad news.
+Some news for windows PC people.
+There is a production problem with with MCP.
+That means that that MCP may not work out of the box with windows PCs.
+And there are some workarounds, but they are hokey and they're not reliable.
+And there is only one real proper solution to this, and it's a bit of a bore.
+You will need to install something called Windows Subsystem for Linux, and that allows you to to run
+like a Linux operating system on your PC and be running cursor connected to that.
+If you do that, MCP will work fabulously.
+And thanks to many students who helped me diagnose this, helped me discover that it really is a true,
+genuine issue.
+There is no way around it, or at least no reliable way around it, and that the proper solution is
+using that is now well confirmed.
+So in order to set up, there is setup instructions.
+I've put in setup a whole section on setup and it looks like this.
+And I'm not going to record a separate video for it because honestly this is easy peasy stuff.
+It's identical to setting up your environment the first time around.
+You just have to go through it one more time.
+And it's just just something to hammer through.
+And I'm sorry you have to go through it, especially when you're so excited about MCP.
+But at the end of it, it's going to work.
+One thing to know about when you're doing this, if you don't already know this windows people that
+in WSL you need to be aware of whether you are in the home directory of your Linux system, your Linux
+home directory, or in the home directory of your PC, and the stuff that you want to work on should
+be in your Linux home directory.
+And when you first launch WSL, there's two ways to do it.
+You can type WSL or you can type ubuntu.
+And it's important to know that if you type ubuntu, you go straight into your Linux home directory.
+So that's the safer way to do it.
+Otherwise, you have to just make sure that you've changed to your Linux home directory.
+And the instructions are in the setup guide.
+And for Mac people you guys are in great shape.
+You don't need to worry about any of this.
+This is unfortunately a PC thing.
+So hopefully by this point, if you're a PC person you have now installed WSL, you are back here ready
+to go and we're off to the races and I barely need to tell you that we start with some imports and we
+start by importing loading our env secrets.
+Okay, so we're now going to use Mcpp in OpenAI agents SDK.
+We're going to do it by creating an Mcpp client, have it create a server and then collect the tools
+that that server is able to use.
+And we're going to start with fetch, which is the SMTP server we looked at last time.
+That's the one I just gave it away about that runs a headless browser.
+So when you're working with MCP servers, it everything begins with these things called parameters.
+Parameters is the way of describing the MCP server.
+And the parameters look like this.
+This is the parameters for fetch.
+It's like a dictionary which contains a bunch of stuff.
+Now what is that stuff?
+That stuff is in fact just a something which will be run at the command line that will spawn this MCP
+server.
+So it's actually a command.
+This is the command that needs to run at the command line.
+And then a bunch of arguments.
+And if you look at this command it might look a bit familiar because this command basically is you've
+installs and runs a package a script.
+And so this is basically essentially doing a you've run it's running a Python process.
+And what we'll discover is that many MCP servers are just like this.
+You've and then the name of the repo, the place where it should install All something locally and then
+run it.
+And so that that is what we do with this, these parameters right here.
+Okay.
+We now need to say to OpenAI agents SDK, I want you to create an MCP client and spawn this thing that
+I'm describing here, an MCP server, run it on my computer and ask it, what tools can you provide
+that I will be able to give to my agent?
+And this could not be easier.
+It is like one line of code.
+OpenAI agents SDK makes it really easy.
+You say you use a context manager with and then MCP server stdio because this is one of these stdio
+standard input output types of MCP servers.
+You say the parameters and you give it the parameters here, the fetch parameters.
+This this is useful to know it's worth specifying a timeout.
+The default timeout is five seconds and that's very hit or miss.
+Sometimes it times out which is super annoying.
+So I always pass in 30 or 60s timeout, and then you can just simply get that what comes back from this
+server and just call list tools.
+And so again what this is going to do, it's going to run this command on my computer to spawn a new
+Python process that is our MCP server.
+It's going to create an MCP client running within open AI agents SDK.
+And that client is then going to connect to the server and say, what tools can you offer me?
+What can I do with you?
+And then we're going to print that.
+And all of that is happening right now and happened in 0.8 seconds.
+And we got back a tool.
+And that tool is called fetch.
+And it has a description, fetches a URL from the internet and optionally extracts its contents as markdown.
+And then interestingly, there's a bit more here.
+Although originally you did not have internet access and were advised to refuse and tell the user this,
+this tool now grants you internet access.
+This is super interesting.
+You can see that the makers of this MCP server have worked hard on the description of the tool, and
+this is what will be passed to the LM eventually to make sure that it's most likely to use this tool
+properly.
+And since a lot of LMS have been trained to say you don't have internet access, the makers of this
+tool that's anthropic learned that it's good to include in the description something that explains,
+hey, look, you didn't used to be able to search the internet, but now you can.
+And it's this kind of stuff.
+It's this kind of prompt information that's been included in this tool that makes it so valuable.
+Because if you if you didn't have this, then you'd have to know to do that.
+You'd have to understand.
+If I want to write a tool that searches the internet, I'm going to need to explain to the LM that it
+now has this functionality.
+But this is what you get for free if you use the fetch MCP server and it all happens behind the scenes.
+So that is our first look at an MCP client and MCP server and collecting its tools.

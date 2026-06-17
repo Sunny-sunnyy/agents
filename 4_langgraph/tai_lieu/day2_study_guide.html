@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 2: Managing State, Defining State Objects & Use Reducers - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, Garamond, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 20ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.15rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.08rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 12px;
+      transition: background 0.15s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 14px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      font-weight: 600;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: "Inter", sans-serif;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & Thực hành</span>
+        <h1>LangGraph Day 2: Quản lý trạng thái, Định nghĩa State & Sử dụng Reducers</h1>
+        <p class="lead">
+          Nội dung ôn tập chi tiết ngày học thứ hai về LangGraph. Đi sâu phân tích triết lý trạng thái bất biến (immutable state), cơ chế hoạt động của Reducer (hàm hợp nhất) trong StateGraph, cách khai báo Annotated metadata, và phân tích mã nguồn thực hành Lab 1 (đồ thị không dùng LLM và chatbot tích hợp OpenAI).
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Day 2 Practice</span>
+          <span class="tag">State & Reducers</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Docx LLM (day2_summary.md)</span>
+          <span class="source">Code (1_lab1.ipynb)</span>
+          <span class="source">Slide (Không có)</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus • Tiêu điểm nhanh</h2>
+        <ul class="list">
+          <li><strong>Hợp đồng Node (Node contract):</strong> Node nhận <code>old_state - trạng thái cũ</code> và phải trả về một <code>new_state - trạng thái mới</code> dưới dạng dictionary thay đổi, tuyệt đối không chỉnh sửa (mutate) trực tiếp đối tượng cũ.</li>
+          <li><strong>Cú pháp Annotated:</strong> Sử dụng <code>Annotated[list, add_messages]</code> để gán hàm reducer trực tiếp lên từng trường dữ liệu của State class.</li>
+          <li><strong>Bẫy mất trí nhớ (Statelessness):</strong> Chatbot trong Lab 1 chưa giữ lịch sử hội thoại lâu dài giữa các lần bấm gửi vì mỗi lượt chat đang khởi tạo một instance State hoàn toàn mới.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Docx LLM:</strong> Sử dụng file lý thuyết chi tiết [day2_summary.md](file:///G:/Agent2026Win/agents/4_langgraph/tai_lieu/day2_summary.md) tóm tắt các bài 72, 73, 74, 75.</li>
+                <li><strong>Code:</strong> Đã đối chiếu và phân tích trực tiếp mã nguồn trong file Jupyter Notebook [1_lab1.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/1_lab1.ipynb).</li>
+                <li><strong>Slide:</strong> Không có slide đi kèm.</li>
+                <li><strong>Transcript:</strong> Đã được tích hợp và tóm tắt trực tiếp trong tài liệu Docx LLM.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Mã nguồn trong [1_lab1.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/1_lab1.ipynb) khớp hoàn toàn với các phần lý thuyết được trình bày trong file tóm tắt. Phần <strong>Code Walkthrough</strong> sẽ trích dẫn và phân tích trực tiếp các khối code xây dựng đồ thị ghép từ ngẫu nhiên (silly node) và đồ thị chatbot gọi mô hình OpenAI thật sự.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Cụm technical term viết dưới dạng <code>English term - nghĩa tiếng Việt</code>. Từ đơn phổ biến viết dưới dạng <code>term (nghĩa tiếng Việt)</code>. Ví dụ: <code>state (trạng thái)</code>, <code>immutable - bất biến</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt một trang</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Day 2 tập trung chuyển đổi tư duy từ lý thuyết sang cú pháp lập trình. Trọng tâm là cách định nghĩa <code>state (trạng thái)</code> bằng Pydantic, sử dụng <code>Annotated - kiểu chú thích mở rộng</code> để gán hàm <code>reducer - hàm hợp nhất cập nhật trạng thái</code> và thực thi vòng lặp đồ thị tuyến tính kết nối với giao diện Gradio.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Tránh Mutate:</strong> Không thay đổi thuộc tính của <code>old_state</code> trực tiếp; Node luôn phải trả về đối tượng State mới.</li>
+                <li><strong>add_messages:</strong> Là reducer tích hợp sẵn, giúp tự động tích lũy (nối thêm) tin nhắn mới vào danh sách chat history.</li>
+                <li><strong>Quy trình 5 bước:</strong> Khai báo State -> Khởi tạo Builder -> Tạo Node -> Tạo Edge -> Compile.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Khai báo <code>messages: Annotated[list, add_messages]</code> là công thức chuẩn mực cho bất kỳ đồ thị dạng Chatbot hoặc Agent nào cần tích lũy lịch sử hội thoại. Đây là nền tảng để triển khai xử lý song song và tích hợp bộ nhớ dài hạn (memory) về sau.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Trong bài học [Day 1](file:///G:/Agent2026Win/agents/4_langgraph/tai_lieu/day1_study_guide.html), chúng ta đã làm quen với các khái niệm sơ khởi về kiến trúc đồ thị và so sánh các cấu phần (Framework, Studio, Platform).
+            <br><br>
+            <strong>Day 2</strong> tiến một bước dài bằng cách cụ thể hóa các khái niệm trừu tượng đó thành mã nguồn Python thực tế. Chúng ta bắt đầu sử dụng thư viện <code>LangGraph Framework</code> để code lớp State bằng Pydantic, viết logic Node, nối các Edge với hằng số <code>START</code>, <code>END</code> và gọi phương thức <code>compile()</code> rồi <code>invoke()</code> đồ thị.
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Key concepts - Khái niệm chính</h3>
+              <ul class="list">
+                <li><strong>State - trạng thái:</strong> Snapshot ảnh chụp toàn bộ dữ liệu của hệ thống tại một thời điểm thực thi.</li>
+                <li><strong>immutable - bất biến:</strong> Tính chất bảo đảm dữ liệu của State sau khi tạo ra không thể bị sửa đổi tùy tiện.</li>
+                <li><strong>Annotated - kiểu chú thích mở rộng:</strong> Cú pháp chuẩn của Python dùng để đính kèm thêm metadata (như hàm reducer) vào gợi ý kiểu dữ liệu (type hint).</li>
+                <li><strong>reducer - hàm hợp nhất cập nhật trạng thái:</strong> Hàm chịu trách nhiệm chỉ định cách thức LangGraph gộp các trường dữ liệu cập nhật mới từ Node vào State chung.</li>
+                <li><strong>add_messages - reducer mặc định cho tin nhắn:</strong> Hàm reducer tích lũy có sẵn giúp tự động nối các đối tượng tin nhắn mới (hoặc dict tin nhắn) vào lịch sử tin nhắn cũ.</li>
+                <li><strong>Pydantic BaseModel:</strong> Lớp cơ sở dùng để định nghĩa State class có cấu trúc, hỗ trợ kiểm tra kiểu dữ liệu tự động.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Concept relationships - Mối quan hệ giữa các khái niệm</h3>
+              <p>
+                Trong LangGraph, mối quan hệ điều phối dữ liệu diễn ra như sau:
+                <br><br>
+                Node là một hàm xử lý (transformer). Nó nhận một bản sao của State hiện tại. Sau khi chạy logic, Node trả về một tập hợp các thay đổi (dưới dạng State mới hoặc dictionary). 
+                <br><br>
+                LangGraph đọc thông tin metadata khai báo tại <code>Annotated</code> của State class để tìm hàm <strong>Reducer</strong> tương ứng của trường đó, thực hiện <strong>state merging (hợp nhất trạng thái)</strong> một cách an toàn. Điều này cực kỳ quan trọng khi có <code>parallel nodes (các nút chạy song song)</code> cùng trả về kết quả cập nhật mà không ghi đè mất dữ liệu của nhau.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - Giải thích sâu về cơ chế hoạt động của add_messages</summary>
+            <p>
+              Hàm <code>add_messages</code> không chỉ là một phép cộng danh sách (list concatenation) đơn thuần. Bên dưới lớp vỏ, nó thực hiện các xử lý thông minh sau:
+            </p>
+            <ul class="list" style="margin-top: 8px;">
+              <li><strong>Tự động ép kiểu (Type coercion):</strong> Nếu Node của bạn trả về tin nhắn dưới dạng dict thuần, ví dụ: <code>{"role": "user", "content": "hello"}</code>, <code>add_messages</code> sẽ tự động chuyển nó thành đối tượng tin nhắn chuẩn của LangChain (như <code>HumanMessage</code>).</li>
+              <li><strong>Xử lý cập nhật tin nhắn theo ID:</strong> Nếu tin nhắn mới trả về có trùng <code>id</code> với một tin nhắn đã tồn tại trong State, <code>add_messages</code> sẽ tiến hành ghi đè/cập nhật nội dung của tin nhắn cũ bằng nội dung mới thay vì nối thêm. Đây là cơ sở để cập nhật tin nhắn trong giao diện thời gian thực hoặc sửa lỗi tin nhắn.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình xây dựng Graph</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Docx LLM</span>
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>High-level flow - Quy trình 5 bước thực tế</h3>
+              <ol class="list">
+                <li><strong>Bước 1: Định nghĩa lớp State:</strong> Kế thừa từ <code>BaseModel</code> (hoặc <code>TypedDict</code>) và khai báo các trường dữ liệu kết hợp cú pháp <code>Annotated</code> để gắn hàm reducer (ví dụ: <code>add_messages</code>).</li>
+                <li><strong>Bước 2: Khởi tạo Graph Builder:</strong> Tạo đối tượng quản lý cấu trúc đồ thị bằng lệnh <code>StateGraph(State)</code>.</li>
+                <li><strong>Bước 3: Tạo và đăng ký các Nodes:</strong> Viết các hàm logic (nhận state cũ, trả về state mới) và đăng ký qua <code>graph_builder.add_node(name, func)</code>.</li>
+                <li><strong>Bước 4: Thiết lập các Edges:</strong> Nối các node bằng <code>add_edge()</code>, sử dụng hằng số <code>START</code> để định nghĩa điểm vào và <code>END</code> để định nghĩa điểm ra của luồng chạy.</li>
+                <li><strong>Bước 5: Biên dịch (Compile) đồ thị:</strong> Gọi <code>graph_builder.compile()</code> để khóa cấu trúc đồ thị lại và chuyển thành một thực thể thực thi được.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Data / control flow - Luồng chạy khi gọi invoke()</h3>
+              <p>
+                Khi chạy đồ thị bằng lệnh <code>graph.invoke(initial_state)</code>:
+                <br><br>
+                1. Tham số đầu vào được đưa qua hằng số kết nối <code>START</code>.
+                <br>
+                2. Dữ liệu đi thẳng vào Node đầu tiên trong luồng điều khiển.
+                <br>
+                3. Node đọc dữ liệu từ State, thực thi xử lý (ghép chuỗi ngẫu nhiên hoặc gọi API LLM), tạo ra một đối tượng State mới chứa kết quả trả về.
+                <br>
+                4. LangGraph nhận kết quả, gọi hàm reducer (ví dụ: <code>add_messages</code>) để tích lũy câu trả lời mới vào State chính.
+                <br>
+                5. Luồng chạy đi qua kết nối tiếp theo dẫn tới hằng số kết thúc <code>END</code> và trả về kết quả State cuối cùng cho chương trình gọi.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Immutable update pattern<br>(Mẫu cập nhật bất biến)</h3>
+              <p><strong>Purpose:</strong> Đảm bảo tính nhất quán của trạng thái, giữ nguyên lịch sử snapshot để phục vụ cho debug hoặc quay lại các bước trước (time-travel).</p>
+              <p><strong>When to use:</strong> Bắt buộc áp dụng trong tất cả các Node functions. Tránh hành vi mutate trực tiếp thuộc tính của state đầu vào.</p>
+              <p><strong>Trade-off:</strong> Tốn công sức khởi tạo đối tượng State mới (hoặc trả về dict thay đổi) thay vì gán giá trị trực tiếp như lập trình OOP thông thường.</p>
+            </article>
+            <article class="card">
+              <h3>Annotated metadata<br>(Khai báo metadata qua Annotated)</h3>
+              <p><strong>Purpose:</strong> Đính kèm hướng dẫn hợp nhất dữ liệu (reducer) trực tiếp tại cấu trúc khai báo dữ liệu của State class thay vì nhúng rải rác trong các Node.</p>
+              <p><strong>When to use:</strong> Sử dụng khi khai báo các trường danh sách tin nhắn hoặc các trường cần tích lũy dữ liệu theo thời gian.</p>
+              <p><strong>Trade-off:</strong> Đòi hỏi lập trình viên phải làm quen và học cú pháp <code>Annotated</code> của Python type system.</p>
+            </article>
+            <article class="card">
+              <h3>Gradio interface wrapper<br>(Lớp bọc giao diện Gradio)</h3>
+              <p><strong>Purpose:</strong> Tạo giao diện chat trực quan nhanh chóng để tương tác thử nghiệm với đồ thị trong file Jupyter Notebook.</p>
+              <p><strong>When to use:</strong> Sử dụng ở pha dựng prototype nhanh để kiểm tra hành vi phản hồi của Agent.</p>
+              <p><strong>Trade-off:</strong> Nếu không thiết kế cẩn thận, dễ làm mờ ranh giới giữa logic giao diện (UI) và logic điều phối của đồ thị (Graph).</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code thực tế</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">Code</span>
+            </div>
+          </div>
+          <div class="callout" style="margin-bottom: 16px;">
+            Dưới đây là mã nguồn chính thức được trích xuất từ file Jupyter Notebook thực hành [1_lab1.ipynb](file:///G:/Agent2026Win/agents/4_langgraph/1_lab1.ipynb).
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Phần 1: Đồ thị tối giản không dùng LLM (Silly Node Graph)</h3>
+              <p>Đoạn mã này minh họa cách xây dựng đồ thị cơ bản 5 bước hoàn chỉnh nhưng node xử lý chỉ ghép chữ ngẫu nhiên từ danh sách danh từ và tính từ, chứng minh LangGraph hoạt động độc lập và không phụ thuộc vào bản chất của mô hình ngôn ngữ lớn.</p>
+            </div>
+            <div class="code-meta">
+              <span>Jupyter Cell 1-10</span>
+              <span>Imports & Setup</span>
+              <span>Random string generator</span>
+            </div>
+            <pre><code>from typing import Annotated
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from pydantic import BaseModel
+import random
+
+# Định nghĩa tập dữ liệu mẫu dùng cho silly node
+nouns = ["Cabbages", "Unicorns", "Toasters", "Penguins", "Bananas", "Zombies", "Rainbows", "Eels", "Pickles", "Muffins"]
+adjectives = ["outrageous", "smelly", "pedantic", "existential", "moody", "sparkly", "untrustworthy", "sarcastic", "squishy", "haunted"]
+
+# Bước 1: Định nghĩa lớp State sử dụng Pydantic BaseModel
+# Sử dụng Annotated để gắn reducer add_messages vào trường messages
+class State(BaseModel):
+    messages: Annotated[list, add_messages]
+
+# Bước 2: Khởi tạo Graph Builder với State class vừa định nghĩa
+graph_builder = StateGraph(State)
+
+# Bước 3: Tạo Node xử lý (là một hàm Python nhận old_state và trả về new_state)
+def our_first_node(old_state: State) -> State:
+    # Logic ghép danh từ và tính từ ngẫu nhiên
+    reply = f"{random.choice(nouns)} are {random.choice(adjectives)}"
+    messages = [{"role": "assistant", "content": reply}]
+    
+    # Tạo đối tượng State mới chứa câu trả lời và trả về (Immutable update)
+    new_state = State(messages=messages)
+    return new_state
+
+# Đăng ký node vào builder với tên định danh "first_node"
+graph_builder.add_node("first_node", our_first_node)
+
+# Bước 4: Tạo Edges nối từ điểm START vào first_node, và từ first_node ra điểm END
+graph_builder.add_edge(START, "first_node")
+graph_builder.add_edge("first_node", END)
+
+# Bước 5: Biên dịch đồ thị thành đối tượng có thể chạy được
+graph = graph_builder.compile()
+
+# Hàm chat bọc ngoài để chạy đồ thị với giao diện Gradio
+def chat(user_input: str, history):
+    # Mỗi lần chat được kích hoạt, tạo một state mới chỉ chứa tin nhắn hiện tại của người dùng
+    message = {"role": "user", "content": user_input}
+    messages = [message]
+    state = State(messages=messages)
+    
+    # Gọi thực thi đồ thị
+    result = graph.invoke(state)
+    print("Kết quả State trả về:", result)
+    
+    # Trả về nội dung tin nhắn cuối cùng trong danh sách để hiển thị lên chat giao diện
+    return result["messages"][-1].content
+</code></pre>
+          </article>
+
+          <article class="code-panel" style="margin-top: 20px;">
+            <div>
+              <h3>Phần 2: Chatbot thực tế tích hợp mô hình OpenAI và Gradio</h3>
+              <p>Mã nguồn dưới đây thay thế node ngẫu nhiên bằng một node gọi mô hình <code>gpt-4o-mini</code> thông qua LangChain OpenAI wrapper. Luồng chạy vẫn giữ nguyên cấu trúc đồ thị tuyến tính.</p>
+            </div>
+            <div class="code-meta">
+              <span>Jupyter Cell 11-13</span>
+              <span>ChatOpenAI Integration</span>
+              <span>Gradio Interface</span>
+            </div>
+            <pre><code>from langchain_openai import ChatOpenAI
+import gradio as gr
+
+# Bước 1: Định nghĩa lại State Class
+class State(BaseModel):
+    messages: Annotated[list, add_messages]
+
+# Bước 2: Khởi tạo lại Graph Builder
+graph_builder = StateGraph(State)
+
+# Khởi tạo mô hình ngôn ngữ lớn (LLM) gpt-4o-mini
+# API key được tự động lấy từ môi trường sau khi gọi load_dotenv()
+llm = ChatOpenAI(model="gpt-4o-mini")
+
+# Bước 3: Tạo Node gọi LLM thật sự
+def chatbot_node(old_state: State) -> State:
+    # Gọi mô hình LLM với toàn bộ lịch sử tin nhắn hiện có trong old_state
+    response = llm.invoke(old_state.messages)
+    
+    # Trả về đối tượng State mới chứa tin nhắn phản hồi của LLM
+    new_state = State(messages=[response])
+    return new_state
+
+# Đăng ký chatbot node vào builder
+graph_builder.add_node("chatbot", chatbot_node)
+
+# Bước 4: Tạo Edges liên kết
+graph_builder.add_edge(START, "chatbot")
+graph_builder.add_edge("chatbot", END)
+
+# Bước 5: Biên dịch đồ thị
+graph = graph_builder.compile()
+
+# Hàm chat điều phối chạy đồ thị kết nối giao diện Gradio
+def chat(user_input: str, history):
+    # CHÚ Ý BẪY: Mỗi lần người dùng gửi tin nhắn, một State mới được tạo lập từ đầu
+    # Chỉ chứa tin nhắn mới nhất, do đó đồ thị hiện tại không có bộ nhớ (Stateless)
+    initial_state = State(messages=[{"role": "user", "content": user_input}])
+    
+    # Invoke đồ thị để LLM trả lời
+    result = graph.invoke(initial_state)
+    print("Trạng thái sau invoke:", result)
+    
+    # Trả về nội dung phản hồi cuối cùng của bot
+    return result['messages'][-1].content
+
+# Khởi chạy giao diện chat trực quan trong notebook
+gr.ChatInterface(chat, type="messages").launch()
+</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn - Option</th>
+                <th>Phù hợp nhất - Best for</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm & Đánh đổi - Cons & Trade-off</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pydantic BaseModel làm State</strong></td>
+                <td>Khi làm việc trong môi trường Python lớn hoặc Jupyter Notebook cần kiểu dữ liệu cấu trúc chặt chẽ.</td>
+                <td>Khai báo rõ ràng, hỗ trợ tự động validation dữ liệu đầu vào và đầu ra của từng trường.</td>
+                <td>Nặng hơn một chút so với dict thuần, cú pháp khởi tạo cần import thư viện Pydantic.</td>
+              </tr>
+              <tr>
+                <td><strong>TypedDict làm State</strong></td>
+                <td>Khi xây dựng các ứng dụng nhẹ, ưu tiên tốc độ xử lý hoặc giao tiếp nhanh với các API dạng JSON.</td>
+                <td>Gần gũi với kiểu dictionary mặc định của Python, cú pháp khởi tạo cực kỳ đơn giản và nhanh gọn.</td>
+                <td>Không hỗ trợ validation dữ liệu tự động tại runtime, khó quản lý các trường phức tạp.</td>
+              </tr>
+              <tr>
+                <td><strong>Stateless per-invoke chatbot (Chatbot không lưu trạng thái)</strong></td>
+                <td>Làm các ứng dụng demo nhanh, kiểm tra kết nối API LLM và kiểm thử hoạt động của các nút logic đơn lẻ.</td>
+                <td>Cấu trúc cực kỳ đơn giản, không cần cấu hình bộ lưu trữ cơ sở dữ liệu hoặc checkpointing.</td>
+                <td>Chatbot hoàn toàn bị "mất trí nhớ" qua từng lượt hội thoại. Mỗi câu chat là một phiên độc lập.</td>
+              </tr>
+              <tr>
+                <td><strong>Stateful memory chatbot (Chatbot lưu trạng thái)</strong></td>
+                <td>Các ứng dụng chatbot thực tế, trợ lý ảo cần ghi nhớ ngữ cảnh cuộc trò chuyện của người dùng.</td>
+                <td>Tự động tích lũy lịch sử trò chuyện, duy trì ngữ cảnh dài hạn giúp trả lời chính xác và thông minh.</td>
+                <td>Đòi hỏi cấu hình thêm cơ chế lưu trữ bền vững (checkpointing/persistence) và quản lý thread ID.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Sửa đổi (Mutate) state cũ tại chỗ:</strong> Viết mã sửa trực tiếp list của <code>old_state.messages</code> bên trong hàm Node. Lỗi này làm mất đi tính snapshot của StateGraph, phá hỏng khả năng debug lịch sử đồ thị.</li>
+                <li><strong>Hiểu lầm add_messages tự động duy trì bộ nhớ dài hạn của app:</strong> Nghĩ rằng vì State có reducer <code>add_messages</code> nên chatbot sẽ tự động nhớ tên người dùng ở lượt chat sau. Thực chất, mỗi lần Gradio gọi hàm chat, một đối tượng State mới tinh được tạo lập nên lịch sử cũ bị xóa sạch.</li>
+                <li><strong>Khai báo gợi ý kiểu dữ liệu (type hint) thiếu Annotated:</strong> Chỉ khai báo <code>messages: list</code> trong State. Khi Node trả về tin nhắn mới, LangGraph sẽ ghi đè hoàn toàn danh sách cũ thay vì cộng dồn (append) do thiếu chỉ định hàm reducer.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách tránh</h3>
+              <ul class="list">
+                <li><strong>Viết code an toàn (Immutable):</strong> Luôn tạo một đối tượng State mới bằng cách trả về dictionary chứa thay đổi, ví dụ: <code>return {"messages": [new_msg]}</code> để framework tự gộp thay vì thay đổi đối tượng cũ.</li>
+                <li><strong>Tách biệt Session và Invoke:</strong> Hiểu rằng reducer chỉ giúp hợp nhất tin nhắn trong phạm vi một lần gọi <code>invoke()</code> đồ thị. Để chatbot nhớ tin nhắn dài hạn, cần cấu hình thêm bộ lưu trữ trạng thái (memory persistence) bằng checkpointer ở các bài học sau.</li>
+                <li><strong>Kiểm tra cú pháp Annotated kĩ lưỡng:</strong> Đảm bảo luôn viết <code>messages: Annotated[list, add_messages]</code> để kích hoạt cơ chế tích lũy tin nhắn tự động của LangGraph.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao State trong LangGraph lại được xem là bất biến (immutable)?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Vì State đại diện cho ảnh chụp hệ thống (snapshot) tại một thời điểm cụ thể. Tính bất biến giúp ngăn chặn các tác dụng phụ ngầm (side effects) khi các node chạy song song hoặc ghi đè dữ liệu lên nhau, đồng thời phục vụ cho việc quay lại các bước trước (time-travel debug).
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: annotated đóng vai trò gì trong định nghĩa State của LangGraph?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Cú pháp <code>Annotated</code> cho phép đính kèm hàm <code>reducer</code> (metadata) trực tiếp vào gợi ý kiểu dữ liệu (type hint) của từng trường trong State class. LangGraph đọc metadata này để biết cách hợp nhất (merge) dữ liệu mới trả về từ Node vào State chung.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Tại sao chatbot trong Lab 1 bị "mất trí nhớ" qua các lượt trò chuyện mặc dù đã dùng add_messages?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Vì mỗi lượt nhập tin nhắn mới trên Gradio, hàm <code>chat</code> bọc ngoài lại khởi tạo lại từ đầu đối tượng State bằng lệnh: <code>initial_state = State(messages=[...])</code> chỉ chứa tin nhắn hiện tại. Lịch sử của lượt <code>invoke()</code> trước đó không được lưu trữ hoặc truyền lại vào lần gọi mới.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác nhau cơ bản giữa compile() và invoke() trong LangGraph là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> 
+                <ul>
+                  <li><strong>compile():</strong> Là bước kết thúc pha định nghĩa đồ thị (Build phase), biên dịch cấu trúc đã khai báo thành một đối tượng thực thi.</li>
+                  <li><strong>invoke():</strong> Là pha chạy thực tế (Execution phase), nhận vào trạng thái khởi đầu cụ thể và kích hoạt các Node chạy để trả về State kết quả.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="card" style="margin-top: 14px;">
+            <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+            <p>Hành vi nào dưới đây xảy ra đối với trường <code>messages: Annotated[list, add_messages]</code> khi Node trả về một tin nhắn mới có <code>id</code> trùng khớp với một tin nhắn đã tồn tại sẵn trong State?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Tin nhắn mới sẽ được thêm vào cuối danh sách tin nhắn cũ như một phần tử mới bình thường.</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Hàm reducer add_messages sẽ tự động cập nhật và ghi đè nội dung tin nhắn cũ có cùng ID bằng nội dung mới.</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Đồ thị sẽ báo lỗi Runtime do xung đột ID và dừng quá trình thực thi ngay lập tức.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li><strong>State = Snapshot bất biến.</strong> Tránh tuyệt đối việc gán/mutate state cũ trực tiếp bên trong node.</li>
+                <li><strong>Cú pháp Annotated:</strong> <code>messages: Annotated[list, add_messages]</code> là xương sống của các chatbot graph.</li>
+                <li><strong>Hàm Reducer:</strong> Giải quyết bài toán state merging an toàn, đặc biệt là khi có các node chạy song song (parallelism).</li>
+                <li><strong>Bot mất trí nhớ:</strong> Chatbot trong Lab 1 hiện tại là stateless giữa các lượt chat do khởi tạo State mới mỗi lần Gradio gọi hàm chat.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích chi tiết cơ chế cập nhật tin nhắn theo ID của hàm <code>add_messages</code> không?</li>
+                <li>Lợi ích lớn nhất của việc thiết kế State bất biến (immutable) đối với việc debug hệ thống là gì?</li>
+                <li>Tại sao hàm Node được gọi là một State Transformer, còn hàm Reducer được gọi là một State Merger?</li>
+                <li>Bạn có tự viết lại được đồ thị chatbot tuyến tính kết nối với Gradio mà không cần nhìn code mẫu không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 2. Phân tích chi tiết mã nguồn Lab 1 dựa trên học liệu chính thức của khóa học.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Chính xác! reducer add_messages được thiết kế thông minh để ghi đè tin nhắn cũ nếu tin nhắn mới có cùng trường ID, ngược lại nó mới nối thêm vào cuối danh sách.";
+          result.style.color = "#5db872";
+        } else {
+          result.innerHTML = "Chưa chính xác. Hãy xem lại phần giải thích chi tiết cơ chế hoạt động nâng cao của add_messages ở phần lý thuyết Core Theory (Section 4).";
+          result.style.color = "#c64545";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

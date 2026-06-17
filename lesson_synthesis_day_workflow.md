@@ -5,7 +5,7 @@ Workflow này dùng cho một session xử lý đúng 1 day của khóa học.
 Course domain: AI Agents  
 Course name: AI Engineer Agentic Track: The Complete Agent & MCP Course
 
-## 1. Prompt gửi agent trong session mới
+## 1. Prompt gửi agent trong session mới để tạo file summary day .md
 
 Copy prompt dưới đây vào session mới, rồi gửi kèm:
 
@@ -53,9 +53,10 @@ Quy tắc làm việc:
     - Missing Inputs ghi rõ phần thiếu nếu có.
 
 
-Bạn hãy cùng tôi Brainstorming để trao đổi, hỏi thêm về các vấn đề, thông tin bạn nghĩ cần thiết.
-Phỏng vấn chuyên sâu:
-   - Nếu có nhiều điểm mơ hồ lớn, dùng `@rich-elicitation`.
+Bạn hãy dùng `brainstorming` làm quy trình chính để cùng tôi thảo luận, hỏi thêm, làm rõ yêu cầu.
+   - Luôn bắt đầu bằng `using-superpowers`.
+   - Dùng `brainstorming` làm quy trình chính. 
+   - Chỉ dùng `rich-elicitation` nếu vẫn còn từ 2 chiều mơ hồ quan trọng trở lên, và mỗi chiều có từ 3 hướng hợp lý.
    - Hỏi tối đa 3 câu hỏi quan trọng mỗi lượt.
    - Ưu tiên câu hỏi multiple-choice có recommended option.
    - Không hỏi lan man. Mỗi câu hỏi phải làm thay đổi scope, design, test, hoặc implementation plan.
@@ -73,6 +74,8 @@ transcript:
 code:
 slide: 
 Nội dung các bài trước: 
+
+Bạn có thể tự khám phá các file, folder chứa code khác để hiểu rõ thêm về bài học nếu thấy cần thiết hoặc nếu tôi cung cấp thiếu ngữ cảnh
 ```
 
 ## 2. Mục tiêu workflow

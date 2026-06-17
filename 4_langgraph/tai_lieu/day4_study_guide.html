@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4: Playwright Integration & Worker-Evaluator Feedback Loop - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, Garamond, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 22ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.18rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.08rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 12px;
+      transition: background 0.15s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 14px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      font-weight: 600;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: "Inter", sans-serif;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & Thực hành</span>
+        <h1>LangGraph Day 4: Tự động hóa Trình duyệt với Playwright & Vòng lặp phản hồi Worker-Evaluator</h1>
+        <p class="lead">
+          Tài liệu tổng hợp kiến thức chuyên sâu của Day 4. Tìm hiểu cách đưa <code>Playwright</code> tự động hóa trình duyệt vào đồ thị tác tử, thiết kế State giàu thông tin điều hướng, định nghĩa đầu ra có cấu trúc (structured outputs) thông qua Pydantic, và lập trình kiến trúc vòng lặp tự đánh giá chất lượng Worker-Evaluator Loop trước khi trả phản hồi cuối cùng cho người dùng.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Day 4 Practice</span>
+          <span class="tag">Browser Automation & Multi-Agent Feedback Loop</span>
+        </div>
+        <div class="source-row">
+          <span class="source">day4_summary.md</span>
+          <span class="source">3_lab3.ipynb</span>
+          <span class="source">4_lab4.ipynb</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus • Tiêu điểm nhanh</h2>
+        <ul class="list">
+          <li><strong>Playwright Integration:</strong> Tích hợp trình duyệt tự động để tác tử mở trang web thật, tương tác Javascript động, lấy dữ liệu thời gian thực.</li>
+          <li><strong>Async LangGraph:</strong> Triển khai đồ thị bằng cơ chế <code>async mode - chế độ bất đồng bộ</code> thông qua <code>ainvoke()</code> và <code>arun()</code> của công cụ.</li>
+          <li><strong>Structured Outputs:</strong> Ràng buộc kết quả trả về của LLM theo một Pydantic schema nghiêm ngặt, đóng vai trò chốt chặn dữ liệu máy đọc được.</li>
+          <li><strong>Worker-Evaluator Loop:</strong> Thiết lập quy trình khép kín: Worker thực thi công việc -> Evaluator chấm điểm so với tiêu chí thành công -> Worker tự động sửa đổi hoặc escalation lên người dùng.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>day4_summary.md:</strong> Tổng hợp lý thuyết cốt lõi của bài học 81, 82, 83, 84, 85 về thiết kế tác tử trình duyệt và vòng lặp tự hiệu chỉnh.</li>
+                <li><strong>3_lab3.ipynb:</strong> Notebook chứa mã nguồn Lab 3 về tích hợp Playwright, chạy Async LangGraph và Gradio ChatInterface đơn giản.</li>
+                <li><strong>4_lab4.ipynb:</strong> Notebook chứa mã nguồn Lab 4 xây dựng dự án Sidekick quy mô lớn với Worker-Evaluator Loop và Gradio Blocks.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Mã nguồn của Lab 3 và Lab 4 được tích hợp trực tiếp, bóc tách thành các khối logic mạch lạc với các chú thích tiếng Việt rõ ràng. Toàn bộ logic vá event loop trên môi trường Windows và Jupyter Notebook đều được ghi nhận đầy đủ.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ chuyên ngành được giữ nguyên từ tiếng Anh và dịch nghĩa tiếng Việt kèm theo: <code>async mode - chế độ bất đồng bộ</code>, <code>structured outputs - đầu ra có cấu trúc</code>, <code>success criteria - tiêu chí thành công</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt nhanh một trang</h2>
+            </div>
+          </div>
+          <p>
+            Bảng tra cứu nhanh các câu lệnh, cấu hình và thiết kế cốt lõi trong Day 4:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Khái niệm / Câu lệnh</th>
+                <th>Cấu trúc cú pháp / Cấu hình chính</th>
+                <th>Mục đích sử dụng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Async Event Loop Patch</strong></td>
+                <td><code>import nest_asyncio; nest_asyncio.apply()</code></td>
+                <td>Vá event loop của Jupyter Notebook để cho phép gọi các hàm async lồng nhau của Playwright.</td>
+              </tr>
+              <tr>
+                <td><strong>Async Browser Init</strong></td>
+                <td><code>create_async_playwright_browser(headless=False)</code></td>
+                <td>Mở một trình duyệt Chromium thật có giao diện (headful mode) để dễ dàng theo dõi và debug hành vi.</td>
+              </tr>
+              <tr>
+                <td><strong>Structured Output Binding</strong></td>
+                <td><code>llm.with_structured_output(PydanticBaseModel)</code></td>
+                <td>Ép mô hình LLM trả về dữ liệu tuân thủ nghiêm ngặt schema định nghĩa trước, tránh lỗi định dạng chuỗi tự do.</td>
+              </tr>
+              <tr>
+                <td><strong>Async Invoke Graph</strong></td>
+                <td><code>await graph.ainvoke(state, config)</code></td>
+                <td>Thực thi đồ thị tác tử ở chế độ async, phù hợp cho các tác vụ tốn tài nguyên I/O như điều khiển trình duyệt.</td>
+              </tr>
+              <tr>
+                <td><strong>Session Isolation</strong></td>
+                <td><code>config = {"configurable": {"thread_id": str(uuid.uuid4())}}</code></td>
+                <td>Tách biệt dữ liệu và checkpoints giữa các phiên người dùng khác nhau trên giao diện UI.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ bài cũ</h2>
+            </div>
+          </div>
+          <p>
+            Day 4 tiếp tục mở rộng các khái niệm nền tảng từ những ngày trước đó và nâng cấp khả năng tương tác của tác tử lên một tầm cao mới:
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Day 1 &amp; Day 2</h3>
+              <ul class="list">
+                <li>Thiết lập đồ thị cơ bản với các nodes, edges.</li>
+                <li>Duy trì hội thoại qua <code>State</code> và reducer <code>add_messages</code>.</li>
+                <li>Học cách xây dựng các tác tử có khả năng gọi tool nội bộ đơn giản.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Day 3</h3>
+              <ul class="list">
+                <li>Giới thiệu <code>super-step - siêu bước</code> và bộ lưu trữ snapshot <code>MemorySaver</code>.</li>
+                <li>Sử dụng SQLite database để lưu trữ checkpoints bền vững.</li>
+                <li>Sử dụng LangSmith để quan sát luồng gọi tool (observability).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Day 4 (Bước nhảy vọt)</h3>
+              <ul class="list">
+                <li>Chuyển dịch từ sync sang async execution để xử lý tác vụ trình duyệt không đồng bộ.</li>
+                <li>Sử dụng bộ công cụ <code>Playwright</code> thay cho các API tĩnh đơn giản.</li>
+                <li>Từ đồ thị 1 agent tuyến tính nâng cấp lên mô hình đa tác tử có sự đánh giá chéo (Worker-Evaluator).</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Playwright &amp; PlayWrightBrowserToolkit</h3>
+              <p>
+                <strong>Playwright:</strong> Là một framework mạnh mẽ cho phép tự động hóa trình duyệt web thật (Chromium, Firefox, WebKit), render Javascript động, và giả lập thao tác của người dùng như bấm nút, điền form, chụp ảnh màn hình.
+              </p>
+              <p>
+                <strong>PlayWrightBrowserToolkit:</strong> Bộ công cụ đóng gói sẵn của thư viện LangChain Community, cung cấp cho tác tử các low-level tools như <code>navigate_browser</code>, <code>extract_text</code>, <code>extract_hyperlinks</code>, <code>click_element</code>. Tác tử sẽ tự động quyết định gọi tool nào dựa trên ngữ cảnh nhiệm vụ.
+              </p>
+            </article>
+            <article class="card">
+              <h3>2. Async Execution Model in LangGraph</h3>
+              <p>
+                Khi tích hợp các công cụ I/O nặng như mở trình duyệt hoặc truy vấn web, việc sử dụng cơ chế đồng bộ (sync) sẽ chặn đứng luồng chính, làm giảm hiệu suất hệ thống. LangGraph hỗ trợ đầy đủ <code>async mode - chế độ bất đồng bộ</code>.
+              </p>
+              <ul class="list">
+                <li>Các Node/Tools được định nghĩa bằng <code>async def</code>.</li>
+                <li>Sử dụng <code>await tool.arun(...)</code> để chạy công cụ bất đồng bộ.</li>
+                <li>Gọi <code>await graph.ainvoke(...)</code> thay thế cho <code>graph.invoke(...)</code> thông thường.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>3. Structured Outputs &amp; Pydantic</h3>
+              <p>
+                <strong>Structured Outputs:</strong> Cơ chế bắt buộc LLM phải định dạng kết quả trả về theo đúng JSON schema định nghĩa trước. Nó loại bỏ hoàn toàn việc phân tích văn bản thô (regex/string parse) kém tin cậy.
+              </p>
+              <p>
+                <strong>Pydantic BaseModel:</strong> Dùng để khai báo schema cho Evaluator. Ví dụ:
+                <code>EvaluatorOutput</code> bao gồm 3 thuộc tính: <code>feedback: str</code> (văn bản nhận xét), <code>success_criteria_met: bool</code> (đạt tiêu chí thành công chưa), và <code>user_input_needed: bool</code> (có cần leo thang hỏi người dùng không).
+              </p>
+            </article>
+            <article class="card">
+              <h3>4. State Design &amp; Overwrite Mechanism</h3>
+              <p>
+                Trong các bài học trước, State chỉ chứa danh sách tin nhắn sử dụng reducer <code>add_messages</code> để tích lũy lịch sử. Trong kiến trúc phức tạp của Day 4, State được mở rộng để lưu các biến điều phối đồ thị:
+              </p>
+              <ul class="list">
+                <li><code>success_criteria</code> (str): Tiêu chí người dùng đặt ra.</li>
+                <li><code>feedback_on_work</code> (str/None): Nhận xét của Evaluator cho Worker sửa sai ở vòng kế tiếp.</li>
+                <li><code>success_criteria_met</code> (bool) và <code>user_input_needed</code> (bool): Các cờ chỉ hướng chạy cho Router.</li>
+                <li><em>Cơ chế cập nhật:</em> Chỉ có <code>messages</code> dùng reducer để cộng dồn; các trường cờ điều phối ở trên sẽ bị <strong>ghi đè (overwrite)</strong> bằng giá trị mới nhất do Node trả về.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Luồng xử lý</h2>
+            </div>
+          </div>
+          <p>
+            Day 4 giới thiệu hai mô hình luồng hoạt động từ đơn giản đến phức tạp:
+          </p>
+
+          <details>
+            <summary>Luồng hoạt động 1: One-Agent Tool Loop (Lab 3)</summary>
+            <div class="callout" style="margin-top: 10px;">
+              Đồ thị chỉ chứa duy nhất một tác tử chính (Chatbot) tương tác lặp lại với bộ công cụ trình duyệt cho đến khi hoàn thành nhiệm vụ.
+            </div>
+            <pre><code>[START] -> node: chatbot -> (tools_condition)
+                             |
+                             +---> [Có tool call] ---> node: tools -> (quay lại chatbot)
+                             |
+                             +---> [Không tool call] -> [END]</code></pre>
+            <ol class="list" style="margin-top: 10px;">
+              <li>Nhận yêu cầu của người dùng từ giao diện Gradio ChatInterface.</li>
+              <li>Node <code>chatbot</code> nhận State tin nhắn, gọi LLM đã liên kết với toàn bộ browser tools + push notification tool.</li>
+              <li>Hàm <code>tools_condition</code> kiểm tra kết quả trả về của LLM:
+                <ul>
+                  <li>Nếu có yêu cầu gọi công cụ: Định tuyến sang node <code>tools</code> để thực thi (ví dụ: mở trình duyệt Chromium, điều hướng tới CNN, trích xuất text) rồi quay về node <code>chatbot</code>.</li>
+                  <li>Nếu không có yêu cầu gọi công cụ: Coi như hoàn thành nhiệm vụ và kết thúc luồng.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>Luồng hoạt động 2: Worker-Evaluator Loop (Lab 4 - Sidekick Project)</summary>
+            <div class="callout" style="margin-top: 10px;">
+              Mô hình phức tạp gồm hai LLM độc lập: một Worker thực thi hành động với tools và một Evaluator độc lập đánh giá sản phẩm đầu ra dựa trên tiêu chí thành công của người dùng.
+            </div>
+            <pre><code>[START] -> node: worker -> (worker_router)
+                             |
+                             +---> [Có tool call] ---> node: tools -> (quay lại worker)
+                             |
+                             +---> [Không tool call] -> node: evaluator -> (route_based_on_evaluation)
+                                                                            |
+                                                                            +---> [Chưa đạt & không cần hỏi user] -> (quay lại worker sửa lỗi)
+                                                                            |
+                                                                            +---> [Đạt HOẶC cần thông tin thêm] ----> [END]</code></pre>
+            <ol class="list" style="margin-top: 10px;">
+              <li><strong>Nhận Input:</strong> Người dùng nhập cả yêu cầu công việc lẫn <code>success_criteria - tiêu chí thành công</code>.</li>
+              <li><strong>Worker Node:</strong> Thực hiện nhiệm vụ. Sử dụng prompt chứa tiêu chí thành công. Nếu có feedback của Evaluator ở vòng trước, nó sẽ đọc để sửa chữa câu trả lời.</li>
+              <li><strong>Worker Router:</strong>
+                <ul>
+                  <li>Nếu Worker phát sinh tool call: Định tuyến sang <code>tools</code> để chạy công cụ rồi quay lại <code>worker</code>.</li>
+                  <li>Nếu Worker không cần gọi tool (đã viết xong câu trả lời): Chuyển sang node <code>evaluator</code> để kiểm duyệt chất lượng.</li>
+                </ul>
+              </li>
+              <li><strong>Evaluator Node:</strong> So sánh câu trả lời cuối cùng của Worker với tiêu chí thành công trong State và toàn bộ lịch sử trò chuyện. Trả về cấu trúc <code>EvaluatorOutput</code> gồm nhận xét, cờ thành công và cờ hỏi thông tin người dùng.</li>
+              <li><strong>Evaluation Router (route_based_on_evaluation):</strong>
+                <ul>
+                  <li>Nếu <code>success_criteria_met == True</code> hoặc <code>user_input_needed == True</code>: Kết thúc siêu bước (END), gửi kết quả cuối cùng cùng lời phê duyệt/nhận xét ra ngoài UI cho người dùng.</li>
+                  <li>Nếu <code>success_criteria_met == False</code> (chưa đạt) và không cần hỏi người dùng: Định tuyến quay lại node <code>worker</code> kèm theo <code>feedback_on_work</code> lưu trong State để worker sửa sai ở vòng kế tiếp.</li>
+                </ul>
+              </li>
+            </ol>
+          </details>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Direct Tool Smoke Test</h3>
+              <p>
+                Kỹ thuật kiểm thử khói trực tiếp công cụ trước khi binding vào LLM. Với các công cụ có hành vi phức tạp như Playwright browser, ta nên tạo từ điển công cụ <code>tool_dict</code> và gọi trực tiếp hàm <code>await tool.arun(...)</code> để kiểm tra tính năng mở trình duyệt, tải HTML, và lấy dữ liệu thô. Kỹ thuật này giúp tách biệt lỗi hệ thống (như lỗi cấu hình trình duyệt, lỗi mạng) khỏi lỗi tư duy reasoning của mô hình LLM.
+              </p>
+            </article>
+            <article class="card">
+              <h3>2. Schema-First Evaluator Design</h3>
+              <p>
+                Thay vì viết prompt yêu cầu Evaluator trả về chuỗi text tự do kiểu "Tôi thấy câu trả lời của Worker chưa đạt vì...", ta định hình hợp đồng dữ liệu nghiêm ngặt bằng Pydantic. Điều này đảm bảo các cờ quyết định hướng đi của đồ thị như <code>success_criteria_met</code> và <code>user_input_needed</code> luôn có giá trị boolean hợp lệ, giúp code router hoạt động ổn định và tin cậy tuyệt đối.
+              </p>
+            </article>
+            <article class="card">
+              <h3>3. Criteria-In-State & Prior-Feedback Carryover</h3>
+              <p>
+                Đưa <code>success_criteria</code> vào State dùng chung để cả Worker và Evaluator có cùng một định nghĩa mục tiêu rõ ràng. Bên cạnh đó, việc chuyển giao <code>feedback_on_work</code> cũ sang prompt của Worker ở vòng lặp sau giúp Worker tránh việc lặp lại chính xác các lỗi đã bị Evaluator từ chối ở lượt trước, rút ngắn thời gian hội tụ của vòng lặp phản hồi.
+              </p>
+            </article>
+            <article class="card">
+              <h3>4. Session-Scoped Thread IDs in Gradio State</h3>
+              <p>
+                Khi đóng gói đồ thị thành ứng dụng web đa phiên (multi-session UI) bằng Gradio, việc sử dụng chung một <code>thread_id</code> cứng sẽ gây lẫn lộn bộ nhớ giữa các người dùng. Lab 4 sử dụng <code>gr.State(make_thread_id)</code> để cấp một chuỗi UUID ngẫu nhiên duy nhất cho mỗi phiên tải giao diện. Khi nhấn nút "Reset", ứng dụng sẽ xóa giao diện và sinh ra một thread mới hoàn toàn để làm sạch bộ nhớ.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+          </div>
+          
+          <article class="code-panel">
+            <h3>1. Thiết lập môi trường Async & Tải công cụ Playwright (Lab 3)</h3>
+            <div class="code-meta">
+              <span>Jupyter Notebook cell</span>
+              <span>Library Setup</span>
+            </div>
+            <pre><code>import nest_asyncio
+# Vá asyncio loop của Jupyter Notebook để chấp nhận các nested async tasks
+nest_asyncio.apply()
+
+from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
+from langchain_community.tools.playwright.utils import create_async_playwright_browser
+
+# Khởi tạo trình duyệt Playwright ở chế độ hiển thị cửa sổ (headless=False)
+# Giúp người lập trình nhìn trực tiếp các hành động cuộn trang, bấm nút của tác tử
+async_browser = create_async_playwright_browser(headless=False)
+toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=async_browser)
+
+# Lấy danh sách các công cụ tương tác trình duyệt được đóng gói sẵn từ LangChain Community
+tools = toolkit.get_tools()
+
+# Xem danh sách các công cụ được nạp
+for tool in tools:
+    print(f"{tool.name} -> {tool.description[:60]}...")
+</code></pre>
+            <p>
+              <strong>Chú ý về Event Loop trên Windows:</strong> Trình duyệt Playwright sử dụng <code>ProactorEventLoop</code> trên Windows và có thể gây lỗi <code>NotImplementedError</code> trong notebook. Đoạn code trên hướng dẫn vá file <code>kernelapp.py</code> trong thư mục ảo <code>.venv</code> bằng cách comment dòng thiết lập event loop policy mặc định của tornado, hoặc chuyển code chạy dưới dạng module Python thông thường.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <h3>2. Direct Tool Smoke Test - Kiểm tra khói trình duyệt trực tiếp</h3>
+            <div class="code-meta">
+              <span>Manual Test</span>
+              <span>Async Browser Actions</span>
+            </div>
+            <pre><code># Tạo từ điển công cụ để dễ dàng truy vấn theo tên
+tool_dict = {tool.name: tool for tool in tools}
+
+navigate_tool = tool_dict.get("navigate_browser")
+extract_text_tool = tool_dict.get("extract_text")
+
+# Kiểm thử khói: Tác tử tự truy cập CNN và rút trích văn bản không cần qua LLM
+await navigate_tool.arun({"url": "https://www.cnn.com"})
+text = await extract_text_tool.arun({})
+
+import textwrap
+print(textwrap.fill(text[:500])) # In 500 ký tự đầu tiên đã được định dạng
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>3. Định nghĩa Khế ước dữ liệu & State mở rộng (Lab 4)</h3>
+            <div class="code-meta">
+              <span>Pydantic Schema</span>
+              <span>TypedDict State</span>
+            </div>
+            <pre><code>from pydantic import BaseModel, Field
+from typing import Annotated, List, Dict, Any, Optional
+from langgraph.graph.message import add_messages
+
+# Pydantic schema bắt buộc đầu ra có cấu trúc của Evaluator
+class EvaluatorOutput(BaseModel):
+    feedback: str = Field(description="Nhận xét phản hồi về câu trả lời của tác tử")
+    success_criteria_met: bool = Field(description="Đánh giá tiêu chí thành công đã được đáp ứng hoàn toàn hay chưa")
+    user_input_needed: bool = Field(description="Đặt thành True nếu mô hình bị kẹt hoặc cần hỏi thêm thông tin làm rõ từ người dùng")
+
+# Cấu trúc State của đồ thị nâng cao
+class State(TypedDict):
+    # messages sử dụng reducer add_messages để tích lũy lịch sử hội thoại dạng append-only
+    messages: Annotated[List[Any], add_messages]
+    
+    # Các trường cấu hình điều phối này sẽ bị ghi đè (overwrite) khi node trả về giá trị mới
+    success_criteria: str
+    feedback_on_work: Optional[str]
+    success_criteria_met: bool
+    user_input_needed: bool
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>4. Lập trình Worker Node & Prompt Logic</h3>
+            <div class="code-meta">
+              <span>Worker Logic</span>
+              <span>State Reading</span>
+            </div>
+            <pre><code>from langchain_core.messages import SystemMessage
+
+def worker(state: State) -> Dict[str, Any]:
+    # Prompt định hình vai trò của Worker, ép nó phải tuân thủ success_criteria
+    system_message = f"""You are a helpful assistant that can use tools to complete tasks.
+You keep working on a task until either you have a question or clarification for the user, or the success criteria is met.
+This is the success criteria:
+{state['success_criteria']}
+You should reply either with a question for the user about this assignment, or with your final response.
+If you have a question for the user, you need to reply by clearly stating your question. An example might be:
+
+Question: please clarify whether you want a summary or a detailed answer
+
+If you've finished, reply with the final answer, and don't ask a question; simply reply with the answer.
+"""
+    
+    # Nếu có phản hồi đánh giá không đạt từ Evaluator ở vòng trước, đính kèm nó vào prompt để Worker cải tiến
+    if state.get("feedback_on_work"):
+        system_message += f"""
+Previously you thought you completed the assignment, but your reply was rejected because the success criteria was not met.
+Here is the feedback on why this was rejected:
+{state['feedback_on_work']}
+With this feedback, please continue the assignment, ensuring that you meet the success criteria or have a question for the user."""
+    
+    # Tìm kiếm và cập nhật System Message cũ, hoặc tạo mới nếu chưa tồn tại
+    found_system_message = False
+    messages = state["messages"]
+    for message in messages:
+        if isinstance(message, SystemMessage):
+            message.content = system_message
+            found_system_message = True
+    
+    if not found_system_message:
+        messages = [SystemMessage(content=system_message)] + messages
+    
+    # Gọi LLM đã bind với danh sách tools
+    response = worker_llm_with_tools.invoke(messages)
+    
+    # Trả về cập nhật tin nhắn mới cho State (reducer tự động add_messages)
+    return {
+        "messages": [response],
+    }
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>5. Thiết lập Bộ định tuyến của Worker (worker_router)</h3>
+            <div class="code-meta">
+              <span>Conditional Routing</span>
+              <span>Tool Call Detection</span>
+            </div>
+            <pre><code>def worker_router(state: State) -> str:
+    # Rút ra tin nhắn cuối cùng do Worker sinh ra
+    last_message = state["messages"][-1]
+    
+    # Kiểm tra xem tin nhắn cuối cùng có chứa yêu cầu gọi công cụ (tool calls) hay không
+    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+        # Nếu có, định tuyến đồ thị sang node "tools" thực thi hành động
+        return "tools"
+    else:
+        # Nếu không có tool call, tức Worker nghĩ đã hoàn thành hoặc muốn hỏi user -> chuyển sang "evaluator"
+        return "evaluator"
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>6. Lập trình Evaluator Node với Structured Outputs</h3>
+            <div class="code-meta">
+              <span>Evaluator Node</span>
+              <span>Structured Output Invoke</span>
+            </div>
+            <pre><code>def format_conversation(messages: List[Any]) -> str:
+    # Hàm tiện ích chuẩn hóa danh sách tin nhắn thô thành chuỗi văn bản đơn giản cho Evaluator dễ theo dõi
+    conversation = "Conversation history:\n\n"
+    for message in messages:
+        if isinstance(message, HumanMessage):
+            conversation += f"User: {message.content}\n"
+        elif isinstance(message, AIMessage):
+            text = message.content or "[Tools use]"
+            conversation += f"Assistant: {text}\n"
+    return conversation
+
+def evaluator(state: State) -> State:
+    last_response = state["messages"][-1].content
+
+    system_message = """You are an evaluator that determines if a task has been completed successfully by an Assistant.
+Assess the Assistant's last response based on the given criteria. Respond with your feedback, and with your decision on whether the success criteria has been met,
+and whether more input is needed from the user."""
+    
+    user_message = f"""You are evaluating a conversation between the User and Assistant. You decide what action to take based on the last response from the Assistant.
+
+The entire conversation with the assistant, with the user's original request and all replies, is:
+{format_conversation(state['messages'])}
+
+The success criteria for this assignment is:
+{state['success_criteria']}
+
+And the final response from the Assistant that you are evaluating is:
+{last_response}
+
+Respond with your feedback, and decide if the success criteria is met by this response.
+Also, decide if more user input is required, either because the assistant has a question, needs clarification, or seems to be stuck and unable to answer without help.
+"""
+    # Nếu có lịch sử phản hồi cũ, nhắc nhở Evaluator phát hiện xem Worker có lặp lại lỗi cũ không để nâng cấp thành escalation
+    if state["feedback_on_work"]:
+        user_message += f"Also, note that in a prior attempt from the Assistant, you provided this feedback: {state['feedback_on_work']}\n"
+        user_message += "If you're seeing the Assistant repeating the same mistakes, then consider responding that user input is required."
+    
+    evaluator_messages = [
+        SystemMessage(content=system_message), 
+        HumanMessage(content=user_message)
+    ]
+
+    # Gọi mô hình Evaluator và nhận về cấu trúc dữ liệu Pydantic đã được phân tách sẵn
+    eval_result = evaluator_llm_with_output.invoke(evaluator_messages)
+    
+    # Cập nhật phản hồi nhận xét vào State dạng tin nhắn hiển thị lên UI, đồng thời cập nhật các cờ điều hướng
+    new_state = {
+        "messages": [{"role": "assistant", "content": f"Evaluator Feedback on this answer: {eval_result.feedback}"}],
+        "feedback_on_work": eval_result.feedback,
+        "success_criteria_met": eval_result.success_criteria_met,
+        "user_input_needed": eval_result.user_input_needed
+    }
+    return new_state
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>7. Định tuyến dựa trên Đánh giá (route_based_on_evaluation) & Dựng đồ thị</h3>
+            <div class="code-meta">
+              <span>Graph Assembly</span>
+              <span>Final Router</span>
+            </div>
+            <pre><code>def route_based_on_evaluation(state: State) -> str:
+    # Nếu đạt tiêu chí thành công HOẶC cần sự can thiệp từ người dùng -> Kết thúc đồ thị (END)
+    if state["success_criteria_met"] or state["user_input_needed"]:
+        return "END"
+    else:
+        # Nếu chưa đạt tiêu chí và có thể tự sửa đổi -> Quay lại worker thực thi tiếp
+        return "worker"
+
+# Setup đồ thị
+graph_builder = StateGraph(State)
+
+# Thêm các Node thực thi
+graph_builder.add_node("worker", worker)
+graph_builder.add_node("tools", ToolNode(tools=tools))
+graph_builder.add_node("evaluator", evaluator)
+
+# Liên kết các cạnh điều hướng có điều kiện và trực tiếp
+graph_builder.add_conditional_edges("worker", worker_router, {"tools": "tools", "evaluator": "evaluator"})
+graph_builder.add_edge("tools", "worker")
+graph_builder.add_conditional_edges("evaluator", route_based_on_evaluation, {"worker": "worker", "END": END})
+graph_builder.add_edge(START, "worker")
+
+# Đóng gói đồ thị kèm checkpointer MemorySaver lưu trữ trạng thái chạy
+memory = MemorySaver()
+graph = graph_builder.compile(checkpointer=memory)
+</code></pre>
+          </article>
+
+          <article class="code-panel">
+            <h3>8. Đóng gói Gradio UI với Thread-Scoped Session Memory</h3>
+            <div class="code-meta">
+              <span>Gradio UI Callback</span>
+              <span>Session Isolation</span>
+            </div>
+            <pre><code>import uuid
+import gradio as gr
+
+# Hàm sinh chuỗi UUID độc bản cho mỗi phiên giao diện người dùng
+def make_thread_id() -> str:
+    return str(uuid.uuid4())
+
+# Callback chính được kích hoạt khi người dùng nhấn nút "Go!"
+async def process_message(message, success_criteria, history, thread):
+    # Khai báo cấu hình chứa thread_id duy nhất cho phiên chạy
+    config = {"configurable": {"thread_id": thread}}
+
+    # Khởi tạo trạng thái ban đầu của đồ thị cho siêu bước mới
+    state = {
+        "messages": message,
+        "success_criteria": success_criteria,
+        "feedback_on_work": None,
+        "success_criteria_met": False,
+        "user_input_needed": False
+    }
+    
+    # Thực thi đồ thị bất đồng bộ và đợi toàn bộ siêu bước hoàn thành
+    result = await graph.ainvoke(state, config=config)
+    
+    # Rút trích câu trả lời cuối của Worker (áp chót trong danh sách messages) và phản hồi của Evaluator (cuối cùng)
+    user = {"role": "user", "content": message}
+    reply = {"role": "assistant", "content": result["messages"][-2].content}
+    feedback = {"role": "assistant", "content": result["messages"][-1].content}
+    
+    # Cộng dồn vào lịch sử hiển thị của chatbot
+    return history + [user, reply, feedback]
+
+# Trình xử lý nút Reset: Sinh thread_id mới hoàn toàn để xóa sạch bộ nhớ của đồ thị cũ
+async def reset():
+    return "", "", None, make_thread_id()
+
+# Dựng giao diện người dùng với Gradio Blocks
+with gr.Blocks(theme=gr.themes.Default(primary_hue="emerald")) as demo:
+    gr.Markdown("## Sidekick Personal Co-worker")
+    
+    # gr.State giữ thread_id chạy ngầm độc lập cho từng tab trình duyệt
+    thread = gr.State(make_thread_id())
+    
+    with gr.Row():
+        chatbot = gr.Chatbot(label="Sidekick", height=350, type="messages")
+    with gr.Group():
+        with gr.Row():
+            message = gr.Textbox(show_label=False, placeholder="Yêu cầu công việc gửi trợ lý của bạn...")
+        with gr.Row():
+            success_criteria = gr.Textbox(show_label=False, placeholder="Tiêu chí đánh giá thế nào là hoàn thành công việc?")
+    with gr.Row():
+        reset_button = gr.Button("Reset Session", variant="stop")
+        go_button = gr.Button("Go!", variant="primary")
+        
+    # Kích hoạt hành động gửi tin nhắn
+    go_button.click(process_message, [message, success_criteria, chatbot, thread], [chatbot])
+    reset_button.click(reset, [], [message, success_criteria, chatbot, thread])
+
+demo.launch()
+</code></pre>
+          </article>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 10px;">So sánh các mô hình thực thi đồ thị (Sync vs Async)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn</th>
+                <th>Phù hợp nhất</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Chế độ đồng bộ (Sync Mode)</strong></td>
+                <td>Các ứng dụng đơn giản, chạy thử nghiệm tuyến tính không có tác vụ gọi API bên ngoài nặng hoặc tự động hóa trình duyệt.</td>
+                <td>Lập trình và theo dõi đơn giản, dễ đọc stack trace khi phát sinh lỗi ngoại lệ, không cần quan tâm đến event loop.</td>
+                <td>Gây tắc nghẽn (blocking) luồng chính của máy chủ khi chạy các tác vụ duyệt web I/O-bound dài hạn.</td>
+              </tr>
+              <tr>
+                <td><strong>Chế độ bất đồng bộ (Async Mode)</strong></td>
+                <td>Tích hợp trình duyệt tự động (Playwright), gọi nhiều API đồng thời hoặc xây dựng hệ thống phục vụ nhiều người dùng song song.</td>
+                <td>Tối ưu hiệu năng cực tốt, cho phép hệ thống xử lý các tác vụ chờ đợi I/O mà không chặn luồng tính toán khác.</td>
+                <td>Lập trình phức tạp hơn, bắt buộc phải dùng các thư viện vá như <code>nest_asyncio</code> trong môi trường tương tác notebook.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh Kiến trúc tác tử (One-Agent Loop vs Worker-Evaluator Loop)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Kiến trúc</th>
+                <th>Cơ chế hoạt động</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>One-Agent Loop (1 tác tử lặp với tools)</strong></td>
+                <td>Một LLM tự suy luận, tự gọi công cụ và tự quyết định khi nào đã xong việc để trả kết quả.</td>
+                <td>Cấu trúc đồ thị tối giản, tiết kiệm chi phí gọi LLM (tốn ít token hơn), độ trễ phản hồi thấp hơn.</td>
+                <td>Không có chốt chặn chất lượng khách quan; LLM dễ rơi vào ảo tưởng (hallucination) là đã hoàn thành tốt dù thực tế chưa đạt.</td>
+              </tr>
+              <tr>
+                <td><strong>Worker-Evaluator Loop (Nhóm tác tử có phản hồi)</strong></td>
+                <td>Một Worker thực thi công việc, một Evaluator độc lập với system prompt khác dùng structured output để chấm điểm.</td>
+                <td>Độ chính xác và độ tin cậy vượt trội, có khả năng phát hiện lỗi sai nội bộ và tự sửa chữa trước khi xuất ra UI.</td>
+                <td>Chi phí token cao hơn rõ rệt do lặp lại nhiều vòng, độ trễ phản hồi tăng lên tùy thuộc vào số lượt tự hiệu chỉnh.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Bẫy và lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Các trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Quên từ khóa await khi gọi arun hoặc ainvoke:</strong> Thói quen code đồng bộ (sync) khiến người lập trình gọi <code>navigate_tool.arun(...)</code> trực tiếp. Kết quả nhận được là một đối tượng <code>coroutine</code> chưa hoàn thành chứ không phải kết quả chạy web thực tế.</li>
+                <li><strong>Mắc kẹt vòng lặp vô tận (Infinite Loop):</strong> Worker sinh câu trả lời chưa đạt tiêu chí, Evaluator chấm trượt và gửi feedback, Worker tiếp tục tạo ra câu trả lời tương tự. Đồ thị sẽ lặp đi lặp lại vô hạn làm tiêu tốn lượng token lớn mà không có điểm dừng.</li>
+                <li><strong>Sử dụng chung thread_id cho toàn bộ ứng dụng Gradio:</strong> Cấu hình cứng <code>thread_id = "1"</code> trong hàm callback, khiến mọi tab trình duyệt mở ứng dụng Sidekick đều đọc chung lịch sử, đè dữ liệu lên nhau.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách phòng chống</h3>
+              <ul class="list">
+                <li><strong>Kiểm soát cú pháp nghiêm ngặt:</strong> Luôn rà soát mọi điểm gọi hàm I/O trình duyệt và hàm chạy đồ thị, đảm bảo có tiền tố <code>await</code> đi kèm: <code>await graph.ainvoke(...)</code>.</li>
+                <li><strong>Thiết lập giới hạn cờ leo thang (Escalation Guardrails):</strong> Nhắc nhở Evaluator trong prompt: nếu phát hiện Worker liên tục lặp lại lỗi cũ qua 2-3 vòng, hãy lập tức đặt cờ <code>user_input_needed = True</code> để dừng đồ thị và hỏi ý kiến người dùng. Ngoài ra có thể bổ sung cấu hình giới hạn số lượt lặp tối đa (Max Iterations).</li>
+                <li><strong>Sử dụng UUID tạo phiên:</strong> Tránh dùng hằng số cho thread_id. Sử dụng thư viện <code>uuid</code> để tự động sinh mã ngẫu nhiên cho mỗi phiên giao diện người dùng.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao nest_asyncio lại cần thiết khi chạy Playwright trong Jupyter Notebook?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Jupyter Notebook vốn dĩ đã chạy trên một event loop asyncio ngầm. Thư viện Playwright khi gọi các hàm async cần tạo các vòng lặp sự kiện riêng. <code>nest_asyncio.apply()</code> vá thư viện chuẩn để cho phép các vòng lặp này lồng vào nhau mà không gây xung đột crash chương trình.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Sự khác biệt chính giữa Structured Output và Plain Text Output là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Plain Text Output trả về văn bản tự do, dễ bị sai định dạng khi mô hình sinh từ ngẫu nhiên. Structured Output ép LLM tuân thủ chính xác định dạng định sẵn (ví dụ qua Pydantic schema), giúp các node xử lý logic phía sau luôn nhận được các trường mong muốn có kiểu dữ liệu chuẩn (str, bool, int).
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Feedback loop trong dự án Sidekick hoạt động dựa trên những trường dữ liệu nào trong State?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Dựa trên <code>success_criteria</code> (tiêu chí đánh giá ban đầu), <code>feedback_on_work</code> (nhận xét điểm chưa đạt của Evaluator chuyển lại cho Worker), và 2 cờ điều hướng <code>success_criteria_met</code> cùng <code>user_input_needed</code> để quyết định tiếp tục lặp hay kết thúc.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Làm thế nào để giải quyết vấn đề trễ phản hồi (latency) cao khi dùng Worker-Evaluator Loop?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Có thể sử dụng các mô hình LLM nhỏ và cực nhanh cho Worker (như <code>gpt-4o-mini</code>) và chỉ dùng mô hình lớn đắt tiền cho Evaluator. Bổ sung các bộ kiểm tra logic cứng (Rule-based) để phát hiện nhanh lỗi định dạng trước khi gọi LLM Evaluator chấm điểm sâu.
+              </div>
+            </article>
+          </div>
+
+          <div class="card" style="margin-top: 14px;">
+            <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+            <p>Trong cấu trúc đồ thị Worker-Evaluator của Lab 4, khi nào đồ thị sẽ đi vào node "evaluator"?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Ngay sau khi Worker đưa ra yêu cầu gọi công cụ trình duyệt (tool calls).</button>
+            <button class="button quiz-option" type="button" data-correct="true">B. Khi Worker trả về một thông điệp thông thường không chứa bất kỳ yêu cầu gọi công cụ trình duyệt nào (tool_calls trống).</button>
+            <button class="button quiz-option" type="button" data-correct="false">C. Khi người dùng nhấn nút Reset Session trên giao diện Gradio.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Cần phải nhớ</h3>
+              <ol class="list">
+                <li>Playwright tự động hóa trình duyệt web thật, mở rộng khả năng scraping tĩnh sang duyệt web động.</li>
+                <li>LangGraph async mode sử dụng cú pháp <code>await graph.ainvoke(...)</code> and <code>await tool.arun(...)</code>.</li>
+                <li>Sử dụng Pydantic định nghĩa cấu trúc Evaluator giúp kiểm soát chặt chẽ luồng rẽ nhánh điều hướng của đồ thị.</li>
+                <li>State graph hỗ trợ cả cơ chế ghi đè (overwrite) các biến cờ điều hướng và cơ chế gộp tin nhắn (add_messages reducer).</li>
+                <li>Gradio UI đa phiên cần cấp thread_id ngẫu nhiên qua UUID để tránh nhiễm chéo bộ nhớ hội thoại.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra kiến thức</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích tại sao Worker Node cần phải đọc trường <code>feedback_on_work</code> trong State không?</li>
+                <li>Mô tả cách thức <code>route_based_on_evaluation</code> đưa đồ thị kết thúc (END) hoặc lặp lại.</li>
+                <li>Tại sao việc thiết lập <code>headless=False</code> trong Playwright lại quan trọng đối với quá trình phát triển và kiểm thử?</li>
+                <li>Làm thế nào để tránh tình trạng tác tử bị lặp vô hạn khi Evaluator liên tục từ chối kết quả của Worker?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 4. Phân tích chi tiết tích hợp Playwright và Worker-Evaluator Loop trong LangGraph dựa trên học liệu chính thức.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Chính xác! Khi Worker hoàn thành công việc và trả về tin nhắn văn bản thông thường (không gọi thêm công cụ trình duyệt), Worker Router sẽ định tuyến cuộc hội thoại đến Evaluator Node để tiến hành thẩm định chất lượng.";
+          result.style.color = "#5db872";
+        } else {
+          result.innerHTML = "Chưa chính xác. Hãy xem kỹ lại sơ đồ và phần giải thích cơ chế của Worker Router ở Section 5 hoặc Section 7.";
+          result.style.color = "#c64545";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+But that's not the interesting part of using polygon.
+The interesting part is if you have a paid plan and you want to use their MCP server with all of the
+capabilities.
+And so I'm going to show this to you just so you get a sense for it and totally optional.
+But if you wish, you could sign up even just for the first month, to experience this for yourself.
+So here are the parameters that we're providing for our MCP tool.
+It is UVC, so it's a Python based MCP server.
+And you can see interestingly that the way it works is that you can you can provide a link to the GitHub
+repo which contains this MCP server.
+And you can use that.
+So we're calling MCP polygon from this repo.
+So it doesn't have to be something that's like pip installable.
+It can be something that is just straight from a repo.
+And obviously if you do something like this then you need to do your research.
+You need to go and check that this genuinely is the official GitHub repo for polygon, the company behind
+polygon IO, and make sure you're comfortable with the community traction, the number of stars, the
+kind of support it has, and so on.
+Just as you would do if you were going to clone somebody else's repo.
+The same kind of due diligence.
+Exactly.
+And so I have done that, of course.
+And I'm satisfied with this myself.
+But but you should too.
+And then I'm passing in my polygon key.
+And then I'm going to ask, what tools do you provide me this MCC server.
+So we'll run this.
+And wowza there's a lot of them.
+So there's a bunch of different tools.
+There's a lot that the model is going to be allowed to do.
+It includes, uh, doing things like getting the last trade.
+It has crypto data in here, as well as ethics data, getting market status, tickers, dividends,
+conditions, financials.
+There's there's a there's a lot to get here.
+Uh, and so this this is something which which equips our agent with lots of capabilities to analyse
+financial markets directly.
+Now, you can give all of these tools to your agent, even if you're on the free plan.
+But if you do that, most of these will respond and say this tool isn't available for people on the
+free plan.
+So it's a bit of a bore.
+Uh, what you have to do is, uh, is is either just only provide the one tool, as I did for the free
+plan example, uh, or sign up for the paid plan.
+Okay.
+So let's try these out.
+So, um, as I say, because if you're on the free plan, we have to be specific that it should only
+use the get snapshot ticker tool.
+And so I will run this and have it hopefully use the right tool.
+So so we're now equipping the agent with all of those tools that we just saw.
+And uh oh.
+And it hasn't used the right tool.
+That's super interesting.
+Actually let me also I'm going to upgrade the model while I'm doing it, even though I said get snapshot
+ticker.
+Let's try it a second time.
+It's always good to see her agents being unpredictable.
+Um, let's see whether it gets it right the second time and uses the right ticker.
+It does.
+Uh, so I'm tempted to, to go and rerecord this, but I won't, because I think it's important to see
+that with a genetic AI.
+You do get this, this sometimes ill behavior when it doesn't correctly follow the prompts, and you
+need to be able to account for that in what you do.
+And also, I don't know if this is what fixed it, but upgrading to a more recent model, uh, did did
+appear in this case to make it perform better, but now it did use the right tool, and it got the latest
+share price at $195.
+Okay, so if you do have a paid plan then you can now add this to your M file.
+You just have to in your env file say polygon plan equals paid.
+That makes sure that I switch it to use the right tools.
+And if you do decide to go all the way and have the premium real time plan, you can set this to real
+time.
+And I'll be sure to use all of the real time APIs.
+But I have got just this paid plan, so I'm going to go and update my M file right now.
+Okay, so now if I now run this cell, it should confirm that I'm on the right plan.
+Let's see.
+Yep.
+You've chosen to subscribe to the paid polygon plan.
+And so we'll be looking at prices on a 15 minute delay.
+And that for the time being is uh, is the, the uh, our foray into MCP servers.
+Um, but there are so many more and that's where I will get to with the exercises.
+Um, so I would suggest that you go on to the marketplaces and look for tools which interest you and
+experiment with them right here, try and use.
+I say here all three approaches.
+You'll probably find, like me, that there actually aren't easily available approaches with remote
+MCP servers, so you might not want to go there unless you are already paying user of something like
+asana.
+Um, but assuming that you're not, then then go with those first two approaches.
+Find examples of MCP servers that will run locally and only stay locally.
+Do things on your local computer.
+Find examples that call the web and find examples of MCP servers that are Python based and those that
+are JavaScript based, and try them all out.
+Experiment with them and have fun giving capabilities to your agents and seeing them taking advantage
+of them.
+Well, hopefully you took me up on that.
+You did some exercises and you've added more MCP servers.
+And that's a wrap on day three of week six.
+And that means that we're about to head into the capstone project of building a trading floor.
+And I can't wait to show you this.
+It's such a cool project.
+I'll see you next time.

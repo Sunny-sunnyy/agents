@@ -1,0 +1,78 @@
+Okay, so now we're moving on to another MCP server before we come back and actually put this one to
+use.
+So this one was the first one we looked at was an example of a Python based MCP server that we executed
+by calling up and passing in the name of something that is on PyPI that you could pip install that is
+able to run.
+Now, what we're going to do now is use a JavaScript based MCP server.
+And whilst Python based ones you typically run using JavaScript, ones you run using server side JavaScript,
+which uses something called node that I imagine most of you are probably very familiar with, but you
+may not be if you're not and you don't have node installed in your system, then please follow this
+link to follow Chatgpt's instructions.
+It is super simple and installing node is like what?
+So many people have that and by the way, you do need to have a recent version of node.
+So following this, if you're a node person already, you've got an older version, then use MVVM and
+make sure that you're on a recent new version of node, and make sure you can type like MPX minus minus
+version, and that you get a good recent version.
+So we're now going to to use this to have a node based MCP server.
+So this time when we specify the parameters the command we're going to run is not UVC but it's MPX.
+We're using npm, the node package manager.
+And this isn't getting Pip installed in the same way as before.
+This is now using npm.
+This is coming as a as an official node package.
+And we're using a playwright, Microsoft's playwright, which is the browser automation software.
+And this is a particularly popular MCP server that runs with node using playwright.
+Now you might say to yourself, hang on a second, but isn't isn't the fetch MCP server that we just
+did?
+Didn't you mention that also uses playwright behind the scenes?
+And it's true, it does.
+But there's a benefit to using this MCP server, which will become very clear to you in just a second.
+All right.
+So once we've specified the parameters, we then have exactly the same code construct.
+We take MCP server Stdio our context manager.
+We pass in the parameters.
+Again remember this timeout is important to have.
+And then we call server tools again to find the tools that comes from this.
+And when I run this it's going to call MDX which is going to then install that package and then call
+the tools on it.
+And wowza, this is what we get back.
+So this is the difference from fetch.
+Fetch.
+We just got one tool.
+This is actually giving you much more granular control over the playwright process.
+This is a ton of tools to do things like close the browser, resize the browser, see the console messages,
+upload a file, press a key, navigate back and forward, take a screenshot which is super interesting.
+Drag click hover select.
+So this is giving fine grained control over the browser window to our agent, where fetch was a much
+simpler MVP server just to collect one web page.
+So this is pretty exciting.
+This is opening the ability for us to write agents that can power a browser window, much as our sidekick
+did in week four.
+And now, one of the great things about MCP servers is that it's so easy to equip your agent with a
+whole slew of these.
+You can just find ones that interest you and just add it in, which is why we're going to go on and
+do another one.
+It's going to be another JavaScript based one, another node based one.
+And so you can see, first of all I'm just going to I just use this just to quickly, uh, get the name
+of a directory, I'm going to get the name of a directory called sandbox inside this directory right
+over there.
+And if that doesn't already exist for you in your file system, you might need to create that sandbox
+folder right there, that directory.
+So I'm going to get that, that path.
+And then again I'm just going to create one of these parameters.
+The command is mpc's again to run node.
+And I'm passing in again the name of something that's that's an npm.
+That is the it's another anthropic example reference MCP server.
+And it's called server file system.
+And it kind of does what you're probably expecting.
+But we'll make it list its tools again.
+So now this is again running that node program the server.
+It created a client.
+It spawned the server.
+It connected to it.
+It asked for tools.
+And this is what it got back.
+It's able to basically read and write from your local file system.
+It can read a file, read multiple files, create a directory, list directory, and so on, but always
+within the sandbox path that we specified.
+So this is allowing you to equip an agent with tools so that it can read and write from your file system,
+but keeping it isolated to within a certain directory.

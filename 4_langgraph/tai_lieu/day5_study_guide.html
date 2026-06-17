@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5: Capability Expansion, Modularization & Session Lifecycle Management - Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1200px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--body);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", Georgia, Garamond, serif;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      max-width: 22ch;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    }
+
+    h3 {
+      color: var(--ink);
+      font-size: 1.18rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.9em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--ink);
+      font-weight: 600;
+      background: var(--surface-soft);
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 30px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: var(--surface-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.08rem;
+    }
+
+    .tag-row,
+    .source-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source {
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .source.extended {
+      border-color: rgba(204, 120, 92, 0.38);
+      background: rgba(204, 120, 92, 0.08);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 26px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 18px;
+    }
+
+    .toc h2 {
+      font-family: "Inter", sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      padding: 8px 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 12px;
+      transition: background 0.15s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--canvas);
+      padding: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--hairline-soft);
+      padding-bottom: 14px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-family: "Inter", sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    details p,
+    details ul,
+    details ol {
+      margin-top: 10px;
+    }
+
+    .card h3 {
+      font-weight: 600;
+    }
+
+    .list {
+      padding-left: 21px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      background: var(--canvas);
+    }
+
+    summary {
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: "Inter", sans-serif;
+      outline: none;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+      font-size: 0.95rem;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--on-dark-soft);
+      font-size: 0.86rem;
+    }
+
+    .code-meta span {
+      background: var(--surface-dark-elevated);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+      background: var(--surface-card);
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--primary-active);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer strong {
+      color: var(--on-dark);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết & Thực hành</span>
+        <h1>LangGraph Day 5: Đóng gói Ứng dụng Trợ lý Sidekick & Quản lý vòng đời Tài nguyên Đa phiên</h1>
+        <p class="lead">
+          Nội dung ôn tập nâng cao ngày học thứ năm. Học cách cấu trúc và module hóa một dự án LangGraph lớn từ Jupyter Notebook sang các module Python độc lập, tích hợp các năng lực mạnh mẽ (tìm kiếm web, thao tác tệp tin trong sandbox, REPL Python), và giải quyết vấn đề cô lập tài nguyên phiên làm việc (session isolation) chống rò rỉ bộ nhớ browser.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Day 5 Practice</span>
+          <span class="tag">Session Isolation & Lifecycle Management</span>
+        </div>
+        <div class="source-row">
+          <span class="source">day5_summary.md</span>
+          <span class="source">app.py</span>
+          <span class="source">sidekick.py</span>
+          <span class="source">sidekick_tools.py</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus • Tiêu điểm nhanh</h2>
+        <ul class="list">
+          <li><strong>Modular Architecture:</strong> Tách biệt cấu trúc mã nguồn thành 3 tệp tin: <code>sidekick_tools.py</code> (công cụ), <code>sidekick.py</code> (đồ thị & logic), và <code>app.py</code> (UI & callback).</li>
+          <li><strong>Capability Expansion:</strong> Bổ sung các công cụ mạnh mẽ nhưng nhạy cảm: Wikipedia, Google Serper search, File Management, và Python REPL.</li>
+          <li><strong>Session Isolation:</strong> Dùng <code>gr.State</code> để cô lập đối tượng Sidekick và bộ nhớ lưu trữ cho từng người dùng riêng biệt trên UI Gradio.</li>
+          <li><strong>Resource Cleanup:</strong> Ràng buộc sự kiện đóng trình duyệt Chromium và giải phóng bộ nhớ ngầm qua cơ chế <code>delete_callback</code> khi phiên UI kết thúc.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Mục lục</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Quiz</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <!-- Section 1: Source Map -->
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>day5_summary.md:</strong> Tóm tắt lý thuyết bài 86, 87, 88, 89, 90, 91 về modularization, session isolation và feedback loop chạy thử thực tế.</li>
+                <li><strong>sidekick_tools.py:</strong> Định nghĩa lớp công cụ tích hợp trình duyệt Playwright, Serper search API, File system sandbox và Python REPL.</li>
+                <li><strong>sidekick.py:</strong> Lớp cốt lõi xây dựng đồ thị Worker-Evaluator, tinh chỉnh prompts và đóng gói hàm chạy siêu bước.</li>
+                <li><strong>app.py:</strong> Khởi tạo giao diện web UI Gradio, quản lý trạng thái phiên thông qua <code>gr.State</code> và dọn dẹp tài nguyên ngầm.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Mã nguồn của 3 tệp tin Python được trích dẫn đầy đủ và chuẩn xác, phản ánh cách tổ chức dự án thực tế. Các logic xử lý bất đồng bộ lồng ghép của trình duyệt và mô hình rẽ nhánh được liên kết chặt chẽ với phần lý thuyết.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ chuyên ngành được duy trì định dạng chuẩn: <code>capability expansion - mở rộng năng lực công cụ</code>, <code>separation of concerns - tách biệt trách nhiệm</code>, <code>session isolation - cô lập phiên người dùng</code>.
+          </div>
+        </section>
+
+        <!-- Section 2: Cheat Sheet -->
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet - Tóm tắt nhanh một trang</h2>
+            </div>
+          </div>
+          <p>
+            Tóm tắt các lệnh, import và cấu hình vòng đời quan trọng nhất trong Day 5:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Khái niệm / Thành phần</th>
+                <th>Cú pháp khai báo / Import tiêu biểu</th>
+                <th>Vai trò &amp; Tác động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>File Sandbox Limit</strong></td>
+                <td><code>FileManagementToolkit(root_dir="sandbox")</code></td>
+                <td>Giới hạn quyền ghi và đọc file của tác tử độc nhất trong thư mục <code>sandbox</code> để bảo vệ hệ thống.</td>
+              </tr>
+              <tr>
+                <td><strong>Python execution</strong></td>
+                <td><code>from langchain_experimental.tools import PythonREPLTool</code></td>
+                <td>Cấp năng lực tính toán và chạy thử code Python động cho tác tử (không có Docker sandbox mặc định).</td>
+              </tr>
+              <tr>
+                <td><strong>Stateful UI session</strong></td>
+                <td><code>sidekick = gr.State(delete_callback=free_resources)</code></td>
+                <td>Đăng ký bộ lưu trữ đối tượng Sidekick riêng cho từng phiên UI và tự động dọn dẹp khi tab đóng.</td>
+              </tr>
+              <tr>
+                <td><strong>Session Setup</strong></td>
+                <td><code>ui.load(setup, [], [sidekick])</code></td>
+                <td>Trình kích hoạt chạy lúc UI tải, tạo mới đối tượng Sidekick và thực hiện async setup.</td>
+              </tr>
+              <tr>
+                <td><strong>Session Cleanup</strong></td>
+                <td><code>asyncio.get_running_loop().create_task(browser.close())</code></td>
+                <td>Đóng các tiến trình Chromium chạy ngầm một cách bất đồng bộ để tránh tràn RAM.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 3: Previous Context -->
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ bài cũ</h2>
+            </div>
+          </div>
+          <p>
+            Day 5 đại diện cho bước chuyển hóa từ môi trường nghiên cứu thử nghiệm sang kiến trúc ứng dụng bền vững:
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Day 1 &amp; Day 2</h3>
+              <ul class="list">
+                <li>Xây dựng đồ thị cơ bản trong file notebook rời rạc.</li>
+                <li>Hội thoại tích lũy tin nhắn tuyến tính.</li>
+                <li>Lần đầu gọi các custom API tools đơn giản.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Day 3 &amp; Day 4</h3>
+              <ul class="list">
+                <li>Lưu trữ checkpointing bền vững với SQLite.</li>
+                <li>Tự động hóa trình duyệt bất đồng bộ (Playwright).</li>
+                <li>Kiến tạo vòng lặp tự đánh giá chất lượng Worker-Evaluator Loop trong 1 file Jupyter notebook.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Day 5 (Đóng gói ứng dụng)</h3>
+              <ul class="list">
+                <li>Tách mã nguồn thành cấu trúc 3 module sạch (UI, Graph, Tools).</li>
+                <li>Quản lý vòng đời tài nguyên phức tạp (mở/đóng browser) theo từng session người dùng Gradio.</li>
+                <li>Cá nhân hóa tác tử bằng cách mở rộng các tiers công cụ đa dạng.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 4: Core Theory -->
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Modularization &amp; Separation of Concerns</h3>
+              <p>
+                <strong>Modularization:</strong> Quy trình bóc tách mã nguồn cồng kềnh thành các file chức năng riêng biệt. Tránh lỗi phụ thuộc lặp và giúp nhiều kỹ sư có thể phát triển song song.
+              </p>
+              <p>
+                <strong>Separation of Concerns:</strong> Phân chia trách nhiệm rõ ràng:
+              </p>
+              <ul class="list">
+                <li><code>sidekick_tools.py</code>: Chỉ quản lý định nghĩa và khởi tạo công cụ (capability layer).</li>
+                <li><code>sidekick.py</code>: Quản lý cấu trúc đồ thị, logic nodes, routers và prompt (orchestration layer).</li>
+                <li><code>app.py</code>: Quản lý thiết kế UI và callbacks (interaction layer).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>2. Session Isolation &amp; State Management</h3>
+              <p>
+                Trong các chatbot thông thường, việc lưu trữ đối tượng tác tử trong biến global sẽ làm rò rỉ lịch sử trò chuyện và tài nguyên trình duyệt giữa các người dùng khác nhau.
+              </p>
+              <p>
+                <strong>gr.State:</strong> Giải pháp lưu trữ đối tượng động theo từng phiên của Gradio. Mỗi tab trình duyệt khi mở ra sẽ có một instance <code>Sidekick</code> độc lập với <code>thread_id</code> (UUID ngẫu nhiên) và database memory riêng biệt, đảm bảo an toàn thông tin và tính nhất quán dữ liệu.
+              </p>
+            </article>
+            <article class="card">
+              <h3>3. Async Constructor Split &amp; Cleanup Lifecycle</h3>
+              <p>
+                <strong>Async Setup Split:</strong> Các hàm dựng trong Python (<code>__init__</code>) không hỗ trợ lập trình bất đồng bộ (async). Vì Playwright browser cần khởi chạy bằng <code>await</code>, ta bắt buộc phải tách phần khởi tạo tài nguyên sang một phương thức async riêng là <code>setup()</code> và gọi nó chủ động sau khi tạo instance.
+              </p>
+              <p>
+                <strong>Resource Cleanup:</strong> Trình duyệt Chromium mở ngầm bởi Playwright tiêu tốn nhiều tài nguyên hệ thống. Đăng ký hàm hủy thông qua <code>delete_callback</code> của Gradio State giúp tự động kích hoạt <code>cleanup()</code> đóng browser khi người dùng tắt tab hoặc refresh trang.
+              </p>
+            </article>
+            <article class="card">
+              <h3>4. Tuning Prompts for Tool &amp; Evaluator Behavior</h3>
+              <p>
+                Quá trình chuyển dịch sang hệ thống đa công cụ đòi hỏi việc tinh chỉnh prompt dựa trên bằng chứng thực nghiệm (empirical prompt tuning):
+              </p>
+              <ul class="list">
+                <li><strong>Worker Prompt:</strong> Phải được chèn thông tin thời gian thực động (datetime) và chỉ dẫn rõ ràng cho <code>PythonREPLTool</code> bắt buộc sử dụng lệnh <code>print()</code> để xuất kết quả, tránh lỗi nhận về chuỗi rỗng.</li>
+                <li><strong>Evaluator Prompt:</strong> Cần được bổ sung chỉ dẫn <code>give the benefit of the doubt - cho assistant hưởng lợi của nghi ngờ</code>. Nhờ đó, Evaluator tin tưởng khi Assistant thông báo đã ghi file vật lý trong sandbox, tránh việc reject oan các tác vụ tạo tệp tin.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 5: Workflow / Pipeline -->
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình chạy</h2>
+            </div>
+          </div>
+          <p>
+            Quy trình chạy và đường đi của dữ liệu từ giao diện người dùng đến đồ thị tác tử ngầm được cô lập hoàn toàn:
+          </p>
+
+          <pre><code>[Người dùng mở tab trình duyệt]
+           |
+           v
+[app.py] ui.load() ----> Gọi setup() ----> Tạo Sidekick() instance riêng
+                                                |
+                                                v
+[sidekick.py] setup() ----> playwright_tools() &amp; other_tools() async start
+                                                |
+                                                v
+                                            Dựng graph &amp; MemorySaver
+                                                |
+                                                v
+                                        Lưu instance vào gr.State
+                                                |
+[Người dùng click "Go!"]                        |
+           |                                    v
+           v                                    |
+[app.py] process_message() <--------------------+ (Lấy Sidekick instance từ State)
+           |
+           v
+[sidekick.py] run_superstep() ----> graph.ainvoke(messages, criteria)
+                                         |
+                                         v
+                              Worker -> Tools -> Evaluator loop
+                                         |
+                                         v
+                                  (Lưu Checkpoints)
+                                         |
+           +-----------------------------+
+           v
+Cập nhật chatbot UI &amp; Trả về history mới
+           |
+[Người dùng tắt tab UI]
+           |
+           v
+[app.py] Kích hoạt delete_callback (free_resources) ----> sidekick.cleanup() ----> Đóng Chromium browser ngầm</code></pre>
+        </section>
+
+        <!-- Section 6: Techniques -->
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>1. Class-Wrapped Graph Runtime</h3>
+              <p>
+                Bọc toàn bộ đồ thị LangGraph, bộ nhớ MemorySaver, các handles của browser và Playwright, cùng với phương thức thực thi siêu bước vào bên trong một lớp <code>Sidekick</code> duy nhất. Kỹ thuật này giúp quản lý trạng thái lập trình hướng đối tượng (OOP) sạch sẽ hơn, giúp việc khởi tạo và giải phóng tài nguyên diễn ra đồng bộ, không bị phân tán.
+              </p>
+            </article>
+            <article class="card">
+              <h3>2. Async Initialization &amp; Cleanup lifecycle</h3>
+              <p>
+                Tách biệt quá trình khởi chạy tài nguyên bất đồng bộ ra khỏi hàm khởi dựng đồng bộ (constructor). Đi kèm với đăng ký <code>delete_callback</code> tại <code>gr.State</code> của Gradio. Điều này đảm bảo rằng mỗi khi phiên làm việc bị hủy (do người dùng tắt tab hoặc ứng dụng gọi reset), tài nguyên tiến trình Chromium chạy ngầm sẽ được đóng triệt để thông qua các tác vụ async đẩy vào loop hiện hành.
+              </p>
+            </article>
+            <article class="card">
+              <h3>3. Custom Sandboxed File Root</h3>
+              <p>
+                Khi nạp bộ công cụ quản lý tệp tin <code>FileManagementToolkit</code>, ta thiết lập tham số <code>root_dir="sandbox"</code>. Đây là kỹ thuật tạo thư mục ảo an toàn (sandbox). Tác tử chỉ có thể tạo, sửa đổi và đọc các tệp tin bên trong thư mục này, không thể xâm phạm hoặc đọc trộm các tệp tin hệ thống nhạy cảm khác trên máy chủ.
+              </p>
+            </article>
+            <article class="card">
+              <h3>4. Empirical Prompt Refinement &amp; datetime resource injection</h3>
+              <p>
+                Neo các hướng dẫn sử dụng công cụ đặc thù vào system prompt để khắc phục lỗi vận hành của LLM (như lỗi Python REPL thiếu print). Đồng thời, đưa trực tiếp thông tin thời gian <code>datetime.now()</code> vào prompt của worker như một tài nguyên tĩnh (resource) thay vì tạo ra một công cụ lấy giờ (tool call) để tối ưu hóa chi phí token và tốc độ chạy.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 7: Code Walkthrough -->
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích mã nguồn</h2>
+            </div>
+          </div>
+
+          <details>
+            <summary>Tệp 1: sidekick_tools.py (Định nghĩa lớp công cụ)</summary>
+            <div class="code-panel" style="margin-top: 10px;">
+              <div class="code-meta">
+                <span>sidekick_tools.py</span>
+                <span>Capability Layer</span>
+              </div>
+              <pre><code>from playwright.async_api import async_playwright
+from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
+from dotenv import load_dotenv
+import os
+import requests
+from langchain.agents import Tool
+from langchain_community.agent_toolkits import FileManagementToolkit
+from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
+from langchain_experimental.tools import PythonREPLTool
+from langchain_community.utilities import GoogleSerperAPIWrapper
+from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
+
+load_dotenv(override=True)
+pushover_token = os.getenv("PUSHOVER_TOKEN")
+pushover_user = os.getenv("PUSHOVER_USER")
+pushover_url = "https://api.pushover.net/1/messages.json"
+serper = GoogleSerperAPIWrapper()
+
+# Khởi tạo bất đồng bộ cho Playwright Browser
+async def playwright_tools():
+    playwright = await async_playwright().start()
+    browser = await playwright.chromium.launch(headless=False) # Chạy headful để giám sát trực quan
+    toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=browser)
+    return toolkit.get_tools(), browser, playwright
+
+def push(text: str):
+    """Gửi thông báo đẩy đến thiết bị di động của người dùng qua API Pushover"""
+    requests.post(pushover_url, data = {"token": pushover_token, "user": pushover_user, "message": text})
+    return "success"
+
+# Khởi tạo công cụ quản lý tệp tin bị giới hạn trong thư mục "sandbox"
+def get_file_tools():
+    toolkit = FileManagementToolkit(root_dir="sandbox")
+    return toolkit.get_tools()
+
+# Tổng hợp các công cụ bổ trợ khác ngoài trình duyệt
+async def other_tools():
+    push_tool = Tool(
+        name="send_push_notification", 
+        func=push, 
+        description="Dùng công cụ này khi bạn muốn gửi thông báo đẩy đến người dùng"
+    )
+    file_tools = get_file_tools()
+
+    tool_search = Tool(
+        name="search",
+        func=serper.run,
+        description="Dùng công cụ này khi bạn muốn tìm kiếm thông tin trên internet toàn cầu"
+    )
+
+    wikipedia = WikipediaAPIWrapper()
+    wiki_tool = WikipediaQueryRun(api_wrapper=wikipedia)
+
+    python_repl = PythonREPLTool() # Công cụ chạy code Python
+    
+    return file_tools + [push_tool, tool_search, python_repl, wiki_tool]
+</code></pre>
+            </div>
+          </details>
+
+          <details>
+            <summary>Tệp 2: sidekick.py (Đồ thị Worker-Evaluator &amp; Runtime)</summary>
+            <div class="code-panel" style="margin-top: 10px;">
+              <div class="code-meta">
+                <span>sidekick.py</span>
+                <span>Orchestration Layer</span>
+              </div>
+              <pre><code>from typing import Annotated, List, Any, Optional, Dict
+from typing_extensions import TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+from langchain_openai import ChatOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from pydantic import BaseModel, Field
+from sidekick_tools import playwright_tools, other_tools
+import uuid
+import asyncio
+from datetime import datetime
+
+# Trạng thái điều phối đồ thị
+class State(TypedDict):
+    messages: Annotated[List[Any], add_messages]
+    success_criteria: str
+    feedback_on_work: Optional[str]
+    success_criteria_met: bool
+    user_input_needed: bool
+
+# Schema bắt buộc của Evaluator Node
+class EvaluatorOutput(BaseModel):
+    feedback: str = Field(description="Nhận xét phản hồi về sản phẩm của worker")
+    success_criteria_met: bool = Field(description="Cờ báo tiêu chí thành công đã được đáp ứng hoàn toàn")
+    user_input_needed: bool = Field(description="Cờ báo cần thêm thông tin từ người dùng hoặc tác tử bị kẹt")
+
+class Sidekick:
+    def __init__(self):
+        self.worker_llm_with_tools = None
+        self.evaluator_llm_with_output = None
+        self.tools = None
+        self.graph = None
+        self.sidekick_id = str(uuid.uuid4()) # Định danh duy nhất cho thread
+        self.memory = MemorySaver()
+        self.browser = None
+        self.playwright = None
+
+    # Async setup tách khỏi constructor để hỗ trợ await browser startup
+    async def setup(self):
+        self.tools, self.browser, self.playwright = await playwright_tools()
+        self.tools += await other_tools()
+        
+        worker_llm = ChatOpenAI(model="gpt-4o-mini")
+        self.worker_llm_with_tools = worker_llm.bind_tools(self.tools)
+        
+        evaluator_llm = ChatOpenAI(model="gpt-4o-mini")
+        self.evaluator_llm_with_output = evaluator_llm.with_structured_output(EvaluatorOutput)
+        await self.build_graph()
+
+    def worker(self, state: State) -> Dict[str, Any]:
+        # Tinh chỉnh prompt: Chèn datetime động và quy tắc print() đối với Python REPL
+        system_message = f"""You are a helpful assistant that can use tools to complete tasks.
+    You keep working on a task until either you have a question or clarification for the user, or the success criteria is met.
+    You have many tools to help you, including tools to browse the internet, navigating and retrieving web pages.
+    You have a tool to run python code, but note that you would need to include a print() statement if you wanted to receive output.
+    The current date and time is {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+
+    This is the success criteria:
+    {state["success_criteria"]}
+    You should reply either with a question for the user about this assignment, or with your final response.
+    If you have a question for the user, you need to reply by clearly stating your question.
+    If you've finished, reply with the final answer.
+    """
+        if state.get("feedback_on_work"):
+            system_message += f"""
+    Previously you thought you completed the assignment, but your reply was rejected because the success criteria was not met.
+    Here is the feedback on why this was rejected:
+    {state["feedback_on_work"]}
+    With this feedback, please continue the assignment."""
+
+        messages = state["messages"]
+        found_system_message = False
+        for message in messages:
+            if isinstance(message, SystemMessage):
+                message.content = system_message
+                found_system_message = True
+
+        if not found_system_message:
+            messages = [SystemMessage(content=system_message)] + messages
+
+        response = self.worker_llm_with_tools.invoke(messages)
+        return {"messages": [response]}
+
+    def worker_router(self, state: State) -> str:
+        last_message = state["messages"][-1]
+        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+            return "tools"
+        return "evaluator"
+
+    def format_conversation(self, messages: List[Any]) -> str:
+        conversation = "Conversation history:\n\n"
+        for message in messages:
+            if isinstance(message, HumanMessage):
+                conversation += f"User: {message.content}\n"
+            elif isinstance(message, AIMessage):
+                text = message.content or "[Tools use]"
+                conversation += f"Assistant: {text}\n"
+        return conversation
+
+    def evaluator(self, state: State) -> State:
+        last_response = state["messages"][-1].content
+        system_message = """You are an evaluator that determines if a task has been completed successfully by an Assistant.
+    Assess the Assistant's last response based on the given criteria. Respond with your feedback, and with your decision on whether the success criteria has been met,
+    and whether more input is needed from the user."""
+
+        # Tinh chỉnh prompt: Nhắc nhở evaluator cho assistant hưởng lợi của sự nghi ngờ khi tạo file
+        user_message = f"""You are evaluating a conversation. You decide what action to take based on the last response.
+
+    The entire conversation is:
+    {self.format_conversation(state["messages"])}
+
+    The success criteria is:
+    {state["success_criteria"]}
+
+    And the final response under evaluation is:
+    {last_response}
+
+    The Assistant has access to a tool to write files. If the Assistant says they have written a file, then you can assume they have done so.
+    Overall you should give the Assistant the benefit of the doubt if they say they've done something. But you should reject if you feel that more work should go into this.
+    """
+        if state["feedback_on_work"]:
+            user_message += f"Also, note that in a prior attempt, you provided feedback: {state['feedback_on_work']}\n"
+
+        evaluator_messages = [SystemMessage(content=system_message), HumanMessage(content=user_message)]
+        eval_result = self.evaluator_llm_with_output.invoke(evaluator_messages)
+        
+        return {
+            "messages": [{"role": "assistant", "content": f"Evaluator Feedback on this answer: {eval_result.feedback}"}],
+            "feedback_on_work": eval_result.feedback,
+            "success_criteria_met": eval_result.success_criteria_met,
+            "user_input_needed": eval_result.user_input_needed,
+        }
+
+    def route_based_on_evaluation(self, state: State) -> str:
+        if state["success_criteria_met"] or state["user_input_needed"]:
+            return "END"
+        return "worker"
+
+    async def build_graph(self):
+        graph_builder = StateGraph(State)
+        graph_builder.add_node("worker", self.worker)
+        graph_builder.add_node("tools", ToolNode(tools=self.tools))
+        graph_builder.add_node("evaluator", self.evaluator)
+
+        graph_builder.add_conditional_edges("worker", self.worker_router, {"tools": "tools", "evaluator": "evaluator"})
+        graph_builder.add_edge("tools", "worker")
+        graph_builder.add_conditional_edges("evaluator", self.route_based_on_evaluation, {"worker": "worker", "END": END})
+        graph_builder.add_edge(START, "worker")
+
+        self.graph = graph_builder.compile(checkpointer=self.memory)
+
+    # Lớp bọc runtime đóng vai trò đầu mối giao tiếp chính với app.py
+    async def run_superstep(self, message, success_criteria, history):
+        config = {"configurable": {"thread_id": self.sidekick_id}}
+        state = {
+            "messages": message,
+            "success_criteria": success_criteria or "The answer should be clear and accurate",
+            "feedback_on_work": None,
+            "success_criteria_met": False,
+            "user_input_needed": False,
+        }
+        result = await self.graph.ainvoke(state, config=config)
+        user = {"role": "user", "content": message}
+        reply = {"role": "assistant", "content": result["messages"][-2].content}
+        feedback = {"role": "assistant", "content": result["messages"][-1].content}
+        return history + [user, reply, feedback]
+
+    # Hàm dọn dẹp Chromium browser ngầm tránh leaks
+    def cleanup(self):
+        if self.browser:
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(self.browser.close())
+                if self.playwright:
+                    loop.create_task(self.playwright.stop())
+            except RuntimeError:
+                asyncio.run(self.browser.close())
+                if self.playwright:
+                    asyncio.run(self.playwright.stop())
+</code></pre>
+            </div>
+          </details>
+
+          <details>
+            <summary>Tệp 3: app.py (Giao diện web &amp; Quản lý phiên)</summary>
+            <div class="code-panel" style="margin-top: 10px;">
+              <div class="code-meta">
+                <span>app.py</span>
+                <span>Interaction Layer</span>
+              </div>
+              <pre><code>import gradio as gr
+from sidekick import Sidekick
+import asyncio
+
+# Trình khởi tạo Sidekick instance mới cho mỗi phiên người dùng
+async def setup():
+    sidekick = Sidekick()
+    await sidekick.setup()
+    return sidekick
+
+# Callback chuyển tiếp cuộc gọi đến đồ thị của đúng instance được cô lập
+async def process_message(sidekick, message, success_criteria, history):
+    results = await sidekick.run_superstep(message, success_criteria, history)
+    return results, sidekick
+
+# Hủy đối tượng Sidekick cũ, tạo mới để reset sạch bộ nhớ đệm
+async def reset():
+    new_sidekick = Sidekick()
+    await new_sidekick.setup()
+    return "", "", None, new_sidekick
+
+# Hàm dọn dẹp tiến trình Chromium khi tab đóng hoặc refresh
+def free_resources(sidekick):
+    print("Cleaning up browser resources for closed session...")
+    try:
+        if sidekick:
+            sidekick.cleanup()
+    except Exception as e:
+        print(f"Exception during cleanup: {e}")
+
+# Thiết kế giao diện
+with gr.Blocks(title="Sidekick", theme=gr.themes.Default(primary_hue="emerald")) as ui:
+    gr.Markdown("## Sidekick Personal Co-Worker")
+    
+    # gr.State giữ instance Sidekick độc quyền cho tab này
+    # delete_callback kích hoạt free_resources dọn dẹp khi tab đóng
+    sidekick = gr.State(delete_callback=free_resources)
+
+    with gr.Row():
+        chatbot = gr.Chatbot(label="Sidekick", height=300, type="messages")
+    with gr.Group():
+        with gr.Row():
+            message = gr.Textbox(show_label=False, placeholder="Yêu cầu công việc của bạn...")
+        with gr.Row():
+            success_criteria = gr.Textbox(
+                show_label=False, placeholder="Tiêu chí hoàn thành (Success criteria)..."
+            )
+    with gr.Row():
+        reset_button = gr.Button("Reset", variant="stop")
+        go_button = gr.Button("Go!", variant="primary")
+
+    # Đăng ký sự kiện
+    ui.load(setup, [], [sidekick]) # Tải phiên: Khởi tạo đối tượng Sidekick đưa vào State
+    
+    message.submit(
+        process_message, [sidekick, message, success_criteria, chatbot], [chatbot, sidekick]
+    )
+    success_criteria.submit(
+        process_message, [sidekick, message, success_criteria, chatbot], [chatbot, sidekick]
+    )
+    go_button.click(
+        process_message, [sidekick, message, success_criteria, chatbot], [chatbot, sidekick]
+    )
+    reset_button.click(reset, [], [message, success_criteria, chatbot, sidekick])
+
+ui.launch(inbrowser=True)
+</code></pre>
+            </div>
+          </details>
+        </section>
+
+        <!-- Section 8: Options / Trade-offs -->
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
+            </div>
+          </div>
+          
+          <h3 style="margin-top: 10px;">So sánh các mô hình kiến trúc tác tử đề xuất nâng cấp (Lesson 91)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Lựa chọn kiến trúc</th>
+                <th>Phù hợp nhất</th>
+                <th>Ưu điểm - Pros</th>
+                <th>Nhược điểm - Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Single Powerful Worker (Baseline hiện hành)</strong></td>
+                <td>Tác vụ vừa và nhỏ, cần khả năng ứng biến linh hoạt cao, ít bị bó buộc bởi quy trình cứng.</td>
+                <td>Cấu trúc tối giản, tốc độ phản hồi nhanh, tác tử tự do thay đổi thứ tự gọi tools theo tình huống thực tế.</td>
+                <td>Dễ mất phương hướng (loss of coherence) khi ngữ cảnh trò chuyện và số lượng công cụ nạp vào quá lớn.</td>
+              </tr>
+              <tr>
+                <td><strong>Planner-Executor Multi-Agent (Nâng cấp đề xuất)</strong></td>
+                <td>Các nhiệm vụ quy mô lớn, phức tạp, đòi hỏi nhiều bước xử lý tuần tự (ví dụ: nghiên cứu thị trường rồi lập báo cáo tài chính).</td>
+                <td>Giảm tải ngữ cảnh cho từng Node, phân rã vấn đề con thông minh, tăng tính ổn định của chuỗi hành động.</td>
+                <td>Làm giảm sự linh hoạt khi phát sinh thông tin mới (khó đổi hướng chạy), tốn nhiều chi phí token và tăng độ trễ.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px;">So sánh các phương pháp quản lý bộ nhớ đệm (Memory Persistence)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Phương pháp bộ nhớ</th>
+                <th>Độ bền (Durability)</th>
+                <th>Khả năng cô lập (Isolation)</th>
+                <th>Mục đích tối ưu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>In-Memory (MemorySaver)</strong></td>
+                <td><strong>Không bền vững.</strong> Dữ liệu biến mất khi tiến trình Python kết thúc hoặc ứng dụng reload.</td>
+                <td>Cô lập tốt trên RAM của tab người dùng thông qua UUID thread.</td>
+                <td>Thử nghiệm nhanh (prototyping), chạy demo giao diện local ngắn hạn.</td>
+              </tr>
+              <tr>
+                <td><strong>Persistent DB (SQLiteSaver)</strong></td>
+                <td><strong>Bền vững trung bình.</strong> Dữ liệu lưu trong file <code>memory.db</code> vật lý, an toàn qua restart.</td>
+                <td>Cô lập an toàn dựa trên định danh người dùng ổn định (ví dụ: login username).</td>
+                <td>Ứng dụng thực tế cá nhân hóa, trợ lý Sidekick ghi nhớ thói quen của người dùng lâu dài.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 9: Pitfalls -->
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Bẫy và lỗi thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - Các trường hợp dễ lỗi</h3>
+              <ul class="list">
+                <li><strong>Browser leaks do crash tiến trình UI:</strong> Người dùng tắt tab trình duyệt đột ngột hoặc mất kết nối mạng. Hàm dọn dẹp thông thường không được kích hoạt khiến Chromium browser tiếp tục chạy ẩn trên RAM máy chủ, gây cạn kiệt bộ nhớ sau nhiều phiên.</li>
+                <li><strong>Evaluator reject oan các tác vụ tạo file:</strong> Worker thông báo đã tạo file thành công trong sandbox. Tuy nhiên Evaluator không thể truy cập trực tiếp ổ cứng để kiểm tra tệp tin thực tế, dẫn đến việc nghi ngờ và định tuyến Worker chạy lại vô ích.</li>
+                <li><strong>Python REPL trả về kết quả trống:</strong> Worker gửi đoạn mã <code>x = 5 * 3</code> vào Python tool để tính toán nhưng không sử dụng hàm <code>print(x)</code>. Kết quả trả về cho Worker là chuỗi rỗng khiến Worker không có thông tin xử lý tiếp.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - Cách phòng chống</h3>
+              <ul class="list">
+                <li><strong>Sử dụng delete_callback của Gradio State:</strong> Luôn đăng ký hàm giải phóng tài nguyên vật lý <code>cleanup()</code> vào tham số <code>delete_callback</code> của <code>gr.State</code> để đảm bảo dọn dẹp Chromium bất kể tab bị tắt theo cách nào.</li>
+                <li><strong>Tuning prompt Evaluator (Benefit of the doubt):</strong> Thêm chỉ dẫn rõ ràng cho Evaluator: nếu Worker tuyên bố đã ghi file và mô tả cấu trúc file hợp lý, hãy chấp nhận tuyên bố đó thay vì kiểm duyệt vật lý, hoặc chỉ cấu hình quét tệp tin sandbox qua công cụ file read.</li>
+                <li><strong>Tuning prompt Worker (Print enforcement):</strong> Chèn quy tắc cứng vào Worker prompt: bắt buộc sử dụng <code>print()</code> cho mọi kết quả tính toán cần hiển thị từ Python REPL tool.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- Section 10: Flashcards / Quiz -->
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Tại sao phải sử dụng gr.State để lưu trữ Sidekick instance trong Gradio app thay vì khai báo biến toàn cục?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Khai báo biến toàn cục (global) khiến mọi người dùng truy cập web app đều dùng chung một đối tượng Sidekick. Điều này gây nhiễm chéo dữ liệu hội thoại, lẫn lộn browser sessions và mất an toàn thông tin. <code>gr.State</code> đảm bảo mỗi tab trình duyệt (mỗi user session) sở hữu một Sidekick instance độc lập.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Lợi ích và rủi ro lớn nhất của công cụ PythonREPLTool là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> <strong>Lợi ích:</strong> Cho phép tác tử tự động hóa tính toán phức tạp, phân tích dữ liệu và chạy thuật toán ngay tại chỗ. <strong>Rủi ro:</strong> Chạy code Python trực tiếp trên máy chủ mà không có môi trường cô lập ảo (Docker sandbox) có thể dẫn đến việc tác tử vô tình thực thi lệnh nguy hại xóa file hoặc chiếm quyền kiểm soát hệ thống.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Cơ chế "benefit of the doubt" trong Evaluator Node giải quyết vấn đề gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Giải quyết việc Evaluator quá khắt khe khi đánh giá các tác vụ tạo tệp tin vật lý (do Evaluator không thể mở ổ cứng ra đọc trực tiếp). Chỉ dẫn này ép Evaluator tin tưởng nếu Assistant khẳng định đã lưu báo cáo vào sandbox, tránh việc đồ thị rơi vào vòng lặp từ chối vô hạn.
+              </div>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Khi người dùng nhấn nút "Reset", app.py xử lý như thế nào để làm sạch hoàn toàn bộ nhớ?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <div class="flash-answer">
+                <strong>A:</strong> Trình xử lý sự kiện Reset không chỉ làm trống các ô nhập văn bản trên giao diện UI, mà còn khởi tạo lại một đối tượng <code>Sidekick</code> mới hoàn toàn, chạy hàm setup async mới để cấp một UUID thread mới, xóa sạch vết tích checkpoints cũ trong RAM.
+              </div>
+            </article>
+          </div>
+
+          <div class="card" style="margin-top: 14px;">
+            <h3>Quick quiz - Trắc nghiệm nhanh</h3>
+            <p>Đặc tính kỹ thuật nào giải quyết triệt để nguy cơ rò rỉ tiến trình Chromium chạy ngầm (browser leaks) khi người dùng đóng tab trình duyệt Gradio?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Khai báo thư viện nest_asyncio.apply() trong sidekick_tools.py.</button>
+            <button class="button quiz-option" type="button" data-correct="false">B. Sử dụng MemorySaver để lưu checkpoints ngầm trong RAM máy chủ.</button>
+            <button class="button quiz-option" type="button" data-correct="true">C. Đăng ký hàm hủy cleanup() vào tham số delete_callback của gr.State.</button>
+            <div class="quiz-result" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Section 11: Quick Memory -->
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Cần phải nhớ</h3>
+              <ol class="list">
+                <li>Tách mã nguồn theo nguyên tắc Separation of Concerns để dễ bảo trì dự án lớn.</li>
+                <li>Playwright browser setup cần thực thi async, yêu cầu tách hàm async setup riêng khỏi constructor.</li>
+                <li>gr.State cô lập Sidekick instance và SQLite thread cho mỗi phiên kết nối của người dùng.</li>
+                <li>Ghi file vật lý của tác tử bắt buộc phải giới hạn root_dir để tránh phá hỏng hệ thống máy chủ.</li>
+                <li>Python REPL tool cần được grounding chặt chẽ trong prompt bắt buộc sử dụng print() để lấy output.</li>
+                <li>delete_callback là lá chắn bảo vệ RAM máy chủ khỏi rò rỉ trình duyệt Chromium ngầm.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra kiến thức</h3>
+              <ul class="list">
+                <li>Bạn có thể giải thích sự khác biệt về vai trò giữa sidekick_tools.py và sidekick.py không?</li>
+                <li>Tại sao constructor Python (__init__) không thể khai báo async def? Giải pháp thay thế là gì?</li>
+                <li>Mô tả hành vi của đồ thị Sidekick trong trường hợp người dùng nhấn nút Reset trên UI.</li>
+                <li>Tại sao PythonREPLTool lại được coi là công cụ nhạy cảm nhất về an toàn hệ thống trong Day 5?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 5. Phân tích chi tiết thiết kế ứng dụng Sidekick đa module, cô lập phiên và quản lý vòng đời tài nguyên trên LangGraph và Gradio.
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0]?.id;
+      const offset = window.scrollY + 170;
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.innerText = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const result = button.parentElement.querySelector(".quiz-result");
+        if (button.dataset.correct === "true") {
+          result.innerHTML = "Chính xác! Đăng ký hàm cleanup() vào delete_callback của gr.State sẽ tự động kích hoạt quá trình đóng Chromium browser khi Gradio dọn dẹp phiên làm việc cũ, bảo vệ máy chủ khỏi rò rỉ tài nguyên.";
+          result.style.color = "#5db872";
+        } else {
+          result.innerHTML = "Chưa chính xác. Hãy xem kỹ lại phần giải thích cơ chế của Resource Cleanup Lifecycle ở Section 4 hoặc Section 6.";
+          result.style.color = "#c64545";
+        }
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

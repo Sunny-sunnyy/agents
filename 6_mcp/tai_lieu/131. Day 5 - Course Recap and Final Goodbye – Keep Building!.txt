@@ -1,0 +1,119 @@
+Well, thank you for indulging me on my ten pieces of advice there.
+Again, these are just one practitioner's thoughts, but I do hope you find some of it helpful.
+Okay.
+So with that, I want to take you back to review the journey of the last six weeks and what an adventure
+it has been.
+Seems like a long time ago that we were looking at the foundations of a genetic eye, looking at what
+it's like to call multiple llms through the direct native APIs, and also different agentic design patterns,
+ending with the personal career agent that hopefully you deployed on Huggingface spaces.
+I know people have been looking at my one, and I know that some of you are ask cheeky questions to
+it because when you do, of course I get a notification.
+It hits my Apple Watch and it happens at the strangest of times.
+And I've actually cracked up in the middle of a meeting when someone asked a particularly silly question
+to it.
+So it's great fun, but hopefully you have your own and it's a bit more serious than you posted on it
+on LinkedIn, and it's getting some traction.
+And then in week two, we unveiled my favorite OpenAI agents SDK.
+Nice and easy.
+We built some really cool projects, we built the deep research, and a number of students have extended
+this and made meteor deep research apps that do things like asking clarifying questions.
+And that's all in the community Contributions project and in the folder.
+And you should put something in there too, because there's lots of great stuff.
+And then in week three, we went a different direction by looking at crew AI, more of a batteries included
+framework.
+And I think for me, the startling thing about week three was when we built the engineering team and
+I got to tell you that the the results of that I find it spellbinding.
+And just recently I tried running all of the test cases and they all run flawlessly.
+It's so amazing to see this come together, and I hope you had the same experience, and I hope you've
+actually put this to good use and built something with it, as we did in building the accounts stuff
+for for week six.
+And then week four was a surprise for me.
+I'd used Landgraf before, but not as in as much detail as I did in during week four building those
+projects, and I really enjoyed it and I was very impressed by it.
+It wasn't as heavyweight as I was expecting and it was very powerful.
+And the psychic that we built was great fun.
+I hope you've enjoyed that.
+I hope you've used it as well and extended it.
+I actually rebuilt it myself in OpenAI agents SDK to as a way to, to use it myself.
+Um, but it's really interesting to see that and to take advantage of the Landgraf and the Lang chain
+ecosystem in building that.
+And then week five was another bit of a surprise.
+Using Autogen, I found that Autogen agent chat was particularly lightweight and simple and easy to
+work with, although perhaps not as mature as OpenAI agent SDK.
+And then I really enjoyed Autogen core.
+As I say, there's there's some shades of some of the same things that Google has worked on with a to
+a um, in the way that Autogen core can allow different, different heterogeneous agents to talk to
+each other.
+So it's exciting stuff.
+And then building the agent creator was a lot of fun.
+I really like meta exercise and surreal and and exciting, so I hope I hope you enjoyed that that project,
+and I hope that it sparked some thoughts about different ways that you can take an agent creator to
+be building more agents.
+And then week six hardly needs a recap because we've done it.
+It's fresh in your minds.
+MCP servers, building them, using them 44 different tools in our capstone project for equity traders.
+That was such good fun and hopefully you found it, like me, a fitting conclusion, a really juicy
+project to wrap things up.
+And nice that it's a commercial project that applies it to a real business area.
+If you're in finance, I hope you're looking to extend it.
+If you're not in finance, I hope you're thinking about how could you apply a similar kind of agent
+framework to your business area, that that's the big idea.
+And then also at the end we went through some thoughts about overall picking agent frameworks.
+It doesn't matter.
+And some general points about things to look for as you're building your agent.
+Solution.
+Okay.
+We're going to head into our final farewell part.
+Don't go anywhere.
+There's only like a minute or two left of this whole adventure, and it's super important that I get
+to say to you, congratulations, you've made it through the full curriculum.
+You've now experienced so many different agent frameworks and patterns and designs and projects, and
+you should be equipped yourself.
+Just as we've equipped our agents, you are now equipped to be going off and building commercial, exciting
+projects that use autonomous agents.
+And you should be celebrating that on LinkedIn.
+And many, many congratulations for making it to that point.
+Let me now tell you the final to do's for you.
+And so my first request to you is to be building.
+You should go in and look at the community contributions from others, and then add some of your own
+community contributions.
+If you're interested in the trading simulator.
+I really love this project.
+I would love it if you added more MCP servers.
+Add some more agents to the mix, give it some more autonomy to do new things.
+I'd love to be able to add short selling crypto currency trading into the mix, But if if a different
+project appeals to you more, then work on that.
+I can't wait to see the stuff that you build and then share on LinkedIn.
+Share your success with this project with this course.
+Share your contributions, share any aha moment, anything that's been inspirational for you, or an
+insight that you'd like to highlight to other people and post that.
+And if you tag me, then I will weigh in and make sure that it gets amplified along my community as
+well, to make sure that that your expertise is shared wide and perhaps catches the attention of future
+clients of yours, or maybe future employers of yours as well.
+And then I may may have mentioned this maybe once or twice.
+Uh, please do connect with me on LinkedIn.
+I love connecting with people on LinkedIn.
+You don't need to, uh, make a comment if you don't want to.
+You can just connect.
+But if you do want to make a comment, then I will reply.
+And, uh, yeah, people joke that I have an agent running.
+It's not an agent.
+It's going to be me.
+I will reply to you.
+I do reserve the right to occasionally paste from my clipboard because, you know, I do sometimes say
+the same thing again and again, but I assure you that at least 50% of the content will be original
+content typed, but maybe half of it will be a sort of paste at the end of it there.
+But I'm sure you'll forgive me for that.
+That that must be allowed.
+But other than that, please do connect with me on LinkedIn.
+And I should also say my my editor would kill me if I didn't mention that.
+If you're able to rate this course on Udemy, it makes a huge difference.
+That's the main way that Udemy decides whether or not to recommend this course to other people.
+So as I say, it makes an enormous difference for me and for the course.
+If you have a moment to go in and rate the course, I would be super grateful.
+And that brings us to the final few seconds of this course.
+It remains for me to thank you so much for making it all the way through to the very, very, very end
+to say a big farewell.
+It's been great hanging out for the last six weeks.
+I hope to make many more courses so so I will be back.
+In the meantime, please do stay in touch and please do keep building.

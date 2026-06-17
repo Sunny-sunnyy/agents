@@ -1,0 +1,87 @@
+So first we take a look at some code and then we go and run our trading floor.
+So I wanted to point out that there are a few settings in the EMV file that you can control.
+You need to put these in there to make sure that things work properly.
+Run every N minutes just literally like that.
+Equals 60 will make sure that it that it runs every 60 minutes.
+Actually if you if you don't include it in your M file it will default to 60.
+Anyway, run even when market is closed, is how you can make sure that it doesn't start trading all
+night overnight every every hour.
+And now I currently have this.
+True because it is Sunday right now.
+And I want to I want it to be trading and use many models.
+If it's false, it just uses Gpt4 mini.
+If it's true, it uses the models that we just saw in the user interface.
+And so obviously I have it as true.
+All right.
+And now I need to show you the class that brings it all together.
+That is wonderfully simple and is a fitting conclusion to the other material that we've covered.
+So we collect the variables that I just mentioned from the env file.
+These are the names of our agents.
+And then we simply look how short this is.
+We create our traders.
+Uh, so we create a collection of traders for each of these different traders.
+And then here is the run every n minutes function.
+This is the one that that does everything.
+It all happens here.
+We start by adding this trace.
+This is where we register that we want OpenAI agents SDK to record any traces using that log tracer
+that I created that I showed you a moment ago.
+We then create our traders as done here.
+And then there's a nice little whiletrue, uh, thing here.
+So this will keep going forever.
+Um, it will then call async gather, which you remember means that all these async methods will happen
+at the same time.
+Trader run for each of our traders so all four traders will be kicked off at the same time, and async
+IO will make sure that they all run as if as if it's multithreaded.
+But of course, what's going on is that anytime one of them is is locked on, IO is waiting for something
+to come back, another one will run that will allow them all to run.
+Uh, and uh, at the end of that, it will then sleep for the number of minutes that we specify.
+And finally there's this if name is main.
+And that's where we kick off this whole thing.
+So all that remains now is for me to actually kick this off.
+Let's do it.
+And so the time has come now to launch our trading floor.
+See these agents in action and see in particular this while true loop running.
+So I'm going to bring up a terminal.
+This is our running user interface.
+I'm going to open a new terminal window to run.
+At the same time, I'm going to change to the sixth directory and I'm going to do you've run Trading
+Floor dot Pi.
+And this is now kicking off our agent process and running our various agents.
+So it's running for different traders and their researchers.
+And right away you can see I hope that the information in these panels has started flying by.
+And this of course is our user interface tracking the traces that we have intercepted and written ourselves
+so that we can be managing the logs.
+It's being stored to a database and and showing here visibly on the user interface.
+And it is terrific fun to watch this and see autonomy in action.
+You'll see the different colors representing things like calling different MCP servers actually using
+tools.
+The red when you see it is when it's actually calling our accounts business logic, our own home grown
+MCP server and that noise, if I don't know if it comes through on this mic, but it just made a notification
+noise that one of our four traders of Warren or George or Ray or Cathy just made a trading decision
+and I got alerted about it, and they will now be off and running.
+It typically takes them a few minutes.
+Uh, thanks to the joys of async coding, they can run in parallel like this as they do their thinking.
+They will go through managing their portfolio, and down below you can see things like their current
+holdings and their recent transactions.
+So you can keep keep stock on what they're doing.
+Uh, and uh, yeah, as I say, it's uh, it's it's terrific.
+Terrific fun to see this.
+Here we go.
+We can just see here.
+Sold five AMD shares, retrieving account details and then sold three Qualcomm and bought four Nvidia
+shares as Warren.
+Uh, they do tend to love Nvidia.
+Uh, so um, which must be something to do with the researcher and some other share activity going on,
+and an update there to our to the values of the portfolios.
+Oh, and another text message I just got, which is and another one which is trading going on AMD trade
+apparently.
+Uh, and yeah, as I say, this is super addictive.
+I absolutely love watching this.
+Obviously the learning point here is to really get this very visual, very real, tangible sense of
+what it's like to have multiple agents working, uh, calling other agents and using a bunch of different
+MCP servers to achieve a commercial objective.
+Uh, and being able to use this as a way of inspecting what's going on and understanding the LM activity
+that's happening behind the scenes to allow for this trading activity.
+So hopefully when you run this yourself and get this sense, uh, you'll find it, uh, highly, highly
+educational and insightful as well as being quite a lot of fun.

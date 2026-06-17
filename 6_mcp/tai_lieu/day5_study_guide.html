@@ -1,0 +1,1496 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 5 MCP (127-131) - Study Guide</title>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1220px;
+      --shadow-soft: 0 8px 24px rgba(20, 20, 19, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--body);
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.08), transparent 26%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--canvas) 22%, var(--canvas) 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.66;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 2.7vw, 2.7rem);
+    }
+
+    h3 {
+      font-size: 1.24rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    strong {
+      color: var(--body-strong);
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.92em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(245, 240, 232, 0.95));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.06rem;
+    }
+
+    .tag-row,
+    .source-row,
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source,
+    .mini-pill {
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--muted);
+    }
+
+    .extended {
+      border-color: rgba(204, 120, 92, 0.34);
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .hero-panel,
+    .code-panel,
+    .metric-panel {
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .hero-panel,
+    .code-panel {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-panel h3,
+    .code-panel h3 {
+      color: var(--on-dark);
+    }
+
+    .hero-panel p,
+    .code-panel p,
+    .hero-panel li {
+      color: var(--on-dark-soft);
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-grid,
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metric-panel {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .metric-panel p:first-child {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .metric-panel strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 1.48rem;
+      color: var(--ink);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 26px;
+      margin-top: 28px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 16px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .sidebar-card {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.76);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .sidebar-card h3 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+    }
+
+    .progress-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-strong);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent-amber));
+      border-radius: inherit;
+      transition: width 0.18s ease-out;
+    }
+
+    .toc {
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--muted);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 22px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.72);
+      padding: 30px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      max-width: 74ch;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 240, 232, 0.72));
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card.dark {
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .card.dark h3,
+    .card.dark h4,
+    .card.dark strong {
+      color: var(--on-dark);
+    }
+
+    .card.dark code {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--on-dark);
+    }
+
+    .list {
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .grounding {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      background: rgba(204, 120, 92, 0.09);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-item {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.84);
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .badge-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--body-strong);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      padding: 10px 14px;
+      transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.secondary {
+      background: transparent;
+      border-color: var(--hairline);
+      color: var(--muted);
+    }
+
+    details {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.78);
+      padding: 16px 18px;
+    }
+
+    details+details {
+      margin-top: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--body-strong);
+    }
+
+    summary::marker {
+      color: var(--primary);
+    }
+
+    .flashcard {
+      min-height: 180px;
+    }
+
+    .flash-answer {
+      display: none;
+      color: var(--body-strong);
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-block {
+      align-content: start;
+    }
+
+    .quiz-option {
+      width: 100%;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.86);
+      border-color: var(--hairline);
+      color: var(--body);
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(93, 184, 114, 0.54);
+      background: rgba(93, 184, 114, 0.14);
+      color: #1f5e2d;
+    }
+
+    .quiz-option.incorrect {
+      border-color: rgba(198, 69, 69, 0.38);
+      background: rgba(198, 69, 69, 0.1);
+      color: #7d2e2e;
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .footer {
+      border-radius: 24px;
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      padding: 30px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .footer h3,
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .footer code {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .metric-grid,
+      .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 26px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section,
+      .sidebar-card {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">MCP Course Finale</div>
+        <h1>Day 5 MCP (127-131)</h1>
+        <p class="lead">
+          Day 5 chốt dự án bằng cách biến trading system từ một orchestration demo thành một hệ có thể quan sát,
+          chạy lặp, có dashboard, có trace, rồi khép lại bằng lời khuyên về framework fit, metric-first thinking
+          và thói quen tiếp tục build sau khóa học.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Capstone finale</span>
+          <span class="tag">Observability</span>
+          <span class="tag">Gradio dashboard</span>
+          <span class="tag">Framework advice</span>
+          <span class="tag">10 essential lessons</span>
+        </div>
+        <div class="source-row">
+          <span class="source">Nguồn chính: <code>day5_summary.md</code></span>
+          <span class="source">Code: <code>5_lab5.ipynb</code>, <code>app.py</code>, <code>trading_floor.py</code></span>
+          <span class="source">Code: <code>reset.py</code>, <code>tracers.py</code>, <code>traders.py</code></span>
+          <span class="source">State/MCP: <code>accounts.py</code>, <code>accounts_client.py</code>, <code>accounts_server.py</code>, <code>database.py</code></span>
+          <span class="source extended">Kiến thức mở rộng tách riêng khi cần</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div>
+          <h3>Điểm cần nhớ ngay</h3>
+          <p>Day 5 có hai lớp nội dung khác nhau nhưng liên kết chặt: lớp sản phẩm/runtime và lớp tư duy xây agent system.</p>
+        </div>
+        <div class="mini-row">
+          <span class="mini-pill">127: UI + persona + reset + trace</span>
+          <span class="mini-pill">128: launch loop + env settings</span>
+          <span class="mini-pill">129: chọn framework</span>
+          <span class="mini-pill">130: 10 lessons</span>
+          <span class="mini-pill">131: recap + next steps</span>
+        </div>
+        <ul class="list">
+          <li><strong>Runtime split:</strong> <code>app.py</code> là dashboard, <code>trading_floor.py</code> là activity engine.</li>
+          <li><strong>Observability:</strong> trace không chỉ để debug mà là lớp kể lại “inner thoughts” cho UI.</li>
+          <li><strong>Advice:</strong> framework fit quan trọng hơn FOMO; problem, metric và traces dẫn đường tốt hơn hype.</li>
+        </ul>
+      </div>
+    </header>
+
+    <section class="metric-grid" style="margin-top: 24px;">
+      <article class="metric-panel">
+        <p>Capstone focus</p>
+        <strong>4 traders + 1 dashboard</strong>
+        <span>Warren, George, Ray, Cathie chạy lặp với holdings, logs, chart và PnL hiển thị liên tục.</span>
+      </article>
+      <article class="metric-panel">
+        <p>Launch model</p>
+        <strong>2 process tách biệt</strong>
+        <span><code>uv run app.py</code> cho UI, <code>uv run trading_floor.py</code> cho trading loop nền.</span>
+      </article>
+      <article class="metric-panel">
+        <p>Final takeaway</p>
+        <strong>Build before optimize</strong>
+        <span>Dùng model mạnh trên small data trước; dùng traces và metrics để học nhanh rồi mới tối ưu cost (chi phí).</span>
+      </article>
+    </section>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <h3>Reading progress</h3>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3>Mục lục</h3>
+          <nav class="toc">
+            <a href="#source-map">1. Source Map</a>
+            <a href="#cheat-sheet">2. Cheat Sheet / Executive Summary</a>
+            <a href="#previous-context">3. Previous Context</a>
+            <a href="#core-theory">4. Core Theory</a>
+            <a href="#workflow">5. Workflow / Pipeline</a>
+            <a href="#techniques">6. Techniques</a>
+            <a href="#code-walkthrough">7. Code Walkthrough</a>
+            <a href="#options">8. Options / Trade-offs</a>
+            <a href="#pitfalls">9. Pitfalls</a>
+            <a href="#flashcards">10. Flashcards / Q&amp;A</a>
+            <a href="#memory">11. Quick Memory</a>
+          </nav>
+        </div>
+        <div class="sidebar-card">
+          <h3>Study controls</h3>
+          <div class="button-row">
+            <button id="expandAll" class="button primary" type="button">Expand all</button>
+            <button id="collapseAll" class="button secondary" type="button">Collapse all</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            Bản guide này chỉ dùng những gì đọc được từ <code>day5_summary.md</code> và code được cung cấp để suy ra nội dung chính.
+            Chỗ nào là tổng hợp/khái quát thêm sẽ gắn nhãn <span class="mini-pill extended">Kiến thức mở rộng</span>.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Nguồn</th>
+                <th>Vai trò trong bài</th>
+                <th>Dùng để grounding phần nào</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>day5_summary.md</code></td>
+                <td>Tóm tắt 5 lesson 127-131, bao gồm cả finale runtime và lời khuyên cuối khóa.</td>
+                <td>Cheat sheet, previous context, core theory, workflow, techniques, pitfalls, flashcards.</td>
+              </tr>
+              <tr>
+                <td><code>5_lab5.ipynb</code></td>
+                <td>Xác nhận lab flow: reset traders, bật tracer, chạy UI, chạy trading loop, cảnh báo monitor API usage.</td>
+                <td>Workflow runtime và thứ tự launch thực hành.</td>
+              </tr>
+              <tr>
+                <td><code>app.py</code></td>
+                <td>Gradio dashboard hiển thị strategy, holdings, transactions, PnL, chart và logs.</td>
+                <td>Code walkthrough cho UI, observability, refresh loop.</td>
+              </tr>
+              <tr>
+                <td><code>trading_floor.py</code></td>
+                <td>Entry point orchestration: env settings, tạo traders, gắn tracer, chạy <code>asyncio.gather(...)</code> theo chu kỳ.</td>
+                <td>Workflow runtime, options/trade-offs, pitfalls.</td>
+              </tr>
+              <tr>
+                <td><code>reset.py</code> + <code>tracers.py</code></td>
+                <td>Thiết lập baseline cho 4 trader và biến trace events thành log entries cho UI.</td>
+                <td>Core theory về observability và code walkthrough.</td>
+              </tr>
+              <tr>
+                <td><code>traders.py</code></td>
+                <td>Ghép agent trader với researcher-as-tool, đọc resources, toggle trade/rebalance, bọc trace.</td>
+                <td>Code walkthrough của behavioral loop và MCP lifecycle.</td>
+              </tr>
+              <tr>
+                <td><code>accounts.py</code>, <code>accounts_client.py</code>, <code>accounts_server.py</code>, <code>database.py</code></td>
+                <td>Lớp state và MCP bridge giúp trader đọc account/strategy, ghi transactions, và để UI đọc logs/portfolio.</td>
+                <td>Code walkthrough cho state flow, không phải trọng tâm lesson advice.</td>
+              </tr>
+              <tr>
+                <td>Không có slide</td>
+                <td>Bài này không có slide được cung cấp.</td>
+                <td>Không tạo section slide riêng.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet / Executive Summary</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Mạch 1: Productized trading floor</h3>
+              <ul class="list">
+                <li><strong>Reset first:</strong> <code>reset.py</code> đưa 4 trader về baseline với 4 persona chiến lược khác nhau.</li>
+                <li><strong>Observe everything:</strong> <code>tracers.py</code> chặn trace/span events và ghi log vào SQLite để UI đọc lại.</li>
+                <li><strong>Run two processes:</strong> <code>app.py</code> là cửa sổ quan sát, <code>trading_floor.py</code> mới là động cơ chạy agents theo chu kỳ.</li>
+                <li><strong>Data path:</strong> trader chạy, account/log/portfolio ghi xuống DB, UI refresh theo timer để hiện holdings, transactions và PnL.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127-128 trong <code>day5_summary.md</code>, notebook cell 6-9, <code>app.py</code>, <code>trading_floor.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Mạch 2: Final advice and habits</h3>
+              <ul class="list">
+                <li><strong>Framework fit:</strong> chọn framework theo team, workflow và problem; đừng mắc analysis paralysis.</li>
+                <li><strong>Metric-first:</strong> bắt đầu từ problem và metric, không bắt đầu từ “muốn dùng agents”.</li>
+                <li><strong>Workflow over autonomy:</strong> agent system tốt thường là workflow được thiết kế tốt, không phải autonomy tối đa.</li>
+                <li><strong>Traces as truth:</strong> trace là nguồn sự thật để học và sửa hệ; đừng chỉ nhìn final answer.</li>
+                <li><strong>Momentum over perfection:</strong> sau khóa học, tiếp tục build để giữ đà học thật.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 129-131 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 18px;">
+            <strong>Một câu chốt bài:</strong> Day 5 cho thấy agent system chỉ “sống được” khi có đủ state, observability, launch discipline và tiêu chí đánh giá rõ ràng; framework chỉ là phương tiện, không phải mục tiêu.
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Đường đi từ Day 1 đến Day 4</h3>
+              <ul class="list">
+                <li><strong>Day 1:</strong> làm quen với MCP concept, server, tool/resource/prompt surface và cách agent gọi capability ngoài model.</li>
+                <li><strong>Day 2:</strong> đi sâu hơn vào MCP servers thực dụng, đặc biệt phần account state và server-client bridge.</li>
+                <li><strong>Day 3:</strong> mở rộng sang market data và cách gắn external information vào decision loop.</li>
+                <li><strong>Day 4:</strong> ghép thành capstone với multi-agent orchestration, researcher-as-tool, templates, config bundles và tracing.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> day1-day4 study guides được cung cấp như previous context, cộng với recap flow trong lesson 131.</p>
+            </article>
+            <article class="card">
+              <h3>Day 5 kế thừa gì từ trước?</h3>
+              <ul class="list">
+                <li>Không còn dừng ở “agent chạy được”, mà bước sang “hệ thống có thể quan sát và vận hành”.</li>
+                <li>Phần <code>traders.py</code> tiếp tục dùng pattern từ Day 4: researcher là tool của trader, không phải actor thay quyền điều phối.</li>
+                <li>Phần account/market/log giữ trạng thái thật, để app và orchestration cùng đọc một nguồn state.</li>
+                <li>Phần advice cuối khóa nối ngược toàn bộ hành trình: problem-first, workflow-first, traces-first.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127-131 trong <code>day5_summary.md</code>, cùng các file <code>traders.py</code>, <code>accounts.py</code>, <code>app.py</code>.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            Day 5 không thêm quá nhiều thuật toán mới, nhưng gom các ý tưởng quan trọng thành một mental model hoàn chỉnh cho agent product:
+            stateful runtime, observability, launch orchestration, framework fit và cách học từ trace thay vì học từ cảm giác.
+          </p>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Agent observability - quan sát được hệ agent</h3>
+              <p>
+                Observability không chỉ là log text. Ở Day 5, trace/span events được chuyển thành log có cấu trúc, rồi bơm lên UI để người học thấy hệ đang nghĩ gì,
+                gọi tool nào và đang ở bước nào của workflow.
+              </p>
+              <p>
+                Đây là khác biệt giữa “agent chạy mơ hồ” và “agent có thể debug, demo, review, giải thích”.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>tracers.py</code>, <code>app.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Trader persona - persona giao dịch</h3>
+              <p>
+                Persona không chỉ là phần mô tả vui mắt. Trong <code>reset.py</code>, mỗi trader có strategy riêng, vì thế cùng một market signal
+                nhưng rationale và hành động có thể khác nhau.
+              </p>
+              <p>
+                Điều này nhấn mạnh một nguyên tắc: agent behavior phụ thuộc mạnh vào instructions, state và tools, không chỉ model.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>reset.py</code>, <code>app.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Split-process runtime - runtime hai tiến trình</h3>
+              <p>
+                UI và engine bị tách ra để tránh nhầm giữa “thấy dashboard” với “hệ đang thật sự chạy”. <code>app.py</code> chỉ render dữ liệu;
+                <code>trading_floor.py</code> mới quyết định khi nào agents chạy.
+              </p>
+              <p>
+                Đây là một bài học kiến trúc nhỏ nhưng quan trọng: monitoring surface và execution surface thường nên tách.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128, notebook cell 6-8, <code>trading_floor.py</code>, <code>app.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Framework fit - độ hợp của framework</h3>
+              <p>
+                Lesson 129 chốt rằng chọn framework đúng không có nghĩa là chọn framework “hot” nhất. Câu hỏi đúng là:
+                framework này có hợp với team, problem, mức flexibility cần có và ecosystem hiện tại không?
+              </p>
+              <p>
+                Nếu chưa rõ, chọn thứ đủ dùng để build và học nhanh thường tốt hơn đợi “framework hoàn hảo”.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 129 trong <code>day5_summary.md</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Workflow over autonomy - workflow quan trọng hơn autonomy</h3>
+              <p>
+                Một agent system tốt thường là workflow được cắt bước hợp lý, có metric, có trace, có state sạch.
+                Autonomy cao nhưng không kiểm soát được thì khó debug và khó shipping hơn nhiều.
+              </p>
+              <p>
+                Day 5 củng cố điều này bằng cách dùng scheduler đơn giản nhưng state và observability lại rất rõ.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128 và 130 trong <code>day5_summary.md</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Data scientist mindset - tư duy khoa học dữ liệu</h3>
+              <p>
+                Lesson 130 khuyên nhìn agent building như một chuỗi experiment: đặt problem, chọn metric, thử trên small data,
+                dùng strong model trước, đọc traces, rồi mới tối ưu cost (chi phí) hoặc architecture.
+              </p>
+              <p>
+                Đây là cách giảm ảo giác “thiết kế bằng cảm hứng” và tăng tốc độ học thật.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 130 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Kiến thức mở rộng: vì sao trace thường đáng tin hơn demo output?</summary>
+            <div style="margin-top: 12px; display: grid; gap: 10px;">
+              <p>
+                Final answer chỉ cho ta đầu ra cuối. Trace cho ta sequence of actions - chuỗi hành động, gồm tool calls, span boundaries,
+                error paths và reasoning breadcrumbs. Với system nhiều tool, trace thường là “raw evidence” tốt hơn cảm nhận chủ quan từ UI.
+              </p>
+              <p class="grounding"><strong>Loại:</strong> <span class="mini-pill extended">Kiến thức mở rộng</span> suy ra từ pattern của Day 5, không phải câu quote trực tiếp.</p>
+            </div>
+          </details>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+          </div>
+          <div class="timeline">
+            <article class="timeline-item">
+              <h3>Pipeline A: Capstone runtime từ reset đến dashboard</h3>
+              <div class="badge-line">
+                <span class="badge">reset</span>
+                <span class="badge">trace</span>
+                <span class="badge">database</span>
+                <span class="badge">ui refresh</span>
+              </div>
+              <ol class="list">
+                <li>Chạy <code>reset_traders()</code> để khởi tạo lại 4 account với strategy baseline và holdings sạch cho buổi lab.</li>
+                <li>Khởi động <code>app.py</code> để mở Gradio dashboard; mỗi trader có chart, holdings, transactions, logs.</li>
+                <li>Khởi động <code>trading_floor.py</code> để tạo traders, gắn <code>LogTracer()</code> và bước vào vòng lặp scheduler.</li>
+                <li>Mỗi trader đọc account resource và strategy resource qua MCP bridge, rồi tạo message trade hoặc rebalance.</li>
+                <li>Trong lúc chạy, trace/span events và account events được ghi xuống SQLite qua <code>write_log(...)</code>.</li>
+                <li>UI dùng timers để đọc lại state từ DB và render những gì đang xảy ra gần như real-time.</li>
+              </ol>
+              <p class="grounding"><strong>Nguồn:</strong> notebook cell 3-9, lesson 127-128, <code>reset.py</code>, <code>traders.py</code>, <code>tracers.py</code>, <code>app.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="timeline-item">
+              <h3>Pipeline B: Launch policy và schedule control</h3>
+              <div class="badge-line">
+                <span class="badge">env vars</span>
+                <span class="badge">market guard</span>
+                <span class="badge">parallelism</span>
+              </div>
+              <ol class="list">
+                <li><code>RUN_EVERY_N_MINUTES</code> đặt nhịp chạy.</li>
+                <li><code>RUN_EVEN_WHEN_MARKET_IS_CLOSED</code> quyết định có bypass market guard hay không.</li>
+                <li><code>USE_MANY_MODELS</code> quyết định mỗi trader dùng model riêng hay tất cả dùng một model.</li>
+                <li>Nếu điều kiện cho phép, <code>asyncio.gather(*[trader.run() for trader in traders])</code> chạy 4 trader song song.</li>
+                <li>Sau mỗi cycle, hệ sleep rồi lặp lại, vì thế đây là service loop chứ không phải script chạy một lần.</li>
+              </ol>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128, notebook cell 6-9, <code>trading_floor.py</code>.</p>
+            </article>
+            <article class="timeline-item">
+              <h3>Pipeline C: Final advice loop để build agent product</h3>
+              <div class="badge-line">
+                <span class="badge">problem</span>
+                <span class="badge">metric</span>
+                <span class="badge">prototype</span>
+                <span class="badge">trace</span>
+                <span class="badge">iterate</span>
+              </div>
+              <ol class="list">
+                <li>Viết problem statement rõ ràng trước khi bàn tới agent hay framework.</li>
+                <li>Chọn metric để biết hệ tốt lên hay tệ đi.</li>
+                <li>Dựng simplest workflow - workflow đơn giản nhất có thể chứng minh giá trị.</li>
+                <li>Prototype từ dưới lên với small data và strong model.</li>
+                <li>Đọc traces, log và failure patterns để hiểu hành vi thật.</li>
+                <li>Sau đó mới tối ưu cost (chi phí), complexity hoặc đổi framework nếu thực sự cần.</li>
+              </ol>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 129-131 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Reset-to-baseline - reset về mốc chuẩn</h3>
+              <p>
+                Trước khi demo hay đánh giá, đưa state về cùng một baseline. Kỹ thuật này giảm nhiễu do state cũ và giúp so sánh các lần chạy dễ hơn.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, notebook cell 3-4, <code>reset.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Trace-to-UI pipeline - pipeline trace lên giao diện</h3>
+              <p>
+                Thay vì chỉ in console, trace/span được chuyển thành log rows để dashboard có thể hiển thị trực tiếp.
+                Đây là cách biến observability từ “tool cho dev” thành “surface cho học và review”.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>tracers.py</code>, <code>app.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Researcher-as-tool - researcher như một tool</h3>
+              <p>
+                <code>traders.py</code> không handoff toàn quyền cho researcher. Thay vào đó, researcher được đóng thành tool để trader vẫn giữ vai trò điều phối chính.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> <code>traders.py</code>, previous-context alignment với Day 4, recap lesson 131.</p>
+            </article>
+            <article class="card">
+              <h3>Context pruning - cắt bớt context</h3>
+              <p>
+                Trước khi đưa account vào prompt, file <code>traders.py</code> bỏ <code>portfolio_value_time_series</code> để giảm noise.
+                Đây là một kỹ thuật context hygiene - vệ sinh context.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> <code>traders.py</code>, <code>accounts.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Runtime toggling - luân phiên hành vi</h3>
+              <p>
+                Sau mỗi lần chạy, <code>self.do_trade = not self.do_trade</code> giúp trader luân phiên giữa trade và rebalance.
+                Kỹ thuật này tạo rhythm - nhịp làm việc rõ ràng trong vòng lặp lâu dài.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> <code>traders.py</code>, lesson 128.</p>
+            </article>
+            <article class="card">
+              <h3>Metric-first prototyping - prototype theo metric</h3>
+              <p>
+                Lời khuyên cuối khóa không phải “thiết kế perfect architecture” mà là dựng flow nhỏ, dùng model mạnh, rồi quan sát metric và traces.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 129-130 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Khi nào nên xem Day 5 như bài học về productization chứ không chỉ về code?</summary>
+            <div style="margin-top: 12px; display: grid; gap: 10px;">
+              <p>
+                Khi bạn nhận ra Day 5 thêm dashboard, refresh cadence, launch policy, reset discipline, monitoring advice và follow-up mindset.
+                Đó đều là dấu hiệu của productization - biến demo thành thứ có thể vận hành, quan sát và mở rộng.
+              </p>
+              <p class="grounding"><strong>Nguồn:</strong> tổng hợp từ lesson 127-131; cách diễn đạt này là <span class="mini-pill extended">Kiến thức mở rộng</span>.</p>
+            </div>
+          </details>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            Phần này chỉ walkthrough các file thật liên quan trực tiếp tới Day 5. Với lesson 129-131, không có code mới được cung cấp,
+            nên chỉ giải thích tư duy chứ không bịa thêm section code giả.
+          </p>
+          <div class="grid-2">
+            <article class="card dark">
+              <h3><code>reset.py</code>: dựng baseline cho 4 trader</h3>
+              <p>Mục đích: đảm bảo demo bắt đầu từ trạng thái nhất quán, mỗi trader có identity và strategy rõ ràng.</p>
+              <pre><code>def reset_traders():
+    Account.get("Warren").reset(waren_strategy)
+    Account.get("George").reset(george_strategy)
+    Account.get("Ray").reset(ray_strategy)
+    Account.get("Cathie").reset(cathie_strategy)</code></pre>
+              <ul class="list">
+                <li>Điểm quan trọng không nằm ở 4 dòng reset, mà ở 4 strategy text dài phía trên.</li>
+                <li>Reset vừa làm sạch holdings/transactions vừa nạp lại persona đầu bài.</li>
+                <li>Đây là nền tảng để so sánh hành vi giữa các model/persona qua nhiều cycle.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, notebook cell 3-4, <code>reset.py</code>.</p>
+            </article>
+            <article class="card dark">
+              <h3><code>tracers.py</code>: biến trace thành log cho UI</h3>
+              <p>Mục đích: chặn lifecycle events từ trace/span và ghi thành log rows có thể truy hồi.</p>
+              <pre><code>def on_span_start(self, span: Span[str]) -&gt; None:
+    write_log(name, "info",
+      f"Started span: {span.span_data.type} - {self._span_name(span)}")
+
+def on_span_end(self, span: Span[str]) -&gt; None:
+    write_log(name, "warning",
+      f"Ended span: {span.span_data.type} - {self._span_name(span)}")</code></pre>
+              <ul class="list">
+                <li>Log không được viết tay ở trader loop mà được sinh từ tracing hooks.</li>
+                <li><code>make_trace_id(...)</code> gắn trader name vào trace id để UI biết log của ai.</li>
+                <li>Thiết kế này tạo observability layer ít xâm lấn hơn so với rải <code>print()</code> khắp code.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>tracers.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="card dark">
+              <h3><code>app.py</code>: dashboard đọc state và logs</h3>
+              <p>Mục đích: cho mỗi trader một màn hình nhỏ có strategy, portfolio chart, holdings, transactions và streaming logs.</p>
+              <pre><code>def get_logs(self, previous=None):
+    logs = read_log(self.name, last_n=13)
+    output = "&lt;div class='terminal'&gt;"
+    ...
+    return output, output
+
+with gr.Blocks(css=css, js=js, fill_width=True) as ui:
+    ...</code></pre>
+              <ul class="list">
+                <li>UI dùng timer 120 giây cho data tables/chart và 0.5 giây cho log panel, nên trải nghiệm “sống”.</li>
+                <li><code>Trader</code> trong file này là view-model, khác với <code>Trader</code> orchestration trong <code>traders.py</code>.</li>
+                <li>PnL, holdings và transactions đều đọc từ state thật của <code>Account</code>, không phải mock.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>app.py</code>, <code>accounts.py</code>, <code>database.py</code>.</p>
+            </article>
+            <article class="card dark">
+              <h3><code>trading_floor.py</code>: scheduler và launch policy</h3>
+              <p>Mục đích: quản lý cadence chạy, policy market-hours và model assignment cho 4 trader.</p>
+              <pre><code>while True:
+    if RUN_EVEN_WHEN_MARKET_IS_CLOSED or is_market_open():
+        await asyncio.gather(*[trader.run() for trader in traders])
+    await asyncio.sleep(RUN_EVERY_N_MINUTES * 60)</code></pre>
+              <ul class="list">
+                <li>Đây là core loop rất ngắn, nhưng được hỗ trợ bởi state, tools, tracing và UI từ các file khác.</li>
+                <li><code>USE_MANY_MODELS</code> cho phép mỗi trader thử model khác nhau để so sánh style/behavior.</li>
+                <li><code>add_trace_processor(LogTracer())</code> nối engine với observability layer trước khi loop bắt đầu.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128, notebook cell 8, <code>trading_floor.py</code>.</p>
+            </article>
+            <article class="card dark">
+              <h3><code>traders.py</code>: ghép MCP, agent loop và trade/rebalance rhythm</h3>
+              <p>Mục đích: dựng trader agent, đóng researcher thành tool, đọc resources và chạy từng cycle có trace.</p>
+              <pre><code>async def get_account_report(self) -&gt; str:
+    account = await read_accounts_resource(self.name)
+    account_json = json.loads(account)
+    account_json.pop("portfolio_value_time_series", None)
+    return json.dumps(account_json)
+
+await Runner.run(self.agent, message, max_turns=MAX_TURNS)</code></pre>
+              <ul class="list">
+                <li>Cặp <code>AsyncExitStack</code> quản lý danh sách MCP servers động cho trader và researcher.</li>
+                <li><code>self.do_trade</code> toggle giữa trade và rebalance sau mỗi vòng.</li>
+                <li>Trace được bọc ngoài <code>run_with_mcp_servers()</code>, nên toàn bộ cycle có observability đồng nhất.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> <code>traders.py</code>, lesson 127-128, previous context từ Day 4.</p>
+            </article>
+            <article class="card dark">
+              <h3><code>accounts_*.py</code> + <code>accounts.py</code> + <code>database.py</code>: state và MCP bridge</h3>
+              <p>Mục đích: nối trader runtime với account state thật, đồng thời cho UI và tools cùng nhìn một nguồn dữ liệu.</p>
+              <pre><code>@mcp.resource("accounts://accounts_server/{name}")
+async def read_account_resource(name: str) -&gt; str:
+    account = Account.get(name.lower())
+    return account.report()</code></pre>
+              <ul class="list">
+                <li><code>accounts_server.py</code> expose tools như <code>buy_shares</code>, <code>sell_shares</code>, <code>change_strategy</code> và resources cho account/strategy.</li>
+                <li><code>accounts_client.py</code> mở stdio session để đọc resource hoặc gọi tool từ phía agent runtime.</li>
+                <li><code>accounts.py</code> giữ holdings, transactions, PnL series; <code>database.py</code> lo persistence cho accounts, logs và market data.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> <code>accounts.py</code>, <code>accounts_client.py</code>, <code>accounts_server.py</code>, <code>database.py</code>.</p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 18px;">
+            <strong>Không có code giả cho lesson 129-131:</strong> ba lesson cuối là framework advice, 10 lessons learned và course recap.
+            Vì không có code mới tương ứng trong nguồn được cung cấp, guide này chỉ tóm tắt ý nghĩa và trade-off của chúng.
+          </div>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Single model vs many models</h3>
+              <ul class="list">
+                <li><strong>Single model:</strong> dễ kiểm soát hơn, rẻ hơn, ít biến số hơn khi debug.</li>
+                <li><strong>Many models:</strong> thú vị hơn để quan sát style khác nhau giữa personas, nhưng tăng complexity và khó so sánh công bằng hơn.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128, <code>trading_floor.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Market-hours only vs forced run</h3>
+              <ul class="list">
+                <li><strong>Market-hours only:</strong> gần điều kiện thật hơn.</li>
+                <li><strong>Forced run:</strong> tiện cho lab/demo, nhưng có thể khiến bạn quên mất runtime assumptions thực tế.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128, <code>RUN_EVEN_WHEN_MARKET_IS_CLOSED</code> trong <code>trading_floor.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Console logs vs dashboard logs</h3>
+              <ul class="list">
+                <li><strong>Console logs:</strong> đơn giản, nhanh dựng, nhưng khó review theo từng trader và khó chia sẻ.</li>
+                <li><strong>Dashboard logs:</strong> tốn thêm plumbing nhưng giúp quan sát system state và trace context tốt hơn nhiều.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127, <code>tracers.py</code>, <code>app.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Batteries included vs flexibility</h3>
+              <ul class="list">
+                <li><strong>Batteries included - đầy pin sẵn:</strong> đi nhanh, nhưng đôi khi bị bó theo abstraction của framework.</li>
+                <li><strong>Flexible stack:</strong> kiểm soát nhiều hơn, nhưng cần nhiều quyết định hơn từ team.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 129 trong <code>day5_summary.md</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Optimize cost early vs learn fast first</h3>
+              <ul class="list">
+                <li><strong>Optimize sớm:</strong> tiết kiệm ngay nhưng dễ tối ưu nhầm chỗ khi chưa hiểu hệ.</li>
+                <li><strong>Learn fast first:</strong> dùng model mạnh hơn trên small data giúp nhìn rõ signal trước khi ép cost (chi phí).</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 130 trong <code>day5_summary.md</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Extend this capstone vs start a fresh project</h3>
+              <ul class="list">
+                <li><strong>Extend capstone:</strong> tận dụng momentum, codebase và lessons vừa học.</li>
+                <li><strong>Fresh project:</strong> tốt khi muốn kiểm tra xem mình đã thật sự nội hóa tư duy hay chưa.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 131 trong <code>day5_summary.md</code>, cộng một lớp <span class="mini-pill extended">Kiến thức mở rộng</span> về learning strategy.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Mở UI rồi tưởng hệ đang chạy:</strong> quên bật <code>trading_floor.py</code> nên dashboard có khung nhưng không có activity mới.</li>
+                <li><strong>Quên reset baseline:</strong> state cũ làm kết quả lab khó so sánh và khó giải thích.</li>
+                <li><strong>Bật many models quá sớm:</strong> tăng số biến trước khi hiểu loop cơ bản.</li>
+                <li><strong>Hiểu sai market guard:</strong> thị trường đóng nên scheduler không thực thi dù code không lỗi.</li>
+                <li><strong>Chọn framework theo hype:</strong> mất thời gian đổi stack thay vì học từ problem và traces.</li>
+                <li><strong>Tối ưu cost (chi phí) quá sớm:</strong> tiết kiệm được ít nhưng học chậm đi nhiều.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128-130, notebook cell 9, <code>trading_floor.py</code>.</p>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - cách tránh</h3>
+              <ul class="list">
+                <li>Nhớ launch theo cặp: <code>app.py</code> để xem, <code>trading_floor.py</code> để chạy.</li>
+                <li>Giữ reset như bước mở đầu cố định trước demo hoặc trước khi so sánh model/persona.</li>
+                <li>Bắt đầu bằng one-model, market override khi cần lab, rồi mới mở complexity dần.</li>
+                <li>Dùng traces và logs làm bằng chứng trước khi suy đoán agent “thông minh” hay “ngu”.</li>
+                <li>Với framework choice, đặt câu hỏi về fit với team/problem trước câu hỏi về trend.</li>
+                <li>Sau khóa học, ưu tiên build một thứ nhỏ thật sự chạy được để giữ momentum.</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127-131 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&amp;A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Vì sao Day 5 phải tách <code>app.py</code> và <code>trading_floor.py</code>?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì <code>app.py</code> là monitoring/dashboard surface, còn <code>trading_floor.py</code> là execution surface.
+                Tách ra giúp không nhầm giữa “thấy UI” và “agents thật sự đang chạy”.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vai trò chính của <code>tracers.py</code> là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Chặn trace/span lifecycle events và ghi chúng thành log entries để dashboard có thể hiện lại hành vi nội bộ của trader.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Bài học cốt lõi của lesson 129 về framework selection là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Chọn framework theo fit với problem, team và workflow; đừng để FOMO hay analysis paralysis kéo bạn xa mục tiêu build thật.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao <code>portfolio_value_time_series</code> bị bỏ khỏi account context trước khi prompt?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Để giảm noise và chỉ giữ context hữu ích cho quyết định hiện tại, tức là một kỹ thuật context pruning - cắt gọn context.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: “Wear the data scientist hat” trong lesson 130 nghĩa là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Xem việc build agent như chuỗi thí nghiệm có problem, metric, baseline, traces và iteration, thay vì thiết kế bằng cảm tính.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Lesson 131 muốn bạn làm gì sau khi khóa học kết thúc?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Tiếp tục build, mở rộng capstone hoặc làm dự án mới để giữ momentum; học thật đến từ tiếp tục thực hành.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card quiz-block">
+              <h3>Quick quiz 1</h3>
+              <p>Phát biểu nào đúng nhất về observability trong Day 5?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Chỉ cần nhìn PnL chart là đủ hiểu agent đang làm gì.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Trace và log cho biết workflow thật, nên đáng tin hơn chỉ nhìn output cuối hoặc chart.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Observability chỉ hữu ích khi deploy production, không cần cho bài học.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+            <article class="card quiz-block">
+              <h3>Quick quiz 2</h3>
+              <p>Bước nào phản ánh đúng lời khuyên của lesson 130?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Chọn framework hot nhất trước, metric tính sau.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Chọn problem, metric, prototype nhỏ với model mạnh, rồi đọc traces để học.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Giảm cost tối đa trước khi chạy thử vì như vậy khoa học hơn.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - phải nhớ</h3>
+              <ol class="list">
+                <li>Day 5 biến capstone thành một hệ có UI, trace, logs, chart và launch policy rõ ràng.</li>
+                <li><code>app.py</code> và <code>trading_floor.py</code> là hai process khác nhau với hai vai trò khác nhau.</li>
+                <li><code>LogTracer</code> là cầu nối giữa runtime trace và dashboard logs.</li>
+                <li><code>reset.py</code> không phải tiện ích phụ; nó tạo baseline để học và so sánh.</li>
+                <li><code>traders.py</code> vẫn giữ pattern researcher-as-tool, đồng thời cắt bớt account context trước khi prompt.</li>
+                <li><code>accounts_server.py</code> là MCP layer để trader tương tác với account state và strategy resources.</li>
+                <li>Framework fit quan trọng hơn framework hype.</li>
+                <li>Problem, metric, trace và iteration quan trọng hơn autonomy phô trương.</li>
+                <li>Course recap chốt một thông điệp đơn giản: tiếp tục build để giữ momentum.</li>
+              </ol>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 127-131, toàn bộ code walkthrough files.</p>
+            </article>
+            <article class="card">
+              <h3>Self-check - tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được vì sao dashboard và engine nên tách process không?</li>
+                <li>Bạn có mô tả được trace-to-UI pipeline từ <code>tracers.py</code> sang <code>database.py</code> rồi tới <code>app.py</code> không?</li>
+                <li>Bạn có phân biệt được persona strategy với model choice trong hành vi trader không?</li>
+                <li>Bạn có nhớ vì sao context pruning trong <code>traders.py</code> là quyết định kiến trúc hữu ích không?</li>
+                <li>Bạn có kể lại được 5 bước advice loop: problem, metric, simplest workflow, strong model, traces, rồi mới optimize không?</li>
+                <li>Bạn có nói được khi nào nên đổi framework và khi nào chỉ nên tiếp tục build với stack hiện có không?</li>
+              </ul>
+              <p class="grounding"><strong>Nguồn:</strong> lesson 128-131 trong <code>day5_summary.md</code>.</p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3>Kết luận nhanh</h3>
+          <p>
+            Day 5 là ngày biến kiến thức MCP và agent orchestration thành một sản phẩm học tập hoàn chỉnh:
+            có state, có trace, có dashboard, có launch discipline và có lời khuyên thực dụng để tiếp tục sau khóa học.
+          </p>
+          <p>
+            Chìa khóa của ngày này không phải một kỹ thuật đơn lẻ, mà là cách mọi lớp ghép vào nhau:
+            <code>reset.py</code> tạo baseline, <code>traders.py</code> chạy agent loop, <code>tracers.py</code> ghi dấu vết,
+            <code>database.py</code> lưu state, <code>app.py</code> kể lại cho con người thấy, còn lesson 129-131 nhắc bạn phải giữ problem-first mindset.
+          </p>
+          <p>
+            Study note: các đoạn gắn nhãn <span class="mini-pill extended">Kiến thức mở rộng</span> đã được tách riêng khỏi phần grounding chính.
+            File này không hiển thị secrets, tokens hay API keys; chỉ nhắc tên biến môi trường khi đó là một phần của runtime design.
+          </p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0] ? sections[0].id : "";
+      const offset = window.scrollY + 180;
+
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = progress + "%";
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.textContent = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-block").forEach((block) => {
+      const result = block.querySelector(".quiz-result");
+      const buttons = block.querySelectorAll(".quiz-option");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          buttons.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const correct = button.dataset.answer === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          result.textContent = correct
+            ? "Đúng. Bạn đang nối đúng giữa observability, runtime loop và tư duy build system của Day 5."
+            : "Chưa đúng. Hãy nhìn lại vai trò của trace, metric hoặc launch policy trong toàn bộ capstone finale.";
+        });
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

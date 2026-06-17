@@ -1,0 +1,125 @@
+It feels like just a second ago that we were starting this thing, and somehow we're already on week
+six, day four.
+We are heading into the final, final section with the capstone project, and let's make sure that we
+end this thing in style.
+This is going to be a great project.
+Welcome.
+Welcome to the Capstone project.
+Welcome to Autonomous Trading.
+We are going to build agents that can make their own decisions about analyzing financial markets, and
+that can make trades in a synthetic account that we have created ourselves in week three with our other
+team of agents.
+Okay, so autonomous traders, then let me tell you a few things about the project that I have in store
+for you.
+So first of all, it's something that is commercial.
+One of the things that I've noticed about a lot of the modern Agentic AI projects is that they're quite
+technical in nature, because they're so open to possibilities that one tends to build things like teams
+of coders and stuff like that.
+I really wanted our capstone project to be something that showed how you could apply it to a true commercial
+problem, like analyzing and understanding financial markets.
+And that's why I've gone in that direction.
+It's going to involve having five different MCP servers with tools and resources, and we will count
+them up.
+And there's going to be a lot of them.
+Look forward to it.
+There's going to be interactions between agents.
+And there's also going to be autonomy in this.
+We're going to allow our agents to choose their own adventure.
+They're going to be given the freedom to make various decisions themselves.
+And then most importantly, something that I may say once or twice, please don't use this for actual
+trading decisions.
+Uh, this is something which, uh, yes.
+I don't don't want to, uh, get in trouble if you go and put your all of your life savings into this.
+This is, of course, an experimental project and nothing more than that.
+Having said that, of course, if you make a massive fortune on this and you're off sailing your yacht,
+then I do expect an invitation.
+Uh, but no, do not, do not, do not use it.
+Do not get your yacht this way.
+Get your yacht by building autonomous agentic solutions for people.
+Not by having your traders run amok with financial markets.
+Anyway, with that introduction, we're going to spend most of our time sleeves rolled up in code.
+And let's get started now.
+Okay, here we go.
+Back in cursor.
+We're going into the folder for six.
+And we're going into lab for our Autonomous Traders project and Equity Trading Simulation to illustrate
+autonomous agents powered by tools and resources from MCP servers.
+Okay.
+So we are going to create a simulation.
+We are going to have four different traders eventually.
+And one researcher actually each trader will have their own researcher powered by a bunch of MCP servers.
+We're going to have our homemade accounts MCP server that you remember that we did in the second day.
+We will use fetch that we used in the first day we'll use memory.
+We'll use the SQL based relationship memory that we looked at.
+We'll use the brave search and we'll use the financial data courtesy of polygon AI.
+So what we're going to go through now is, is build this in the lab.
+And then we're going to look at the code, the module traders Pi.
+That will take the same thing pulled together.
+And it shows you a practice which I like to do, which is to work initially in the lab while you experiment.
+And it ties to a point that I know I make a million times that I'll make again at the end, which is
+how important it is to approach agent projects with a data scientists hat on.
+First and foremost, be looking to experiment and understand what you're doing.
+Uh, not just jumping straight into engineering and building building.
+It's important to start by investigating and understanding what you're doing.
+One other thing that's important to do is not use this for trading decisions.
+If I haven't already mentioned that, uh, so one more warning for that.
+Okay.
+Let's get going.
+Let's do our imports and set our EMV.
+And let's look at the polygon situation.
+Do we have an API key.
+And have you said whether or not we are in a paid plan?
+We are in paid plan.
+For me, you may be false there and we're not using the real time polygon.
+Okay.
+What we're going to be doing in the next few cells is, is collecting together the different MCP server
+parameters for all of the MCP servers that we're going to equip our model with.
+So first of all, I've got a little decision here.
+If we're using any of the paid polygon plans then we are going to directly use polygons MCP server with
+its whole set of different tools.
+If not, we're just going to use that tiny MCP server that I handcrafted in market server.
+And that's because if you're using the free plan, we don't want to overwhelm the model with lots of
+different tools.
+And there's another reason for it too, which is that here I'm using that trick of caching the previous
+day's data so that we don't exceed our rate limits with polygon on the free plan.
+So that's why we've got the little decision there.
+And then we're also going to include in our parameters the accounts server.
+So this is our homegrown.
+MCP server to read and write from accounts.
+And then there's a new one push server.
+I wonder what that could possibly be.
+Let's just run this.
+And then we're going to take a quick look at push server.
+It's another homegrown MCP server.
+What could it possibly be doing.
+Let's have a look.
+Here it is.
+Push server.
+Push server of course is going to send a push notification.
+You know how I like the push notifications because it makes it feel so autonomous when it's like messaging
+you suddenly.
+And so we're going to have it pushing.
+We're going to arm it with an MCP tool.
+Um, and this is an example of a case where we're writing this MCP server and we're not delegating on
+to some business logic, we're just putting all the logic right here in this single Python module.
+It's an MCP server.
+It has a single tool.
+It's called push.
+And it takes a little pedantic object that we've set up here to say that it is a brief message to push,
+and that is the message that we give.
+So this is a clear example of how you can write a little tool and expose it as an MCP server.
+Now, as I said before, really there's absolutely nothing stopping you from just having this as a tool.
+In fact, that would be the better way of doing it.
+There's no point in having an MCP server like this when we're just using the tool ourselves locally,
+but we want to get into the practice of making MCP servers, so why not?
+Okay, so with that, we have now also included our push notification as well as the accounts and the
+market data as our trader MCP servers.
+So that's set up the MCP servers that our trader will use.
+But we'll have another agent called the researcher that's able to do market research.
+And we also want to arm that agent with tools as well.
+And for that one we will use the brave key and we'll give it fetch as well.
+We'll give it the ability to fetch web pages.
+Um, and so both of these two together are going to be some, the tools that we will equip our model
+with.
+All right.
+And now it's going to be time to put these to use.

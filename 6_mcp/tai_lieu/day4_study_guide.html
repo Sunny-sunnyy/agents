@@ -1,0 +1,1572 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Day 4 MCP (123-126) - Study Guide</title>
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --content: 1220px;
+      --shadow-soft: 0 8px 24px rgba(20, 20, 19, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--body);
+      background:
+        radial-gradient(circle at top right, rgba(204, 120, 92, 0.08), transparent 26%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--canvas) 22%, var(--canvas) 100%);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      line-height: 1.66;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      max-width: 12ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 2.7vw, 2.7rem);
+    }
+
+    h3 {
+      font-size: 1.24rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    strong {
+      color: var(--body-strong);
+    }
+
+    code {
+      border-radius: 6px;
+      background: var(--surface-strong);
+      color: var(--body-strong);
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.92em;
+      padding: 2px 6px;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      background: var(--surface-dark-soft);
+      color: var(--on-dark);
+      padding: 18px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin-top: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      padding: 12px;
+    }
+
+    th {
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 28px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 44px;
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(245, 240, 232, 0.95));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 72ch;
+      color: var(--body-strong);
+      font-size: 1.06rem;
+    }
+
+    .tag-row,
+    .source-row,
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag,
+    .source,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      padding: 5px 11px;
+    }
+
+    .tag {
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+
+    .source,
+    .mini-pill {
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.64);
+      color: var(--muted);
+    }
+
+    .source.extended,
+    .mini-pill.extended {
+      border-color: rgba(204, 120, 92, 0.36);
+      background: rgba(204, 120, 92, 0.1);
+      color: var(--primary-active);
+    }
+
+    .source.code,
+    .mini-pill.code {
+      border-color: rgba(93, 184, 166, 0.28);
+      background: rgba(93, 184, 166, 0.1);
+      color: #2f7d71;
+    }
+
+    .hero-panel,
+    .code-panel,
+    .footer {
+      border-radius: var(--radius-xl);
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      padding: 24px;
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(204, 120, 92, 0.18), transparent 38%);
+      pointer-events: none;
+    }
+
+    .hero-panel>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3,
+    .code-panel h3,
+    .footer h3,
+    .footer strong {
+      color: var(--on-dark);
+    }
+
+    .hero-panel p,
+    .hero-panel li,
+    .code-panel p,
+    .code-panel li,
+    .footer p,
+    .footer li {
+      color: var(--on-dark-soft);
+    }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-dark-elevated);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #e4a489);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin-top: 28px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(250, 249, 245, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toc h2 {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .toc nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .toc a {
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 10px;
+      transition: 0.18s ease;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      color: var(--ink);
+      background: var(--surface-card);
+    }
+
+    .toc-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .button {
+      min-height: 40px;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--canvas);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      transition: 0.18s ease;
+    }
+
+    .button:hover {
+      background: var(--surface-card);
+    }
+
+    .button.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+
+    .button.primary:hover {
+      background: var(--primary-active);
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .section {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.58);
+      padding: 28px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .kicker {
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .section-intro {
+      margin-top: 10px;
+      max-width: 74ch;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    details,
+    .timeline-item {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--surface-card);
+      padding: 18px;
+    }
+
+    .card p,
+    .card ul,
+    .card ol,
+    .card table,
+    details p,
+    details ul,
+    details ol,
+    details table,
+    .timeline-item p,
+    .timeline-item ul,
+    .timeline-item ol {
+      margin-top: 10px;
+    }
+
+    .dark-card {
+      background: var(--surface-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark-soft);
+    }
+
+    .dark-card h3,
+    .dark-card h4,
+    .dark-card strong {
+      color: var(--on-dark);
+    }
+
+    .list {
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    .dense-list li + li {
+      margin-top: 6px;
+    }
+
+    details {
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 750;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      float: right;
+      color: var(--primary-active);
+      font-size: 1.1rem;
+      font-weight: 700;
+      transform: translateY(-1px);
+    }
+
+    details[open] summary::after {
+      content: "-";
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      padding: 14px 16px;
+    }
+
+    .callout.extended {
+      border-left-color: var(--accent-amber);
+      background: rgba(232, 165, 90, 0.11);
+    }
+
+    .callout.success {
+      border-left-color: var(--accent-teal);
+      background: rgba(93, 184, 166, 0.1);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 82px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .timeline-item .slot {
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 8px;
+    }
+
+    .code-panel {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .code-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--on-dark-soft);
+    }
+
+    .inline-note {
+      border-left: 3px solid rgba(204, 120, 92, 0.65);
+      margin-top: 12px;
+      padding-left: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .flashcard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flash-answer {
+      display: none;
+      border-top: 1px solid var(--hairline);
+      padding-top: 10px;
+    }
+
+    .flashcard.revealed .flash-answer {
+      display: block;
+    }
+
+    .quiz-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .quiz-option.correct {
+      border-color: rgba(93, 184, 114, 0.45);
+      background: rgba(93, 184, 114, 0.14);
+    }
+
+    .quiz-option.incorrect {
+      border-color: rgba(198, 69, 69, 0.36);
+      background: rgba(198, 69, 69, 0.08);
+    }
+
+    .quiz-result {
+      min-height: 24px;
+      font-weight: 700;
+      color: var(--primary-active);
+    }
+
+    .footer {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .footer code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .layout,
+      .grid-2,
+      .grid-3,
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+      }
+
+      .hero {
+        padding: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-inline: 14px;
+      }
+
+      .section,
+      .hero,
+      .hero-panel,
+      .footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Study guide • Ôn tập lý thuyết &amp; thực hành</span>
+        <h1>Day 4 MCP (123-126)</h1>
+        <p class="lead">
+          Day 4 là điểm chuyển từ các demo MCP rời rạc sang một <strong>capstone project - dự án tổng hợp</strong> có bài toán gần thực tế:
+          trading floor mô phỏng với nhiều trader, một researcher, nhiều MCP servers, và <strong>agent autonomy - tính tự chủ của agent</strong>.
+          Cả ngày học xoay quanh bốn ý lớn: đóng khung bài toán thương mại an toàn bằng
+          <strong>synthetic account - tài khoản mô phỏng</strong>, làm hệ thống “sống dậy” trong notebook,
+          đọc trace để hiểu đúng hành vi agent, rồi module hóa thành <code>mcp_params.py</code>, <code>templates.py</code>, <code>traders.py</code>.
+        </p>
+        <div class="tag-row">
+          <span class="tag">AI Engineer Agentic Track</span>
+          <span class="tag">Week 6 • Day 4</span>
+          <span class="tag">Autonomous Traders Capstone</span>
+        </div>
+        <div class="source-row">
+          <span class="source">day4_summary.md</span>
+          <span class="source code">4_lab4.ipynb</span>
+          <span class="source code">push_server.py / templates.py / mcp_params.py / traders.py</span>
+          <span class="source code">accounts_client.py / tracers.py</span>
+          <span class="source extended">Kiến thức mở rộng</span>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <h2>Quick focus</h2>
+        <ul class="list dense-list">
+          <li><strong>Day 4</strong> không phải bài về trading thật, mà là sandbox học kiến trúc agent nhiều capability.</li>
+          <li><strong>Researcher-as-tool - agent nghiên cứu dưới dạng công cụ</strong> là pattern then chốt để trader vẫn giữ vai trò điều phối.</li>
+          <li><strong>Trace-first verification - kiểm chứng bằng trace</strong> quan trọng hơn việc chỉ đọc final answer.</li>
+          <li><strong>AsyncExitStack</strong> là kỹ thuật giúp hệ nhiều MCP servers còn giữ được code sạch khi module hóa.</li>
+        </ul>
+        <div>
+          <p style="margin-bottom: 8px;">Reading progress</p>
+          <div class="progress-track" aria-label="Reading progress">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+        <div class="callout success">
+          <strong>Big picture:</strong> Day 4 dạy cách biến một workflow agent đang chạy trong lab thành
+          <strong>một business component có thể tái dùng</strong>, chứ không dừng ở mức notebook demo.
+        </div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <aside class="toc">
+        <h2>Navigation</h2>
+        <nav>
+          <a href="#source-map">1. Source Map</a>
+          <a href="#cheat-sheet">2. Cheat Sheet</a>
+          <a href="#previous-context">3. Previous Context</a>
+          <a href="#core-theory">4. Core Theory</a>
+          <a href="#workflow">5. Workflow / Pipeline</a>
+          <a href="#techniques">6. Techniques</a>
+          <a href="#code-walkthrough">7. Code Walkthrough</a>
+          <a href="#options">8. Options / Trade-offs</a>
+          <a href="#pitfalls">9. Pitfalls</a>
+          <a href="#flashcards">10. Flashcards / Q&amp;A</a>
+          <a href="#memory">11. Quick Memory</a>
+        </nav>
+        <div class="toc-tools">
+          <button class="button" type="button" id="expandAll">Expand notes</button>
+          <button class="button" type="button" id="collapseAll">Collapse notes</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="source-map" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 1</div>
+              <h2>Source Map - Bản đồ nguồn</h2>
+              <p class="section-intro">
+                Guide này bám vào toàn bộ cụm 123-126 trong <code>day4_summary.md</code> và được khóa lại bằng
+                <code>4_lab4.ipynb</code> cùng các module Python Day 4. Vì transcript lesson 124 có chữ “UI”
+                nhưng nội dung thực tế nghiêng mạnh về lab setup và tracing, phần tổng hợp bên dưới sẽ bám vào nội dung nguồn thực sự,
+                không suy diễn thêm UI ngoài phạm vi tài liệu.
+              </p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Sources used - Nguồn đã dùng</h3>
+              <ul class="list">
+                <li><strong>Nguồn chính:</strong> <code>day4_summary.md</code> cho toàn bộ cụm 123-126.</li>
+                <li><strong>Notebook:</strong> <code>4_lab4.ipynb</code> để xác nhận capstone framing, researcher/trader prototype, trace review và bước import <code>Trader</code>.</li>
+                <li><strong>Module Day 4:</strong> <code>push_server.py</code>, <code>templates.py</code>, <code>mcp_params.py</code>, <code>traders.py</code>.</li>
+                <li><strong>Context phụ có liên quan trực tiếp:</strong> <code>accounts_client.py</code> và <code>tracers.py</code> vì <code>traders.py</code> dùng trực tiếp chúng.</li>
+                <li><strong>Previous context:</strong> <code>day1_study_guide.html</code>, <code>day2_study_guide.html</code>, <code>day3_study_guide.html</code>.</li>
+                <li><strong>Slide:</strong> không có.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Grounding notes - Ghi chú căn cứ</h3>
+              <p>
+                Day 4 là ngày có hai lớp nội dung: một lớp nói về <strong>kiến trúc và quy trình làm agent systems</strong>,
+                lớp còn lại đi vào <strong>module hóa orchestration</strong>. Vì vậy, guide này không chỉ bám code cuối,
+                mà còn giữ lại các bài học từ trace, từ prototype notebook, và từ nguyên tắc “start in the lab first”.
+              </p>
+              <p>
+                Tên secrets như <code>PUSHOVER_USER</code>, <code>PUSHOVER_TOKEN</code>, <code>DEEPSEEK_API_KEY</code>,
+                <code>GOOGLE_API_KEY</code>, <code>GROK_API_KEY</code>, <code>OPENROUTER_API_KEY</code> chỉ được nhắc ở mức biến môi trường,
+                không đọc hay hiển thị giá trị thật.
+              </p>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> cụm technical term viết dạng
+            <code>English - nghĩa tiếng Việt</code>, còn từ đơn phổ biến viết dạng <code>cost (chi phí)</code>.
+            Ví dụ trong file này: <code>researcher-as-tool - agent nghiên cứu dưới dạng công cụ</code>,
+            <code>trace-driven debugging - debug dựa trên trace</code>,
+            <code>thin orchestration class - lớp điều phối mỏng</code>.
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="slot">123</div>
+              <div>
+                <h4>Launch the trading floor</h4>
+                <p>Mở capstone, định nghĩa bài toán, boundary an toàn, và thêm <code>push_server.py</code> như capability nhỏ hỗ trợ cảm giác autonomy.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">124</div>
+              <div>
+                <h4>Bring the agents to life in the lab</h4>
+                <p>Khởi tạo researcher và trader, dùng researcher như tool, nạp account/strategy resources, rồi chạy trace.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">125</div>
+              <div>
+                <h4>Read the trace, then reorganize</h4>
+                <p>Từ trace mismatch mà rút ra bài học lớn: debug qua trace, giữ business rules ở code, và tách config/prompt thành module riêng.</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="slot">126</div>
+              <div>
+                <h4>Package the trader as a component</h4>
+                <p>Chốt bước chuyển <code>lab -> reusable class</code> bằng <code>Trader</code>, <code>AsyncExitStack</code>, và mode luân phiên trade/rebalance.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cheat-sheet" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 2</div>
+              <h2>Cheat Sheet / Executive Summary</h2>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Core idea - Ý chính</h3>
+              <p>
+                Day 4 nối toàn bộ kiến thức Day 1-3 vào một trading floor mô phỏng: accounts từ Day 2,
+                memory/search/market data từ Day 3, và tư duy multi-server orchestration từ Day 1.
+                Giá trị học lớn nhất không phải “agent trade được gì”, mà là <strong>cách agent được ghép, quan sát, và đóng gói</strong>.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Must know - Cần nhớ</h3>
+              <ul class="list">
+                <li><strong>Researcher</strong> là agent chuyên biệt được trader gọi như tool, không phải handoff toàn quyền.</li>
+                <li><strong>Resources</strong> từ accounts system được bơm vào prompt để trader ra quyết định trên state thật.</li>
+                <li><strong>Trace</strong> là công cụ đọc sự thật vận hành, đặc biệt khi final summary và system state không khớp.</li>
+                <li><strong>Trader class</strong> là kết quả của quá trình lab-first rồi mới module hóa.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Use in practice - Dùng khi nào</h3>
+              <p>
+                Khi bạn muốn nâng một notebook agent thành module có thể tái dùng, Day 4 cho khung rất rõ:
+                xác định capability bundles, tách prompts/config/orchestration, giữ business guardrails ở code,
+                và dùng traces như lớp kiểm chứng bắt buộc trước khi nghĩ tới UI hay app packaging.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>One-sentence summary - Tóm tắt một câu</h3>
+              <p>
+                Day 4 là ngày biến “một agent có nhiều tools” thành “một hệ nhiều agent, nhiều server, có business state,
+                có trace, có lifecycle, và có module boundaries đủ sạch để mở rộng tiếp”.
+              </p>
+            </article>
+            <article class="card">
+              <h3>What changed from Day 3?</h3>
+              <p>
+                Day 3 thiên về capability sources - nguồn capability; Day 4 thiên về capability composition - ghép năng lực
+                và orchestration - điều phối, tức là đưa các capability đó vào nhịp vận hành của một solution hoàn chỉnh hơn.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section id="previous-context" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 3</div>
+              <h2>Previous Context - Liên hệ với bài trước</h2>
+            </div>
+          </div>
+          <div class="callout">
+            Day 1 dạy bạn MCP là protocol để gắn nhiều server vào agent.
+            Day 2 tạo <code>accounts_server.py</code> và cách đọc resources/account state.
+            Day 3 thêm memory, Brave Search, và market paths theo plan.
+            Day 4 là nơi ba ngày đó nhập lại thành một capstone có mục tiêu rõ: researcher nghiên cứu, trader hành động,
+            system ghi log/trace, và kiến trúc đủ sạch để chuyển từ notebook sang module.
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>From Day 2</h3>
+              <p>
+                Không có Day 2 thì Day 4 không có <strong>resource injection - đưa resource vào prompt</strong>.
+                Trader chỉ ra quyết định có ngữ cảnh vì nó đọc được account details và strategy qua MCP resources,
+                thay vì hardcode state trong code.
+              </p>
+            </article>
+            <article class="card">
+              <h3>From Day 3</h3>
+              <p>
+                Không có Day 3 thì researcher sẽ thiếu memory, Brave Search, fetch và market intelligence.
+                Day 4 vì vậy là điểm hội tụ của capability reuse - tái sử dụng năng lực, chứ không phải ngày học một công cụ mới hoàn toàn.
+              </p>
+            </article>
+          </div>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Kiến thức mở rộng:</strong> nhìn theo software engineering, Day 4 là bước
+            <strong>architecture consolidation - hợp nhất kiến trúc</strong>.
+            Kiến thức trước đó không biến mất; chúng được re-packaged thành các boundaries rõ hơn:
+            data path, prompt path, orchestration path, observability path.
+          </div>
+        </section>
+
+        <section id="core-theory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 4</div>
+              <h2>Core Theory - Lý thuyết cốt lõi</h2>
+              <p class="section-intro">
+                Core theory của Day 4 nằm ở sự thay đổi cấp độ trừu tượng:
+                từ học từng MCP server sang học cách ghép chúng thành một system với trạng thái,
+                vai trò, vòng đời và cơ chế quan sát.
+              </p>
+            </div>
+            <div class="source-row">
+              <span class="source">day4_summary.md</span>
+              <span class="source code">4_lab4.ipynb</span>
+              <span class="source code">traders.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Capstone project - dự án tổng hợp cuối chặng</h3>
+              <p>
+                Capstone ở Day 4 không chỉ để “cho vui”. Nó buộc người học đi từ mức biết từng primitive
+                như tool, resource, memory, search, market data sang mức ghép chúng thành solution.
+                Điều này làm lộ ra những vấn đề mà demo nhỏ không lộ: guardrails, orchestration, state, trace, prompt hygiene.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Researcher-as-tool - agent nghiên cứu dưới dạng công cụ</h3>
+              <p>
+                Researcher không được trao quyền điều phối toàn bộ; trader vẫn là agent chính.
+                Researcher được bọc thành tool để trader gọi khi cần. Đây là một dạng
+                <strong>hierarchical composition - ghép tác nhân theo tầng</strong> rất hợp khi muốn chuyên môn hóa nhưng không muốn mất vai trò điều phối chính.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Resource injection - đưa resource vào prompt</h3>
+              <p>
+                Thay vì bắt trader mở đầu bằng nhiều tool calls để biết account đang có gì, chiến lược là đọc account/strategy resources trước,
+                rồi bơm thẳng vào prompt. Kỹ thuật này làm decision context “sống” ngay từ đầu, đặc biệt hữu ích khi state hệ thống thay đổi liên tục.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Trace-driven debugging - debug dựa trên trace</h3>
+              <p>
+                Day 4 nhấn mạnh rằng final answer đẹp không chứng minh hệ đúng. Khi Tesla trade không xuất hiện trong holdings,
+                trace cho biết lý do là <code>Insufficient funds to buy shares</code>, tức là business rule đang làm đúng việc.
+                Đây là điểm rất quan trọng: trace không chỉ để xem “đã gọi tool gì”, mà để phân biệt bug với rule enforcement.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Lab-first development - phát triển bắt đầu từ lab</h3>
+              <p>
+                Một nguyên tắc đi xuyên Day 4 là: đừng kiến trúc hóa cả hệ ngay từ đầu. Hãy làm prototype trong notebook,
+                xem trace, hiểu failure modes, rồi mới rút dần thành module.
+                Đây là cách giảm risk (rủi ro) cho agent systems, vốn khó đoán hơn nhiều so với app logic thuần.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Thin orchestration class - lớp điều phối mỏng</h3>
+              <p>
+                <code>Trader</code> không nên ôm prompt text, danh sách server, logic account resources và model factory trong một khối hỗn loạn.
+                Day 4 cho thấy hướng tốt hơn: <code>templates.py</code> lo prompts, <code>mcp_params.py</code> lo server manifests,
+                còn <code>traders.py</code> lo flow và lifecycle.
+              </p>
+            </article>
+          </div>
+          <details>
+            <summary>Deep explanation - tại sao Day 4 nhấn mạnh trace hơn UI?</summary>
+            <p>
+              Vì UI chỉ cho bạn thấy bề mặt của autonomy, còn trace cho bạn thấy cấu trúc thật của autonomy.
+              Trong các hệ nhiều tools, nhiều servers, nhiều prompts và nhiều trạng thái, output cuối thường che giấu phần lớn các bước trung gian.
+              Nếu không dùng trace, bạn rất dễ hiểu sai nguyên nhân của một hành vi: tưởng model hallucinate, trong khi thật ra business rule chặn đúng;
+              tưởng tool fail hoàn toàn, trong khi side effect vẫn chạy; hoặc tưởng prompt ổn, trong khi tool routing đang lệch. Day 4 do đó ưu tiên observability trước presentation.
+            </p>
+          </details>
+          <div class="callout extended">
+            <strong>Kiến thức mở rộng:</strong> với systems phức tạp hơn, cùng tư duy này thường dẫn tới
+            <strong>trace-first productization - sản phẩm hóa sau khi trace đủ rõ</strong>:
+            chỉ xây UI và automation dày hơn khi bạn đã hiểu tương đối chắc hành vi runtime.
+          </div>
+        </section>
+
+        <section id="workflow" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 5</div>
+              <h2>Workflow / Pipeline - Quy trình / luồng hoạt động</h2>
+            </div>
+            <div class="source-row">
+              <span class="source">day4_summary.md</span>
+              <span class="source code">4_lab4.ipynb</span>
+              <span class="source code">mcp_params.py / traders.py</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Flow 1 - Launching the capstone</h3>
+              <ol class="list">
+                <li>Chọn bài toán mô phỏng trading equity thay vì demo kỹ thuật thuần.</li>
+                <li>Giữ boundary an toàn bằng <strong>synthetic account - tài khoản mô phỏng</strong>, không dùng tiền thật.</li>
+                <li>Xác định các capability bundles cần có: accounts, market, fetch, Brave Search, memory, push.</li>
+                <li>Đặt mục tiêu module hóa: cuối ngày phải có <code>traders.py</code> quản lý một trader riêng.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Flow 2 - Bring the agents to life in the lab</h3>
+              <ol class="list">
+                <li>Notebook tách server params thành nhóm trader và nhóm researcher.</li>
+                <li>Researcher được tạo như một agent chuyên nghiên cứu tài chính trên web.</li>
+                <li>Researcher được convert thành tool để trader gọi, thay vì handoff vai trò chính.</li>
+                <li>Trader đọc account và strategy resources rồi nhúng chúng vào prompt.</li>
+                <li><code>Runner.run(..., max_turns=30)</code> cho phép flow đủ sâu để search, research, trade và gửi push.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card">
+              <h3>Flow 3 - Inspect the trace and learn from mismatch</h3>
+              <ol class="list">
+                <li>So sánh summary cuối với holdings/account state thật.</li>
+                <li>Nếu mismatch, mở trace để xem từng tool call và từng error span.</li>
+                <li>Xác định lỗi Tesla buy bị chặn vì <code>Insufficient funds</code>, tức là accounts business rule làm đúng.</li>
+                <li>Rút ra kết luận: đừng phán bug trước khi kiểm tra runtime evidence.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Flow 4 - Migrate to modules</h3>
+              <ol class="list">
+                <li>Tách manifests sang <code>mcp_params.py</code>.</li>
+                <li>Tách instructions và message templates sang <code>templates.py</code>.</li>
+                <li>Gói orchestration vào <code>Trader</code> trong <code>traders.py</code>.</li>
+                <li>Dùng <code>AsyncExitStack</code> để quản lý danh sách <code>MCPServerStdio</code> động.</li>
+                <li>Luân phiên <code>trade</code> và <code>rebalance</code> qua cờ <code>do_trade</code> để tạo nhịp quản lý danh mục.</li>
+              </ol>
+            </article>
+          </div>
+          <div class="callout" style="margin-top: 14px;">
+            <strong>Control flow - luồng điều phối tổng quát:</strong>
+            <code>Trader class -> researcher tool -> search/fetch/memory -> trader tools/resources -> market/account/push -> trace logs</code>.
+            Khi module hóa xong, Day 4 đã có đủ xương sống để tạo nhiều trader độc lập thay vì một notebook run thủ công.
+          </div>
+        </section>
+
+        <section id="techniques" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 6</div>
+              <h2>Techniques - Kỹ thuật sử dụng</h2>
+              <p class="section-intro">
+                Techniques của Day 4 là tập hợp giữa kỹ thuật kiến trúc agent, kỹ thuật prompt grounding và kỹ thuật quản lý runtime.
+                Chúng đều xuất hiện trực tiếp trong summary hoặc trong code.
+              </p>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card">
+              <h3>Commercial framing - đóng khung theo bài toán thương mại</h3>
+              <p><strong>Purpose:</strong> đặt MCP vào một use case gần doanh nghiệp hơn thay vì demo rời rạc.</p>
+              <p><strong>When to use:</strong> khi muốn kiểm tra stack tool hiện có có ghép thành solution được hay không.</p>
+              <p><strong>Trade-off:</strong> realism cao hơn nhưng complexity cũng tăng mạnh.</p>
+            </article>
+            <article class="card">
+              <h3>Agent specialization - chuyên môn hóa agent</h3>
+              <p><strong>Purpose:</strong> tách vai researcher và trader để prompt và capability đỡ rối.</p>
+              <p><strong>When to use:</strong> khi agent chính cần năng lực phụ sâu nhưng không nên ôm trọn vai trò đó.</p>
+              <p><strong>Trade-off:</strong> thêm một lớp orchestration nhưng hành vi rõ vai hơn.</p>
+            </article>
+            <article class="card">
+              <h3>Resource-grounded prompting - neo prompt bằng resources</h3>
+              <p><strong>Purpose:</strong> đưa account state và strategy thật vào decision loop ngay đầu phiên.</p>
+              <p><strong>When to use:</strong> khi quyết định của agent phụ thuộc mạnh vào state hệ thống hiện tại.</p>
+              <p><strong>Trade-off:</strong> prompt dài hơn nhưng giảm tool calls mở đầu và giảm state drift.</p>
+            </article>
+            <article class="card">
+              <h3>Trace reconciliation - đối chiếu trace với kết quả cuối</h3>
+              <p><strong>Purpose:</strong> tìm root cause khi final summary và system state không khớp.</p>
+              <p><strong>When to use:</strong> bất cứ khi nào hành vi agent nghe hợp lý nhưng kết quả runtime gây nghi ngờ.</p>
+              <p><strong>Trade-off:</strong> tốn thời gian đọc trace nhưng đổi lại hiểu đúng hệ hơn hẳn.</p>
+            </article>
+            <article class="card">
+              <h3>Parameterized MCP bundles - bó server tham số hóa</h3>
+              <p><strong>Purpose:</strong> tái sử dụng danh sách servers theo vai trò và theo plan mà không hardcode khắp nơi.</p>
+              <p><strong>When to use:</strong> khi project có nhiều persona hoặc nhiều data tiers như free/paid/realtime.</p>
+              <p><strong>Trade-off:</strong> thêm abstraction nhẹ nhưng giảm duplicate và dễ mở rộng.</p>
+            </article>
+            <article class="card">
+              <h3>Dynamic async context stacking - gom context bất đồng bộ động</h3>
+              <p><strong>Purpose:</strong> dùng <code>AsyncExitStack</code> để mở/đóng nhiều MCP servers sạch hơn nested <code>async with</code>.</p>
+              <p><strong>When to use:</strong> khi số servers lớn và có thể thay đổi theo cấu hình.</p>
+              <p><strong>Trade-off:</strong> đọc khó hơn lúc đầu, nhưng scale tốt hơn nhiều.</p>
+            </article>
+          </div>
+          <details>
+            <summary>Technique insight - đâu là kỹ thuật cần mang sang project thật ngay?</summary>
+            <p>
+              Kỹ thuật đáng mang sang nhất là <strong>trace reconciliation + parameterized MCP bundles</strong>.
+              Một cái giúp bạn hiểu hệ đang làm gì; cái còn lại giúp bạn tổ chức hệ đủ sạch để thay toolsets, personas hoặc plans mà không đập vỡ orchestration.
+            </p>
+          </details>
+        </section>
+
+        <section id="code-walkthrough" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 7</div>
+              <h2>Code Walkthrough - Phân tích code</h2>
+              <p class="section-intro">
+                Day 4 có code thật và notebook thật, nên walkthrough dưới đây đi theo hành trình
+                <strong>prototype -> inspect -> package</strong>. Trọng tâm là mục đích, logic chính và lý do thiết kế,
+                không phải chép lại toàn bộ file.
+              </p>
+            </div>
+            <div class="source-row">
+              <span class="source code">4_lab4.ipynb</span>
+              <span class="source code">push_server.py</span>
+              <span class="source code">templates.py</span>
+              <span class="source code">mcp_params.py</span>
+              <span class="source code">traders.py</span>
+            </div>
+          </div>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 1 - <code>4_lab4.ipynb</code>: capstone framing và lab setup</h3>
+              <p>Phần đầu notebook cho thấy Day 4 chưa nhảy thẳng vào module, mà bắt đầu từ cách lắp hệ bằng tay trong lab.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: định nghĩa problem scope và dựng prototype researcher/trader</span>
+              <span>Key names: <code>MCPServerStdio</code>, <code>get_researcher()</code>, <code>get_researcher_tool()</code></span>
+            </div>
+            <pre><code>### Week 6 Day 4
+# Autonomous Traders
+# The goal of today's lab is to make a new python module, traders.py
+
+researcher_mcp_servers = [
+    MCPServerStdio(params, client_session_timeout_seconds=30)
+    for params in researcher_mcp_server_params
+]
+trader_mcp_servers = [
+    MCPServerStdio(params, client_session_timeout_seconds=30)
+    for params in trader_mcp_server_params
+]
+
+async def get_researcher_tool(mcp_servers) -> Tool:
+    researcher = await get_researcher(mcp_servers)
+    return researcher.as_tool(tool_name="Researcher", tool_description=research_tool())</code></pre>
+            <p class="inline-note">
+              Đây là nơi Day 4 nói thẳng triết lý phát triển của nó: trước hết hãy chứng minh capstone chạy được trong lab,
+              sau đó mới rút thành module. Đồng thời, đoạn <code>researcher.as_tool(...)</code> là chìa khóa cho pattern researcher-as-tool.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 2 - <code>push_server.py</code>: tiny MCP server cho push notification</h3>
+              <p>Đây là ví dụ rõ nhất cho <strong>tiny MCP server pattern - mẫu server MCP siêu nhỏ</strong>.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: thêm observability/notification ở cuối trading flow</span>
+              <span>Key names: <code>PushModelArgs</code>, <code>@mcp.tool()</code>, <code>push()</code></span>
+            </div>
+            <pre><code>mcp = FastMCP("push_server")
+
+class PushModelArgs(BaseModel):
+    message: str = Field(description="A brief message to push")
+
+@mcp.tool()
+def push(args: PushModelArgs):
+    payload = {"user": pushover_user, "token": pushover_token, "message": args.message}
+    requests.post(pushover_url, data=payload)
+    return "Push notification sent"</code></pre>
+            <p class="inline-note">
+              Transcript cũng nhấn mạnh rằng xét thuần công năng, đây không nhất thiết phải là một MCP server.
+              Nó được làm như vậy để toàn hệ giữ cùng abstraction layer - lớp trừu tượng, và để người học thấy cả capability nhỏ cũng có thể được “server hóa”.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 3 - <code>templates.py</code>: prompt templates như code assets</h3>
+              <p>File này biến prompts từ “string dài trong notebook” thành tài sản mã nguồn có tổ chức.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: gom instructions và message templates theo vai trò và theo mode</span>
+              <span>Key names: <code>researcher_instructions()</code>, <code>trader_instructions()</code>, <code>trade_message()</code>, <code>rebalance_message()</code></span>
+            </div>
+            <pre><code>def researcher_instructions():
+    return f"""You are a financial researcher...
+Make use of your knowledge graph tools...
+The current datetime is {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+"""
+
+def trade_message(name, strategy, account):
+    return f"""Based on your investment strategy, you should now look for new opportunities...
+Here is your current account:
+{account}
+Now, carry out analysis, make your decision and execute trades."""</code></pre>
+            <p class="inline-note">
+              Điểm đáng học không chỉ là nội dung prompt, mà là cách Day 4 tách chúng ra khỏi orchestration code.
+              Khi trader có hai mode <code>trade</code> và <code>rebalance</code>, việc để prompt nằm riêng giúp thay đổi hành vi mà không làm rối <code>Trader</code> class.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 4 - <code>mcp_params.py</code>: capability bundles theo vai trò và theo plan</h3>
+              <p>File này là manifest trung tâm cho server composition của Day 4.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: chọn market path và tách bundles cho trader/researcher</span>
+              <span>Key names: <code>market_mcp</code>, <code>trader_mcp_server_params</code>, <code>researcher_mcp_server_params(name)</code></span>
+            </div>
+            <pre><code>if is_paid_polygon or is_realtime_polygon:
+    market_mcp = {
+        "command": "uvx",
+        "args": ["--from", "git+https://github.com/polygon-io/mcp_polygon@v0.1.0", "mcp_polygon"],
+        "env": {"POLYGON_API_KEY": polygon_api_key},
+    }
+else:
+    market_mcp = {"command": "uv", "args": ["run", "market_server.py"]}
+
+trader_mcp_server_params = [
+    {"command": "uv", "args": ["run", "accounts_server.py"]},
+    {"command": "uv", "args": ["run", "push_server.py"]},
+    market_mcp,
+]</code></pre>
+            <p class="inline-note">
+              Đây là chỗ Day 4 thật sự ghép Day 2 và Day 3 vào cùng một hệ: trader có accounts + push + market,
+              researcher có fetch + Brave Search + memory. Mỗi persona nhận một capability bundle đúng vai trò của nó.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 5 - <code>traders.py</code>: lớp điều phối Trader</h3>
+              <p>Đây là file đích của Day 4, nơi prototype notebook được đóng gói thành component tái dùng.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: tạo trader agent, quản lý lifecycle servers, đọc state và chạy trace</span>
+              <span>Key names: <code>get_model()</code>, <code>get_account_report()</code>, <code>run_with_mcp_servers()</code>, <code>run()</code></span>
+            </div>
+            <pre><code>def get_model(model_name: str):
+    if "/" in model_name:
+        return OpenAIChatCompletionsModel(model=model_name, openai_client=openrouter_client)
+    elif "deepseek" in model_name:
+        return OpenAIChatCompletionsModel(model=model_name, openai_client=deepseek_client)
+    else:
+        return model_name
+
+async def get_account_report(self) -> str:
+    account = await read_accounts_resource(self.name)
+    account_json = json.loads(account)
+    account_json.pop("portfolio_value_time_series", None)
+    return json.dumps(account_json)
+
+async def run(self):
+    try:
+        await self.run_with_trace()
+    except Exception as e:
+        print(f"Error running trader {self.name}: {e}")
+    self.do_trade = not self.do_trade</code></pre>
+            <p class="inline-note">
+              Có ba quyết định thiết kế rất đáng nhớ ở đây:
+              <strong>multi-model abstraction</strong> qua <code>get_model()</code>,
+              <strong>prompt hygiene</strong> qua việc bỏ <code>portfolio_value_time_series</code>,
+              và <strong>stateful mode switching</strong> qua <code>self.do_trade = not self.do_trade</code>.
+            </p>
+          </article>
+
+          <article class="code-panel">
+            <div>
+              <h3>Block 6 - <code>traders.py</code>: AsyncExitStack cho lifecycle động</h3>
+              <p>Đây là phần transcript gọi là “fancy Python”, nhưng thực chất là kỹ thuật giúp code còn đọc được khi số servers tăng lên.</p>
+            </div>
+            <div class="code-meta">
+              <span>Purpose: mở nhiều MCPServerStdio mà không lồng quá sâu</span>
+              <span>Key names: <code>AsyncExitStack</code>, <code>stack.enter_async_context()</code>, <code>MCPServerStdio</code></span>
+            </div>
+            <pre><code>async def run_with_mcp_servers(self):
+    async with AsyncExitStack() as stack:
+        trader_mcp_servers = [
+            await stack.enter_async_context(
+                MCPServerStdio(params, client_session_timeout_seconds=120)
+            )
+            for params in trader_mcp_server_params
+        ]
+        async with AsyncExitStack() as stack:
+            researcher_mcp_servers = [
+                await stack.enter_async_context(
+                    MCPServerStdio(params, client_session_timeout_seconds=120)
+                )
+                for params in researcher_mcp_server_params(self.name)
+            ]
+            await self.run_agent(trader_mcp_servers, researcher_mcp_servers)</code></pre>
+            <p class="inline-note">
+              Lợi ích lớn nhất ở đây là khả năng scale theo danh sách params. Khi Day 4 kết thúc bằng con số
+              <strong>6 MCP servers và 44 tools</strong>, bạn sẽ thấy ngay vì sao nested <code>async with</code> thủ công là hướng không bền.
+            </p>
+          </article>
+        </section>
+
+        <section id="options" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 8</div>
+              <h2>Options / Trade-offs nếu phù hợp</h2>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Option - Lựa chọn</th>
+                <th>Best for - Phù hợp khi</th>
+                <th>Trade-off - Đánh đổi</th>
+                <th>Risk - Rủi ro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Keep everything in notebook</strong></td>
+                <td>Prototype rất sớm, còn đang khám phá prompt và tool mix.</td>
+                <td>Nhìn nhanh và sửa nhanh, nhưng khó tái dùng và khó mở rộng thành nhiều traders.</td>
+                <td>Dễ trở thành “lab forever” và không tách nổi boundaries.</td>
+              </tr>
+              <tr>
+                <td><strong>Module by concern</strong></td>
+                <td>Đã hiểu tương đối rõ hành vi runtime và muốn ổn định hóa cấu trúc.</td>
+                <td>Thêm nhiều file hơn, nhưng prompts, config và orchestration sạch hơn nhiều.</td>
+                <td>Nếu tách quá sớm, bạn có thể kiến trúc hóa khi chưa hiểu vấn đề thật.</td>
+              </tr>
+              <tr>
+                <td><strong>Local function for push</strong></td>
+                <td>Chỉ cần utility nội bộ cực nhỏ.</td>
+                <td>Đơn giản hơn MCP server, nhưng mất tính nhất quán abstraction với phần còn lại của hệ.</td>
+                <td>Dễ khó nối nếu sau này muốn chuẩn hóa mọi capability cùng interface.</td>
+              </tr>
+              <tr>
+                <td><strong>MCP push server</strong></td>
+                <td>Muốn toàn bộ capability được truy cập thống nhất theo MCP-first architecture.</td>
+                <td>Tăng thêm process và metadata cho một chức năng nhỏ.</td>
+                <td>Nếu lạm dụng cho mọi utility, kiến trúc sẽ nặng không cần thiết.</td>
+              </tr>
+              <tr>
+                <td><strong>Nested async with</strong></td>
+                <td>Chỉ có 1-2 servers và cần code dễ đọc cho người mới.</td>
+                <td>Rõ ràng lúc đầu, nhưng scale kém khi server count tăng.</td>
+                <td>Code nhanh thành “cầu thang context manager” rất khó bảo trì.</td>
+              </tr>
+              <tr>
+                <td><strong>AsyncExitStack</strong></td>
+                <td>Hệ nhiều servers và danh sách servers có thể thay đổi theo cấu hình.</td>
+                <td>Khó hiểu hơn lúc đầu nhưng phù hợp hơn với runtime động.</td>
+                <td>Dễ gây sợ cho người mới nếu không giải thích kỹ mục đích của nó.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout extended" style="margin-top: 14px;">
+            <strong>Kiến thức mở rộng:</strong> trong agent systems thật, lựa chọn quan trọng nhất thường là
+            <strong>tách concern đúng thời điểm</strong>. Tách quá sớm thì over-architecture; tách quá muộn thì notebook trở thành “bãi dây điện”.
+          </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 9</div>
+              <h2>Pitfalls - Lỗi / bẫy thường gặp</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Failure modes - trường hợp dễ fail</h3>
+              <ul class="list">
+                <li><strong>Nhảy thẳng vào module hóa:</strong> chưa hiểu trace và failure modes mà đã tách file hàng loạt.</li>
+                <li><strong>Đọc final output thay cho trace:</strong> dễ hiểu sai bug thành rule, hoặc rule thành bug.</li>
+                <li><strong>Để prompt strings rải rác:</strong> lâu dần không kiểm soát nổi trader/researcher behavior.</li>
+                <li><strong>Đưa toàn bộ account JSON vào prompt:</strong> làm prompt dài, noisy và tốn token.</li>
+                <li><strong>Nhồi tất cả vào một agent duy nhất:</strong> mất lợi thế specialization và khiến instructions/tool usage rối.</li>
+                <li><strong>Xem push error là hệ hỏng hoàn toàn:</strong> trong transcript, notification vẫn tới điện thoại dù có lỗi quan sát được.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Fix / prevention - cách tránh</h3>
+              <ul class="list">
+                <li>Giữ nguyên tắc <strong>lab-first</strong>: thử nhỏ trong notebook rồi mới tổng quát hóa.</li>
+                <li>Dùng trace như nguồn sự thật runtime trước khi sửa code hay sửa prompt.</li>
+                <li>Tách <code>templates.py</code>, <code>mcp_params.py</code>, <code>traders.py</code> theo concern rõ ràng.</li>
+                <li>Lọc bớt context không cần thiết như <code>portfolio_value_time_series</code> trước khi gửi cho model.</li>
+                <li>Tách vai researcher và trader khi mức độ nhiệm vụ đã đủ khác nhau.</li>
+                <li>Phân biệt rõ side effect thành công với error reporting chưa đẹp để tránh sửa nhầm lớp vấn đề.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="flashcards" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 10</div>
+              <h2>Flashcards / Q&amp;A - Thẻ ôn tập</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card flashcard">
+              <h3>Q: Vì sao researcher nên được trader gọi như tool thay vì handoff?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Vì trader vẫn phải giữ vai trò điều phối chính; researcher chỉ là capability nghiên cứu chuyên sâu mà trader gọi khi cần.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Bài học lớn từ lỗi Tesla buy là gì?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Trace mới cho biết đây là business rule <code>Insufficient funds</code>, không phải agent “bịa” hay bug mơ hồ.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: Vì sao <code>portfolio_value_time_series</code> bị bỏ khỏi prompt?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Để giảm prompt noise và chỉ giữ state hữu ích cho quyết định hiện tại.
+              </p>
+            </article>
+            <article class="card flashcard">
+              <h3>Q: <code>AsyncExitStack</code> giải quyết đúng vấn đề gì ở Day 4?</h3>
+              <button class="button primary" type="button" data-reveal>Reveal answer</button>
+              <p class="flash-answer">
+                <strong>A:</strong> Giải quyết lifecycle của nhiều <code>MCPServerStdio</code> động mà không phải lồng rất nhiều <code>async with</code>.
+              </p>
+            </article>
+          </div>
+          <div class="grid-2" style="margin-top: 14px;">
+            <article class="card quiz-block">
+              <h3>Quick quiz 1</h3>
+              <p>Phát biểu nào đúng nhất về <code>templates.py</code>?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. File này chỉ để lưu text trang trí, không ảnh hưởng logic hành vi.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. File này chứa instructions và message templates, tức là một phần trực tiếp quyết định behavior của researcher và trader.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. File này chỉ tồn tại để tránh import vòng.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+            <article class="card quiz-block">
+              <h3>Quick quiz 2</h3>
+              <p>Khi nào <code>AsyncExitStack</code> đáng giá hơn nested <code>async with</code>?</p>
+              <button class="button quiz-option" type="button" data-answer="false">A. Chỉ khi không dùng MCP servers.</button>
+              <button class="button quiz-option" type="button" data-answer="true">B. Khi số servers lớn hơn và danh sách server cần mở có tính động theo cấu hình hoặc persona.</button>
+              <button class="button quiz-option" type="button" data-answer="false">C. Chỉ để code trông “fancy” hơn.</button>
+              <div class="quiz-result" aria-live="polite"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="memory" class="section">
+          <div class="section-title">
+            <div>
+              <div class="kicker">Section 11</div>
+              <h2>Quick Memory - Ôn nhanh cuối bài</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <article class="card">
+              <h3>Must remember - Phải nhớ</h3>
+              <ol class="list">
+                <li>Day 4 mở capstone bằng một bài toán thương mại mô phỏng, không phải trading thật.</li>
+                <li>Researcher là agent chuyên biệt được trader dùng như tool, không phải handoff agent chính.</li>
+                <li>Account và strategy được đọc qua resources rồi bơm vào prompt để trader quyết định trên state thật.</li>
+                <li>Trace là lớp observability quan trọng nhất để phân biệt bug, business rule và tool/runtime issue.</li>
+                <li><code>mcp_params.py</code> lo server bundles; <code>templates.py</code> lo prompt assets; <code>traders.py</code> lo orchestration.</li>
+                <li><code>AsyncExitStack</code> là chìa khóa giúp hệ nhiều servers còn giữ được code sạch khi chuyển từ notebook sang module.</li>
+                <li><code>Trader.run()</code> luân phiên trade và rebalance qua <code>do_trade</code>, tạo nhịp quản lý danh mục có state.</li>
+                <li>Day 4 kết thúc với một hệ tool-rich: theo summary, tổng cộng 6 MCP servers và 44 tools.</li>
+              </ol>
+            </article>
+            <article class="card">
+              <h3>Self-check - Tự kiểm tra</h3>
+              <ul class="list">
+                <li>Bạn có giải thích được vì sao Day 4 phải bắt đầu trong notebook trước khi module hóa không?</li>
+                <li>Bạn có mô tả được khác biệt giữa researcher-as-tool và handoff trong bối cảnh bài này không?</li>
+                <li>Bạn có nêu được vì sao trace cho câu trả lời tốt hơn final summary khi debug hành vi agent không?</li>
+                <li>Bạn có nhìn ra ranh giới trách nhiệm giữa <code>mcp_params.py</code>, <code>templates.py</code> và <code>traders.py</code> không?</li>
+                <li>Bạn có giải thích được vì sao bỏ bớt account fields trước khi prompt là một quyết định kiến trúc chứ không chỉ là “tối ưu nhỏ” không?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <h3>Kết luận nhanh</h3>
+          <p>
+            Day 4 là ngày MCP bước sang trạng thái “hệ thống”: có nhiều agent, nhiều server, nhiều vai trò,
+            có state, có trace, có config bundles, có prompt assets, và có orchestration code đủ sạch để tái dùng.
+            Đây là bước bản lề trước khi tiến sang app/UI và productization ở các ngày sau.
+          </p>
+          <p>
+            Study note: các đoạn có nhãn <span class="mini-pill extended">Kiến thức mở rộng</span> được tách riêng khỏi phần grounding chính.
+            File này không hiển thị secrets, tokens hay API keys; chỉ dùng tên biến môi trường khi cần giải thích kiến trúc và dependency runtime.
+          </p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const links = Array.from(document.querySelectorAll(".toc a"));
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute("href")))
+      .filter(Boolean);
+    const progressBar = document.getElementById("progressBar");
+    const detailsNodes = Array.from(document.querySelectorAll("details"));
+
+    function setActiveLink() {
+      let current = sections[0] ? sections[0].id : "";
+      const offset = window.scrollY + 180;
+
+      for (const section of sections) {
+        if (section.offsetTop <= offset) {
+          current = section.id;
+        }
+      }
+
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+      });
+    }
+
+    function updateProgress() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? Math.min((window.scrollY / docHeight) * 100, 100) : 0;
+      progressBar.style.width = progress + "%";
+    }
+
+    document.getElementById("expandAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = true;
+      });
+    });
+
+    document.getElementById("collapseAll").addEventListener("click", () => {
+      detailsNodes.forEach((node) => {
+        node.open = false;
+      });
+    });
+
+    document.querySelectorAll("[data-reveal]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".flashcard");
+        card.classList.toggle("revealed");
+        button.textContent = card.classList.contains("revealed") ? "Hide answer" : "Reveal answer";
+      });
+    });
+
+    document.querySelectorAll(".quiz-block").forEach((block) => {
+      const result = block.querySelector(".quiz-result");
+      const buttons = block.querySelectorAll(".quiz-option");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          buttons.forEach((item) => {
+            item.classList.remove("correct", "incorrect");
+          });
+
+          const correct = button.dataset.answer === "true";
+          button.classList.add(correct ? "correct" : "incorrect");
+          result.textContent = correct
+            ? "Đúng. Bạn đang nối đúng giữa orchestration, trace và mục tiêu kiến trúc của Day 4."
+            : "Chưa đúng. Hãy nhìn lại vai trò của file hoặc kỹ thuật này trong toàn bộ trading floor, không chỉ trong một snippet.";
+        });
+      });
+    });
+
+    window.addEventListener("scroll", () => {
+      setActiveLink();
+      updateProgress();
+    }, { passive: true });
+
+    setActiveLink();
+    updateProgress();
+  </script>
+</body>
+
+</html>

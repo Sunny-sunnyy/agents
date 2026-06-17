@@ -1,0 +1,164 @@
+Okay.
+And with this, it's time for us to go and have a look at traders Dot Pi, the module for defining our
+traders.
+And just before I do this, I want to mention that there's some fancy python I've got in here, which
+looks a bit muddling the first time you see it.
+One of the slightly hokey things about working with OpenAI agents SDK is that that you.
+It's good to use the context managers to wrap creating a server like like like I've got right here this
+async with and then the server studio passing in the parameters as a server.
+But that can start to look super ugly if you have a bunch of servers, which we do, we have many.
+When you have many, you'd have to have a separate with statement, a separate context manager on each
+line indented, and it gets a little bit out of control.
+And there is a Python technique, which is quite an advanced technique for not having to have a stack
+like this, but just being able to do it, sort of iterate over lots of context managers, lots of widths,
+and it looks like this.
+and with async code as well.
+It's a little bit a little bit muddling, but you can have uh with an async exit stack.
+And then you can do this enter context for each in a list.
+So this construct that you're seeing here, this code is just taking the MCP server params and iterating
+over that and effectively doing a width for each of those in turn.
+So look into this if you wish.
+It's a construct.
+I use it to make the code a bit neater, but don't let it put you off.
+You could equally well just do it the manual way.
+Okay, so with that little caveat, let's go and have a look at this.
+This is the module.
+It's just taking what we had in the lab and turning it into a Python module.
+There is some cool stuff at the top here that just allows it to switch different models.
+So we're not only relying on OpenAI, we can use deep seq, grok, Google, or we can use open router
+uh, open router for for Americans, we can use open Router to connect to any model of our choosing.
+And if you look in the guides directory, there's a whole guide that talks more about this use of different
+models.
+So based on which one you choose it will pick a different model provider.
+And other than that, this is basically exactly what was in the lab in the notebook, turned into a
+class, into a Python module.
+And just here is that funky stuff I was just talking about with the stacks.
+So, you know, if you're suspicious of this, then look into it a little bit more.
+Read up about this, this construct here and why I've done it this way.
+And if you dislike it, you can always manually have the with with with with with.
+Um, but it will be quite, quite nested.
+It will look a bit bit ugly, but it would be a bit simpler to do it that way.
+But other than that, everything here simply involves creating a trader agent and using a research agent
+as a tool.
+And it's the same code that we had a second ago, and it's all packaged into a nice class trader so
+that we can create an instance of trader giving it a name and an agent and a model name, and off it
+will go.
+One other thing about it that's kind of fun is that I did have it, uh, alternating between making
+trading decisions and making decisions to rebalance its own portfolio.
+So I've given it that ability to, uh, either trade or rebalance as it wishes.
+So you can see here that that, uh, if the do trade flag is set, then it will, it will run a trade
+message.
+Otherwise it will run a rebalance message, which you can look in the templates is a message to say
+you should rebalance your portfolio, uh, to be optimized.
+And at the bottom here in in run this is of course the, the business function.
+This is what kicks it all off.
+It kicks off a run and then it will uh switch that do trade flag.
+It will flip it the other way.
+So that is the trader module.
+It's one thing about this I haven't told you yet, which I'm going to tell you about tomorrow.
+Uh, but this is basically showing you all of the stuff, all of the good stuff that we wanted to build
+around, having an autonomous trader that alternates between trading and balancing its portfolio and
+uses a researcher agent to help it.
+And using a bunch of MCP tools.
+Okay, so now back in the lab, let's actually see what this module does.
+So we're going to import that, uh, trader, the class we were just looking at a second ago.
+We're going to create a new instance called editor of that trader.
+So that's now called Add.
+And because the name is add, it's going to look up an accounts and have access to that same account.
+The thing that just bought Disney shares and then sold them again.
+Some of them.
+Uh, and now we're going to call the trader Dot run.
+This is the business.
+This is the thing that's actually going to kick it off and run this whole process.
+Let me get on with it.
+So I kick that going and while it's running, we'll let it let it run for a little bit.
+So it gets gets started with its activity.
+We'll open up the trace.
+Let's see what's happening here.
+Here it is.
+And so it's it's off and running.
+It's listing tools.
+And it's thinking, uh, we'll see if we can just refresh it like that.
+Yep.
+It's doing a brave web search and it's now going to take its time over this.
+So rather than sitting here thinking of what to say for for a couple of minutes, that will take, I
+will be right back with you.
+Okay.
+Well that just ran and it completed.
+And the result it took, it took 48 seconds.
+It didn't take too long.
+And it did end up by complaining that one of the tools had an error.
+Uh, so we can go and check that out.
+Um, but otherwise it seemed to do its thing.
+So let's go and have a look at the trace.
+Uh, so we'll come in here.
+Here we go.
+So it did.
+Listing tools.
+It starts with the researcher.
+The researcher does a brave web search, and then it comes back.
+And now we're with the trader.
+It does a bunch of of tickers.
+It does lots of tickers.
+It does some buying and some shares.
+What's it bought.
+It bought Amazon um, and and more and Apple and Microsoft and uh that's great.
+Uh, and then at the end here it does some selling and some shares as well.
+Again, I guess because it's so aggressive.
+Uh, so um, looking to, to, uh, sell some shares and then it ends with a push notification.
+And this is where our error happened.
+Uh, there was, uh, it said that there was an error running the tool, which is interesting because
+that looks fine to me.
+And it's also interesting because I did actually get a push notification on my phone there.
+Just, uh, it does indeed have, uh, have exactly the same, uh, message.
+So I got the push notification.
+Uh, it came through.
+It worked fine.
+I'm not sure why the error appeared here.
+It may be because that method didn't return anything, so I just.
+I just changed that just in case.
+But anyways, I'd say that that is a wholehearted success.
+Uh, agent just worked fine.
+Uh, and now we can call our read accounts resource and check what happened.
+And you'll see, indeed, that we do now have, uh, Amazon shares.
+And we've done a bunch of these transactions.
+If you look in here, which are, uh, consistent with that, uh, trading activity.
+So it looks like, uh, things were successful, we've been able to run our trader agent using this
+code, using our module, and it's called a slew of MCP servers.
+And it had collaborating a trader and also a researcher to do it.
+Okay.
+And finally, before we wrap up, let's just quickly count how many tools we just used in total.
+So from that MCP params module we can import the trader and researcher params, add them up and then
+iterate through them.
+And for each one, collect the tools and report on the total number of tools that we just made available
+to our two agents, our trader and researcher agent, in what we just did.
+And so we had a total of six MCP servers and 44 tools.
+That's a lot of tools.
+Uh, so yeah, that was great fun.
+And of course, you know what I'm going to say, the challenge for you is that you can add more tools.
+The more the merrier.
+We can give more capabilities to our traders to allow them to do more.
+And of course, if you work in finance, if you have business knowledge of this area, then I'm scratching
+the surface of what we could achieve with this.
+And you can add in tons more capabilities than our 44 tools.
+But again, one more time, I would urge you to start by adding in those tools, working in the lab
+to understand what the models are capable of and to experiment with it before you.
+Then go and put it into the modules and run it as part of the final architecture.
+And that's a wrap on day four.
+Obviously, we covered a lot of ground, and it's super important that you go through and replicate
+this yourself and look at things, look at this code to get a good sense of how you go about building
+these sorts of agent solutions.
+And of course, make it your own.
+As always, tweak the prompts, experiment.
+Remember, they're all in that one module template Test.py.
+So you can experiment with changing the prompts and see how that affects the characteristics of the
+trader.
+But of course, the big moment is coming tomorrow.
+And we then unveil the full platform.
+We put the finishing touches on everything and there's some really cool finishing touches where you
+bring it all together.
+And I also want to give some summaries on big picture thoughts on the big question like, okay, we've
+we've covered all these different ancient frameworks.
+So which one should I choose for my project.
+We'll answer that as well.
+All in our grand finale next time.

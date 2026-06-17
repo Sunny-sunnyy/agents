@@ -1,0 +1,132 @@
+So there are three core concepts behind MCP that I need to explain to you about.
+First of all is what's known as the MCP host.
+The MCP host is the overall application in which you're going to be equipping an agent with tools.
+And so the host could be something like Clawed Desktop, the piece of software that runs on your computer
+that that manages Claude, the LM and lets you chat with Claude.
+It could be our agent architecture, a piece of software that we've written using perhaps the OpenAI
+agents SDK that's going to run agents and tools so that that overall application piece of software running
+this agent framework that is known as the host, the MCP host and MCP client is a small piece of software.
+Think of it like a plugin that runs inside that host, within the host.
+And each MCP client is going to connect 1 to 1 with something I'm about to explain called an MCP server.
+So if you're running cloud desktop, for example, and you're using a bunch of different MCP servers,
+then you're going to have a little client, an MCP client running for each of those.
+So MCP client lives in the host.
+It connects to the server.
+The server runs outside the host.
+So what is this server?
+The server is the actual piece of code that provides tools and context and prompts these extra capabilities
+to your agent.
+And as I say, tools is the one to really focus on.
+That's the one that's got the most excitement.
+But it can also, in addition to equipping an agent with tools, it can also provide extra context for
+looking up information, and it can provide prompt templates as well.
+That is something that would happen by the MCP server running outside the host.
+Now let me make that concrete by telling you about a particular MCP server called fetch.
+So fetch then it's an MCP server that is able to search the internet and fetch a web page.
+The way it actually does it is kind of cool.
+It runs a browser.
+It launches a browser, headless browser, like a headless Chrome, as they call it, so that you don't
+you don't actually see the browser, and it uses playwright from Microsoft to drive that browser, to
+collect the page and to read its contents and return it.
+So that is a tool, and it's wrapped in an MCC server, and you can run that MCP server, and then you
+can configure Claude Desktop, the Claude desktop application, so that within it it runs an MCP client
+that connects to that MCP server.
+So that Claude, if you're chatting with Claude, it's suddenly able to read web pages live.
+And that's what's happening behind the scenes.
+And in this case that I'm describing, that MCP server is also running on your computer.
+You're talking to Claude Desktop.
+It's able behind the scenes to connect to that MCP server, to run a headless browser, to collect a
+web page, and then to answer questions based on it.
+And in fact, we did that.
+We used the fetch MCP server already in Autogen last week.
+Hopefully you didn't skip last week because it was fun.
+And we used this very MCP server via Autogen and that's what it was doing.
+And perhaps we'll help clarify this to show you a diagram, an architecture diagram of how this fits
+together.
+Imagine this box is representing your computer your machine.
+And within your machine you have a host running.
+So that host it could be Claud desktop app.
+It could be software that we have written as part of this course that's using open AI agents SDK.
+And we have a couple of MCP servers running on your box.
+Maybe one of them is is something that can connect to the local file system.
+Maybe one of them is something that can can ask for the weather.
+And within that host you would have a couple of MCP clients, one MCP client for each of the MCP servers
+running on your computer.
+You can also have a remote server.
+This is an alternative architecture.
+This is the second way of doing it.
+And you can have an MCP server running on that remote server, and you can connect to that remote server
+using an MCP client.
+But it's important to mention that this is in fact quite rare.
+This is not the way it's normally done.
+You hear the word like MCP server and you think, okay, that sounds like something that's like a remote
+server.
+And so you imagine it's like the diagram I've just shown you, but it's actually very rare to do it
+that way.
+Almost always in most of the examples that we'll look at, the MCP servers are things that run on your
+computer.
+They're running outside the host and you're connecting to it, but it's still running on your machine.
+Now you will have retrieved that from somewhere public.
+So it's been shared by somebody else, but it's been retrieved and installed on your computer.
+So like when we use the fetch MCP server, it was running on our machine.
+We were collecting it from actually Anthropic's repository.
+But we were then running the fetch MCP server on our machine outside the host, and we had a host which
+was autogen.
+In this case, we'd written some code that acted as the client, and it was connecting to that server
+running on our computer.
+So using remote MCP servers is possible.
+It's a thing, but it's not common.
+And sometimes these are called hosted MCP servers.
+Sometimes they're called managed MCP servers, but they're not that common.
+And so that's a super important misconception and confusion that I really wanted to clarify the fact
+that in most cases, MCP servers are things that you install from some remote repo, but it's running
+on your box.
+Okay, but it's worth pointing out that there is another configuration here and that looks like this.
+The MCP server that you're running on your box, it might be doing something that just involves locally
+processing on your computer, like it might be writing a file to your file system, but also there are
+many MCP servers that take advantage of functionality over the internet.
+The fetch MCP SMTP server that we just mentioned.
+Of course, that actually runs a web browser and looks over the internet.
+You can also get MCP servers that check the weather.
+And of course they're doing that by calling some web servers.
+So it's very common to have an MCP server that is connecting online and calling some remote service.
+In fact, that is by far the most common of the configurations.
+But it's important in your mind to distinguish between that what I've just shown you, and a case where
+your MCP client is calling a remote MCP server hosted on another machine, which is, as I say, less
+common.
+So one more time, if I haven't stressed this enough, MCP servers mostly run on your box.
+You typically download them and you run them locally.
+And if you're wondering why I'm telling you this 100 times, it's because it really is.
+People do get very confused about this because the terminology is muddling, but that's that's the way
+it works.
+In fact, as I'll show you when we start looking at MCP marketplaces, there are thousands of MCP servers
+and they all run in a box and there's not so many.
+It's quite hard to find ones.
+It's quite hard to discover ones that are ones that you could connect to remotely.
+Now there are two different technical mechanisms for how MCP servers can work two different transport
+mechanisms, as they're called in the official anthropic spec so far.
+The first of them, which is by far the most common, is called studio spelt like that, which stands
+for standard input output.
+I think some people call it studio, but I call it studio.
+And this is the simplest approach.
+And if you're using this approach, then basically your MCP client spawns a process, a separate process
+on your computer, and it communicates with that process over just standard input and output.
+And that's what it's called studio.
+And that process is this is the most common way of doing it.
+And and we'll we'll be exploring this a lot.
+And when we build our own MCP server we'll be using this technique.
+The other technique is called SSE and SSE which stands for Server Side events, uses an Https connection
+and it streams back results much the way that you see stuff streaming back from LMS when when you see
+the information flowing back that also uses SW technology.
+And if you're going to use one of these remote MCP servers, a hosted or managed MCP server, as in
+the picture on the top right there, then you need to use SW.
+You can't use Stdio for connecting remotely like that.
+It has to be SW.
+If you're using local MCP servers, the common case, then it can be either a Cdio studio or SW either
+way, and it's most common to be Stdio.
+Okay, so take a good look at this.
+Make sure that it's getting clear in your mind.
+You know the difference in a host and MCP client and server.
+The three different arrangements SW versus studio.
+And now with that it's time for our lab.
+Let's go and make use of MCP servers in the fabulous OpenAI agents SDK.

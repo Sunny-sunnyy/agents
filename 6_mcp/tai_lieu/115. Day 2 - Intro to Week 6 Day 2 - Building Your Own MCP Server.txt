@@ -1,0 +1,67 @@
+And welcome to day two of week six as we get more into MCP.
+And this is the time that we build our own MCP client and MCP server.
+Remember today we're making our own.
+We're not making a USBA of agent Guy.
+We're making USB-C of Agentic I.
+And another reminder of these core concepts that probably now you're getting this.
+The host is the overall application like cloud desktop or our agent architecture.
+The client lives inside the host and has a one on one connection, like over input output to an MCP
+server, which is a separate process running outside and providing the tools, the contexts, and the
+prompts to your MCP clients to your host.
+And most of the time we're talking about tools, although briefly we'll use contexts as well in our
+journey.
+And there's the example of fetch that we'd used before.
+And a reminder of the architecture again.
+On the bottom left is the idea that you could have an MCP server that connects to an MCP server running
+on your computer, and it does everything locally, like the file writer that we had in when we wrote
+Banoffee Pie.
+The second one along is an MCP client that connects to MCP server running on your box that then calls
+out to some sort of remote internet service.
+And I guess the playwright and fetch are both examples of that.
+And then less common, that third one, sometimes known as an A hosted MCP server or a managed MCP server,
+is when you have an MCP client that connects remotely to the MCP server running on another machine.
+And that would need to be using the SSE transport mechanism, whereas one's running locally could be
+either Stdio or SSE, and they're usually stdio.
+And maybe it's also worth mentioning on this diagram that these MCP servers can be written in Python
+or JavaScript, in which case they're typically the parameters that describe them.
+Have you've as the command to run or MPW.
+They can actually also just be creating a Docker container.
+There's various other ways, but UX and MPW are by far the most common.
+So with that we're going to go and create our own MCP server.
+But just before we do, I want to quickly take a moment to ask, why do we want to make an SMTP server?
+What's the advantage of doing it?
+Well, the number one advantage is you make an SMTP server if you want to share it.
+You've built something which you want other people to be able to use with their agents, because you're
+going to be describing it in a way.
+You're going to be working on the prompts and the information around your tool, and people will be
+able to integrate it with their agents.
+So simply, that's the number one reason.
+And also if it has resources which a bit like a rag context and then prompt templates too, although
+that's not not used so often.
+Also, I suppose there is a small benefit if we're building an agent system and we're using a bunch
+of MCP servers, it might be nice for us to treat our own tools consistently so that everything is packaged
+as MCP servers.
+This is a bit tenuous, but it's one reason we're going to do it this way, because we only want to
+use MCP servers, and it's also useful if you're doing it just so you can understand the plumbing,
+just so you can really build the nuts and bolts and do it yourself.
+Now, you probably realize the reason I'm belaboring this point is because I want to say, why don't
+you want to make an MCP SMTP server.
+What are the reasons against.
+And there's one really important one.
+And it's this if you're only building a tool for you to use yourself, if we're writing a function and
+we want to equip our LLM with that function, then there's no point in building an NCP server that's
+wasting time.
+You can simply decorate that tool with app function tool and then equip your LLM just by just by putting
+it in tools, you can just immediately provide it through the OpenAI agents SDK or using the JSON approach
+from week one.
+And then that function will be called in in your current Python process, it will just be called as
+a tool.
+And that's easy.
+Building an NCP server, which means that it gets spawned and runs as a separate process and communicates
+over standard input output, and is provided as an NCP server.
+That's a whole lot of extra plumbing and and scaffolding that's not needed if it's just to call your
+own tool.
+So it's important to have that that clarity that NCP doesn't help with building your own tools.
+That's already easy and you should just do it.
+MCP is about sharing tools.
+That's the benefit.

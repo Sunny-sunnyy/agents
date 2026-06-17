@@ -1,0 +1,113 @@
+Wait, did you spot that intentional little hiccup there?
+I was it was just after I stopped recording.
+I was thinking, and I'm like, hang on a second, hang on a second.
+We saw that that, uh, in the traces that it bought Tesla stock and it didn't report that it bought
+Tesla stock.
+And we didn't see that in our holdings at the end.
+So let's go back and see what happened there.
+So I went back into the trace and I took a look and I scrolled down load more.
+Uh, and uh uh, sure enough, if we get down to the bottom here, you will see that there were indeed
+these two buying shares.
+First of all, it bought 50 Disney shares.
+And then as I remember it, bought 30 Tesla shares.
+What's going on?
+Well, then I scrolled down and saw that it got an error back from this error executing tool.
+Insufficient funds to buy shares.
+And what's kind of brilliant about this is that that error message is an error message that was written
+by our crew agents in week three.
+We asked it one of our business requirements is that it should put something in there that prevents
+the person from buying more shares than they can afford.
+And so that error message.
+Insufficient funds to buy shares was written by those crew agents.
+That's what's been surfaced back here.
+And that is why those shares weren't bought.
+And that's why it didn't include that on its summary.
+And indeed why why, although it does mention that it should be monitored in the next steps.
+And that's why, of course, it isn't in the holdings at the bottom.
+So there's a great explanation.
+And it's everything is working perfectly.
+So we're now going to go and look at some Python modules, some Python code.
+And this really brings again this very important point that a great way to work with building a genetic
+framework.
+So building a genetic solutions to business problems is to start in the lab.
+Start in a notebook like this experimenting with prompts and different agent configurations.
+And don't move to Python modules until you've done your experiments.
+I do get a lot of people asking me, how am I going to go about building this agent solution to the
+following commercial problem.
+And they want to dive straight into code and building lots of agents, and they want to build a diagram
+that shows boxes with agents all talking to each other.
+And I say to them, look, it's super important to begin by experimenting where that data science hat
+start in the lab, start by experimenting with prompts, understand what are the capabilities that you
+can give an agent, that it can stay coherent and it can follow instructions.
+And how can you give the right balance between autonomy and coherence and these kinds of decisions?
+They come through practice, and it doesn't come from designing a big picture and then coding for a
+long time, and then kicking it off and then complaining when it doesn't do what you want it to do because
+it won't the first time if you do it that way.
+And that's why the right way to approach this is little by little, starting small in the lab.
+So that's what we've done here.
+We've done that.
+We've been in the lab, we've built something, and it's now time for us to turn this into code.
+And we're going to do that.
+And I'm going to show you, piece by piece, three different files MCP servers, templates and traders.
+So first of all MCP servers is where we define our MCP servers.
+So here we go.
+We're looking for.
+It's actually sorry.
+It's it says MCP servers.
+It's MCP params dot pi.
+Change that right now MCP params dot pi is where the MCP servers are specified.
+So here we go.
+We're in MCP params dot pi.
+Now you don't need to have your MCP parameters specified in a python module separate to your other code,
+but I think this is an organized, tidy way of doing it to keep things nicely.
+The right concerns in the right file.
+So in this file, I'm setting up my different MCP parameters that I'll use later when I'm creating the
+MCP servers.
+So first of all, for market data I choose to either use the official polygon MCP server or I use the
+little sneaky one that we made market servers that caches results and makes sure that you can use free
+polygon IO without exceeding your limits.
+So we pick one or the other depending on how your EMV is set up.
+Okay.
+And then the full set of MCP servers for our trader is the accounts server, our homegrown MCP server
+for accounts, the push server, another little homegrown server sending push notifications because
+you know I love them.
+And then the server for the market data.
+Okay.
+And now we've got a separate set of MCP servers for our researcher.
+There are three of them.
+First of all fetch the ability to fetch a page using playwright browser behind the scenes.
+Then we're using the brave search again, our free brave search API for web searches.
+And then this the return of the memory.
+We're using our memory.
+We're using the SQL based memory.
+And you can see I'm actually going to try and have a separate memory file for each trader based on its
+name.
+So the name will be passed in.
+And that's what we will use here as the, the name of the of the memory file, so that every trader,
+every researcher has a separate set of memory.
+Okay.
+That is the MCP params module.
+So the second module I wanted to show you is called templates.
+And here's the thing templates.py is just where I have put any function which is returning like a prompt
+instruction or a string or something like that.
+And I've done this to be organized so that I don't have tons of text coded within the body of my functionality.
+And again, this is just a nice, good practice.
+It's good to separate concerns this way.
+It means that if I need to edit my prompts, I've got one place to go and do it.
+I've got effectively my my prompt templates.
+Uh, in many ways, if you if you think of some of the more opinionated frameworks like Lang chain or
+like crew I for for an agent framework, they sort of force you to separate stuff like this?
+Uh, well, they don't force you.
+But there are ways around it.
+But but, uh, crew, for example, of course, has the YAML files, which, uh, specifically takes
+away takes to one side your text.
+But we're not we're not using those kinds of frameworks, but there's nothing stopping us from, uh,
+putting us through the discipline of putting all of our texts like this into a separate module.
+And that's why I've got it here.
+So I've got, uh, my researcher instructions, my research tool definitions, my trader instructions,
+and my prompts all here in these different functions.
+And you'll see I do things like inserting the current date in the prompts, which I said before was
+a was a very good practice, uh, to avoid having to equip it with the tool that it needs to call.
+Just put the date in the prompt, and you'll also see how I'm putting the strategy and the account details
+straight in there in the prompt.
+So that's templates.py that separates out our uh text into its own module.
