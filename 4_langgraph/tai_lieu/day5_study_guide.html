@@ -7,7 +7,9 @@
   <title>Day 5: Capability Expansion, Modularization & Session Lifecycle Management - Study Guide</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --canvas: #faf9f5;
@@ -408,7 +410,7 @@
       padding-left: 21px;
     }
 
-    .list li + li {
+    .list li+li {
       margin-top: 8px;
     }
 
@@ -507,7 +509,10 @@
         <span class="eyebrow">Study guide • Ôn tập lý thuyết & Thực hành</span>
         <h1>LangGraph Day 5: Đóng gói Ứng dụng Trợ lý Sidekick & Quản lý vòng đời Tài nguyên Đa phiên</h1>
         <p class="lead">
-          Nội dung ôn tập nâng cao ngày học thứ năm. Học cách cấu trúc và module hóa một dự án LangGraph lớn từ Jupyter Notebook sang các module Python độc lập, tích hợp các năng lực mạnh mẽ (tìm kiếm web, thao tác tệp tin trong sandbox, REPL Python), và giải quyết vấn đề cô lập tài nguyên phiên làm việc (session isolation) chống rò rỉ bộ nhớ browser.
+          Nội dung ôn tập nâng cao ngày học thứ năm. Học cách cấu trúc và module hóa một dự án LangGraph lớn từ Jupyter
+          Notebook sang các module Python độc lập, tích hợp các năng lực mạnh mẽ (tìm kiếm web, thao tác tệp tin trong
+          sandbox, REPL Python), và giải quyết vấn đề cô lập tài nguyên phiên làm việc (session isolation) chống rò rỉ
+          bộ nhớ browser.
         </p>
         <div class="tag-row">
           <span class="tag">AI Engineer Agentic Track</span>
@@ -524,10 +529,15 @@
       <aside class="hero-panel">
         <h2>Quick focus • Tiêu điểm nhanh</h2>
         <ul class="list">
-          <li><strong>Modular Architecture:</strong> Tách biệt cấu trúc mã nguồn thành 3 tệp tin: <code>sidekick_tools.py</code> (công cụ), <code>sidekick.py</code> (đồ thị & logic), và <code>app.py</code> (UI & callback).</li>
-          <li><strong>Capability Expansion:</strong> Bổ sung các công cụ mạnh mẽ nhưng nhạy cảm: Wikipedia, Google Serper search, File Management, và Python REPL.</li>
-          <li><strong>Session Isolation:</strong> Dùng <code>gr.State</code> để cô lập đối tượng Sidekick và bộ nhớ lưu trữ cho từng người dùng riêng biệt trên UI Gradio.</li>
-          <li><strong>Resource Cleanup:</strong> Ràng buộc sự kiện đóng trình duyệt Chromium và giải phóng bộ nhớ ngầm qua cơ chế <code>delete_callback</code> khi phiên UI kết thúc.</li>
+          <li><strong>Modular Architecture:</strong> Tách biệt cấu trúc mã nguồn thành 3 tệp tin:
+            <code>sidekick_tools.py</code> (công cụ), <code>sidekick.py</code> (đồ thị & logic), và <code>app.py</code>
+            (UI & callback).</li>
+          <li><strong>Capability Expansion:</strong> Bổ sung các công cụ mạnh mẽ nhưng nhạy cảm: Wikipedia, Google
+            Serper search, File Management, và Python REPL.</li>
+          <li><strong>Session Isolation:</strong> Dùng <code>gr.State</code> để cô lập đối tượng Sidekick và bộ nhớ lưu
+            trữ cho từng người dùng riêng biệt trên UI Gradio.</li>
+          <li><strong>Resource Cleanup:</strong> Ràng buộc sự kiện đóng trình duyệt Chromium và giải phóng bộ nhớ ngầm
+            qua cơ chế <code>delete_callback</code> khi phiên UI kết thúc.</li>
         </ul>
         <div>
           <p style="margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;">Reading progress • Tiến độ đọc</p>
@@ -573,21 +583,30 @@
             <article class="card">
               <h3>Sources used - Nguồn đã dùng</h3>
               <ul class="list">
-                <li><strong>day5_summary.md:</strong> Tóm tắt lý thuyết bài 86, 87, 88, 89, 90, 91 về modularization, session isolation và feedback loop chạy thử thực tế.</li>
-                <li><strong>sidekick_tools.py:</strong> Định nghĩa lớp công cụ tích hợp trình duyệt Playwright, Serper search API, File system sandbox và Python REPL.</li>
-                <li><strong>sidekick.py:</strong> Lớp cốt lõi xây dựng đồ thị Worker-Evaluator, tinh chỉnh prompts và đóng gói hàm chạy siêu bước.</li>
-                <li><strong>app.py:</strong> Khởi tạo giao diện web UI Gradio, quản lý trạng thái phiên thông qua <code>gr.State</code> và dọn dẹp tài nguyên ngầm.</li>
+                <li><strong>day5_summary.md:</strong> Tóm tắt lý thuyết bài 86, 87, 88, 89, 90, 91 về modularization,
+                  session isolation và feedback loop chạy thử thực tế.</li>
+                <li><strong>sidekick_tools.py:</strong> Định nghĩa lớp công cụ tích hợp trình duyệt Playwright, Serper
+                  search API, File system sandbox và Python REPL.</li>
+                <li><strong>sidekick.py:</strong> Lớp cốt lõi xây dựng đồ thị Worker-Evaluator, tinh chỉnh prompts và
+                  đóng gói hàm chạy siêu bước.</li>
+                <li><strong>app.py:</strong> Khởi tạo giao diện web UI Gradio, quản lý trạng thái phiên thông qua
+                  <code>gr.State</code> và dọn dẹp tài nguyên ngầm.</li>
               </ul>
             </article>
             <article class="card">
               <h3>Grounding notes - Ghi chú căn cứ</h3>
               <p>
-                Mã nguồn của 3 tệp tin Python được trích dẫn đầy đủ và chuẩn xác, phản ánh cách tổ chức dự án thực tế. Các logic xử lý bất đồng bộ lồng ghép của trình duyệt và mô hình rẽ nhánh được liên kết chặt chẽ với phần lý thuyết.
+                Mã nguồn của 3 tệp tin Python được trích dẫn đầy đủ và chuẩn xác, phản ánh cách tổ chức dự án thực tế.
+                Các logic xử lý bất đồng bộ lồng ghép của trình duyệt và mô hình rẽ nhánh được liên kết chặt chẽ với
+                phần lý thuyết.
               </p>
             </article>
           </div>
           <div class="callout" style="margin-top: 14px;">
-            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ chuyên ngành được duy trì định dạng chuẩn: <code>capability expansion - mở rộng năng lực công cụ</code>, <code>separation of concerns - tách biệt trách nhiệm</code>, <code>session isolation - cô lập phiên người dùng</code>.
+            <strong>Terminology rule - Quy tắc thuật ngữ:</strong> Các thuật ngữ chuyên ngành được duy trì định dạng
+            chuẩn: <code>capability expansion - mở rộng năng lực công cụ</code>,
+            <code>separation of concerns - tách biệt trách nhiệm</code>,
+            <code>session isolation - cô lập phiên người dùng</code>.
           </div>
         </section>
 
@@ -614,12 +633,14 @@
               <tr>
                 <td><strong>File Sandbox Limit</strong></td>
                 <td><code>FileManagementToolkit(root_dir="sandbox")</code></td>
-                <td>Giới hạn quyền ghi và đọc file của tác tử độc nhất trong thư mục <code>sandbox</code> để bảo vệ hệ thống.</td>
+                <td>Giới hạn quyền ghi và đọc file của tác tử độc nhất trong thư mục <code>sandbox</code> để bảo vệ hệ
+                  thống.</td>
               </tr>
               <tr>
                 <td><strong>Python execution</strong></td>
                 <td><code>from langchain_experimental.tools import PythonREPLTool</code></td>
-                <td>Cấp năng lực tính toán và chạy thử code Python động cho tác tử (không có Docker sandbox mặc định).</td>
+                <td>Cấp năng lực tính toán và chạy thử code Python động cho tác tử (không có Docker sandbox mặc định).
+                </td>
               </tr>
               <tr>
                 <td><strong>Stateful UI session</strong></td>
@@ -691,43 +712,59 @@
             <article class="card">
               <h3>1. Modularization &amp; Separation of Concerns</h3>
               <p>
-                <strong>Modularization:</strong> Quy trình bóc tách mã nguồn cồng kềnh thành các file chức năng riêng biệt. Tránh lỗi phụ thuộc lặp và giúp nhiều kỹ sư có thể phát triển song song.
+                <strong>Modularization:</strong> Quy trình bóc tách mã nguồn cồng kềnh thành các file chức năng riêng
+                biệt. Tránh lỗi phụ thuộc lặp và giúp nhiều kỹ sư có thể phát triển song song.
               </p>
               <p>
                 <strong>Separation of Concerns:</strong> Phân chia trách nhiệm rõ ràng:
               </p>
               <ul class="list">
                 <li><code>sidekick_tools.py</code>: Chỉ quản lý định nghĩa và khởi tạo công cụ (capability layer).</li>
-                <li><code>sidekick.py</code>: Quản lý cấu trúc đồ thị, logic nodes, routers và prompt (orchestration layer).</li>
+                <li><code>sidekick.py</code>: Quản lý cấu trúc đồ thị, logic nodes, routers và prompt (orchestration
+                  layer).</li>
                 <li><code>app.py</code>: Quản lý thiết kế UI và callbacks (interaction layer).</li>
               </ul>
             </article>
             <article class="card">
               <h3>2. Session Isolation &amp; State Management</h3>
               <p>
-                Trong các chatbot thông thường, việc lưu trữ đối tượng tác tử trong biến global sẽ làm rò rỉ lịch sử trò chuyện và tài nguyên trình duyệt giữa các người dùng khác nhau.
+                Trong các chatbot thông thường, việc lưu trữ đối tượng tác tử trong biến global sẽ làm rò rỉ lịch sử trò
+                chuyện và tài nguyên trình duyệt giữa các người dùng khác nhau.
               </p>
               <p>
-                <strong>gr.State:</strong> Giải pháp lưu trữ đối tượng động theo từng phiên của Gradio. Mỗi tab trình duyệt khi mở ra sẽ có một instance <code>Sidekick</code> độc lập với <code>thread_id</code> (UUID ngẫu nhiên) và database memory riêng biệt, đảm bảo an toàn thông tin và tính nhất quán dữ liệu.
+                <strong>gr.State:</strong> Giải pháp lưu trữ đối tượng động theo từng phiên của Gradio. Mỗi tab trình
+                duyệt khi mở ra sẽ có một instance <code>Sidekick</code> độc lập với <code>thread_id</code> (UUID ngẫu
+                nhiên) và database memory riêng biệt, đảm bảo an toàn thông tin và tính nhất quán dữ liệu.
               </p>
             </article>
             <article class="card">
               <h3>3. Async Constructor Split &amp; Cleanup Lifecycle</h3>
               <p>
-                <strong>Async Setup Split:</strong> Các hàm dựng trong Python (<code>__init__</code>) không hỗ trợ lập trình bất đồng bộ (async). Vì Playwright browser cần khởi chạy bằng <code>await</code>, ta bắt buộc phải tách phần khởi tạo tài nguyên sang một phương thức async riêng là <code>setup()</code> và gọi nó chủ động sau khi tạo instance.
+                <strong>Async Setup Split:</strong> Các hàm dựng trong Python (<code>__init__</code>) không hỗ trợ lập
+                trình bất đồng bộ (async). Vì Playwright browser cần khởi chạy bằng <code>await</code>, ta bắt buộc phải
+                tách phần khởi tạo tài nguyên sang một phương thức async riêng là <code>setup()</code> và gọi nó chủ
+                động sau khi tạo instance.
               </p>
               <p>
-                <strong>Resource Cleanup:</strong> Trình duyệt Chromium mở ngầm bởi Playwright tiêu tốn nhiều tài nguyên hệ thống. Đăng ký hàm hủy thông qua <code>delete_callback</code> của Gradio State giúp tự động kích hoạt <code>cleanup()</code> đóng browser khi người dùng tắt tab hoặc refresh trang.
+                <strong>Resource Cleanup:</strong> Trình duyệt Chromium mở ngầm bởi Playwright tiêu tốn nhiều tài nguyên
+                hệ thống. Đăng ký hàm hủy thông qua <code>delete_callback</code> của Gradio State giúp tự động kích hoạt
+                <code>cleanup()</code> đóng browser khi người dùng tắt tab hoặc refresh trang.
               </p>
             </article>
             <article class="card">
               <h3>4. Tuning Prompts for Tool &amp; Evaluator Behavior</h3>
               <p>
-                Quá trình chuyển dịch sang hệ thống đa công cụ đòi hỏi việc tinh chỉnh prompt dựa trên bằng chứng thực nghiệm (empirical prompt tuning):
+                Quá trình chuyển dịch sang hệ thống đa công cụ đòi hỏi việc tinh chỉnh prompt dựa trên bằng chứng thực
+                nghiệm (empirical prompt tuning):
               </p>
               <ul class="list">
-                <li><strong>Worker Prompt:</strong> Phải được chèn thông tin thời gian thực động (datetime) và chỉ dẫn rõ ràng cho <code>PythonREPLTool</code> bắt buộc sử dụng lệnh <code>print()</code> để xuất kết quả, tránh lỗi nhận về chuỗi rỗng.</li>
-                <li><strong>Evaluator Prompt:</strong> Cần được bổ sung chỉ dẫn <code>give the benefit of the doubt - cho assistant hưởng lợi của nghi ngờ</code>. Nhờ đó, Evaluator tin tưởng khi Assistant thông báo đã ghi file vật lý trong sandbox, tránh việc reject oan các tác vụ tạo tệp tin.</li>
+                <li><strong>Worker Prompt:</strong> Phải được chèn thông tin thời gian thực động (datetime) và chỉ dẫn
+                  rõ ràng cho <code>PythonREPLTool</code> bắt buộc sử dụng lệnh <code>print()</code> để xuất kết quả,
+                  tránh lỗi nhận về chuỗi rỗng.</li>
+                <li><strong>Evaluator Prompt:</strong> Cần được bổ sung chỉ dẫn
+                  <code>give the benefit of the doubt - cho assistant hưởng lợi của nghi ngờ</code>. Nhờ đó, Evaluator
+                  tin tưởng khi Assistant thông báo đã ghi file vật lý trong sandbox, tránh việc reject oan các tác vụ
+                  tạo tệp tin.</li>
               </ul>
             </article>
           </div>
@@ -781,6 +818,49 @@ Cập nhật chatbot UI &amp; Trả về history mới
            |
            v
 [app.py] Kích hoạt delete_callback (free_resources) ----> sidekick.cleanup() ----> Đóng Chromium browser ngầm</code></pre>
+
+          <div class="grid-2" style="margin-top: 20px;">
+            <article class="card">
+              <h3>1. Khởi tạo phiên làm việc (Session Initialization)</h3>
+              <p>Khi người dùng tải trang web Gradio (<code>app.py</code>), luồng xử lý diễn ra như sau:</p>
+              <ul class="list">
+                <li>Sự kiện tải trang <code>ui.load()</code> kích hoạt hàm <code>setup()</code> để tạo mới một đối tượng <code>Sidekick</code> độc lập.</li>
+                <li>Hàm <code>setup()</code> chạy bất đồng bộ để khởi tạo trình duyệt Chromium (Playwright) và nạp danh sách công cụ bổ trợ (Wikipedia, Google Serper, Python REPL, File Management trong thư mục <code>sandbox</code>).</li>
+                <li>Đối tượng <code>Sidekick</code> được lưu trữ vào <code>gr.State</code> riêng của phiên kết nối hiện tại, giúp cô lập dữ liệu (Session Isolation) giữa các người dùng.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>2. Vòng lặp thực thi tác vụ (Task Execution Loop)</h3>
+              <p>Khi người dùng nhấn nút "Go!", yêu cầu và tiêu chí thành công được gửi tới đồ thị thông qua <code>run_superstep()</code>:</p>
+              <ul class="list">
+                <li>Luồng đi từ <strong>START</strong> tới node <strong>worker</strong> để LLM xử lý yêu cầu và quyết định hành động tiếp theo.</li>
+                <li>Nếu cần sử dụng công cụ, đồ thị rẽ nhánh sang node <strong>tools</strong>, chạy công cụ và quay lại node <strong>worker</strong>.</li>
+                <li>Nếu không cần công cụ, luồng chuyển đến node <strong>evaluator</strong> để LLM đối chiếu kết quả với tiêu chí thành công.</li>
+                <li>Nếu đạt yêu cầu hoặc cần thêm thông tin từ người dùng, đồ thị kết thúc (<strong>END</strong>). Nếu không đạt, Evaluator gửi phản hồi (feedback) để Worker làm lại.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>3. Phản hồi giao diện (UI Response Updates)</h3>
+              <p>Sau khi vòng lặp đồ thị kết thúc và trả về kết quả qua phương thức <code>ainvoke()</code>:</p>
+              <ul class="list">
+                <li>Hàm <code>process_message()</code> trích xuất câu trả lời cuối cùng của Assistant cùng với nhận xét/phản hồi của Evaluator từ trạng thái đồ thị.</li>
+                <li>Dữ liệu hội thoại được định dạng lại và đẩy trực tiếp lên cấu trúc lịch sử chat của chatbot Gradio trên màn hình trình duyệt của người dùng.</li>
+                <li>Trạng thái đồ thị (checkpoints) được lưu trữ thông qua <code>MemorySaver</code> tương ứng với <code>thread_id</code> được sinh ngẫu nhiên.</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <h3>4. Giải phóng tài nguyên (Resource Cleanup)</h3>
+              <p>Quản lý vòng đời tài nguyên để tối ưu hóa bộ nhớ RAM trên máy chủ:</p>
+              <ul class="list">
+                <li>Khi người dùng tắt tab trình duyệt hoặc tải lại trang, Gradio sẽ dọn dẹp các trạng thái phiên.</li>
+                <li>Cơ chế <code>delete_callback</code> được cấu hình trên <code>gr.State</code> sẽ tự động kích hoạt hàm callback <code>free_resources()</code>.</li>
+                <li>Hàm này gọi phương thức <code>cleanup()</code> của đối tượng <code>Sidekick</code> để đóng trình duyệt Chromium chạy ngầm và dừng Playwright một cách triệt để, ngăn chặn hoàn toàn rò rỉ bộ nhớ (browser leaks).</li>
+              </ul>
+            </article>
+          </div>
         </section>
 
         <!-- Section 6: Techniques -->
@@ -795,25 +875,37 @@ Cập nhật chatbot UI &amp; Trả về history mới
             <article class="card">
               <h3>1. Class-Wrapped Graph Runtime</h3>
               <p>
-                Bọc toàn bộ đồ thị LangGraph, bộ nhớ MemorySaver, các handles của browser và Playwright, cùng với phương thức thực thi siêu bước vào bên trong một lớp <code>Sidekick</code> duy nhất. Kỹ thuật này giúp quản lý trạng thái lập trình hướng đối tượng (OOP) sạch sẽ hơn, giúp việc khởi tạo và giải phóng tài nguyên diễn ra đồng bộ, không bị phân tán.
+                Bọc toàn bộ đồ thị LangGraph, bộ nhớ MemorySaver, các handles của browser và Playwright, cùng với phương
+                thức thực thi siêu bước vào bên trong một lớp <code>Sidekick</code> duy nhất. Kỹ thuật này giúp quản lý
+                trạng thái lập trình hướng đối tượng (OOP) sạch sẽ hơn, giúp việc khởi tạo và giải phóng tài nguyên diễn
+                ra đồng bộ, không bị phân tán.
               </p>
             </article>
             <article class="card">
               <h3>2. Async Initialization &amp; Cleanup lifecycle</h3>
               <p>
-                Tách biệt quá trình khởi chạy tài nguyên bất đồng bộ ra khỏi hàm khởi dựng đồng bộ (constructor). Đi kèm với đăng ký <code>delete_callback</code> tại <code>gr.State</code> của Gradio. Điều này đảm bảo rằng mỗi khi phiên làm việc bị hủy (do người dùng tắt tab hoặc ứng dụng gọi reset), tài nguyên tiến trình Chromium chạy ngầm sẽ được đóng triệt để thông qua các tác vụ async đẩy vào loop hiện hành.
+                Tách biệt quá trình khởi chạy tài nguyên bất đồng bộ ra khỏi hàm khởi dựng đồng bộ (constructor). Đi kèm
+                với đăng ký <code>delete_callback</code> tại <code>gr.State</code> của Gradio. Điều này đảm bảo rằng mỗi
+                khi phiên làm việc bị hủy (do người dùng tắt tab hoặc ứng dụng gọi reset), tài nguyên tiến trình
+                Chromium chạy ngầm sẽ được đóng triệt để thông qua các tác vụ async đẩy vào loop hiện hành.
               </p>
             </article>
             <article class="card">
               <h3>3. Custom Sandboxed File Root</h3>
               <p>
-                Khi nạp bộ công cụ quản lý tệp tin <code>FileManagementToolkit</code>, ta thiết lập tham số <code>root_dir="sandbox"</code>. Đây là kỹ thuật tạo thư mục ảo an toàn (sandbox). Tác tử chỉ có thể tạo, sửa đổi và đọc các tệp tin bên trong thư mục này, không thể xâm phạm hoặc đọc trộm các tệp tin hệ thống nhạy cảm khác trên máy chủ.
+                Khi nạp bộ công cụ quản lý tệp tin <code>FileManagementToolkit</code>, ta thiết lập tham số
+                <code>root_dir="sandbox"</code>. Đây là kỹ thuật tạo thư mục ảo an toàn (sandbox). Tác tử chỉ có thể
+                tạo, sửa đổi và đọc các tệp tin bên trong thư mục này, không thể xâm phạm hoặc đọc trộm các tệp tin hệ
+                thống nhạy cảm khác trên máy chủ.
               </p>
             </article>
             <article class="card">
               <h3>4. Empirical Prompt Refinement &amp; datetime resource injection</h3>
               <p>
-                Neo các hướng dẫn sử dụng công cụ đặc thù vào system prompt để khắc phục lỗi vận hành của LLM (như lỗi Python REPL thiếu print). Đồng thời, đưa trực tiếp thông tin thời gian <code>datetime.now()</code> vào prompt của worker như một tài nguyên tĩnh (resource) thay vì tạo ra một công cụ lấy giờ (tool call) để tối ưu hóa chi phí token và tốc độ chạy.
+                Neo các hướng dẫn sử dụng công cụ đặc thù vào system prompt để khắc phục lỗi vận hành của LLM (như lỗi
+                Python REPL thiếu print). Đồng thời, đưa trực tiếp thông tin thời gian <code>datetime.now()</code> vào
+                prompt của worker như một tài nguyên tĩnh (resource) thay vì tạo ra một công cụ lấy giờ (tool call) để
+                tối ưu hóa chi phí token và tốc độ chạy.
               </p>
             </article>
           </div>
@@ -1173,7 +1265,7 @@ ui.launch(inbrowser=True)
               <h2>Options / Trade-offs - Bản đồ lựa chọn</h2>
             </div>
           </div>
-          
+
           <h3 style="margin-top: 10px;">So sánh các mô hình kiến trúc tác tử đề xuất nâng cấp (Lesson 91)</h3>
           <table>
             <thead>
@@ -1188,14 +1280,19 @@ ui.launch(inbrowser=True)
               <tr>
                 <td><strong>Single Powerful Worker (Baseline hiện hành)</strong></td>
                 <td>Tác vụ vừa và nhỏ, cần khả năng ứng biến linh hoạt cao, ít bị bó buộc bởi quy trình cứng.</td>
-                <td>Cấu trúc tối giản, tốc độ phản hồi nhanh, tác tử tự do thay đổi thứ tự gọi tools theo tình huống thực tế.</td>
-                <td>Dễ mất phương hướng (loss of coherence) khi ngữ cảnh trò chuyện và số lượng công cụ nạp vào quá lớn.</td>
+                <td>Cấu trúc tối giản, tốc độ phản hồi nhanh, tác tử tự do thay đổi thứ tự gọi tools theo tình huống
+                  thực tế.</td>
+                <td>Dễ mất phương hướng (loss of coherence) khi ngữ cảnh trò chuyện và số lượng công cụ nạp vào quá lớn.
+                </td>
               </tr>
               <tr>
                 <td><strong>Planner-Executor Multi-Agent (Nâng cấp đề xuất)</strong></td>
-                <td>Các nhiệm vụ quy mô lớn, phức tạp, đòi hỏi nhiều bước xử lý tuần tự (ví dụ: nghiên cứu thị trường rồi lập báo cáo tài chính).</td>
-                <td>Giảm tải ngữ cảnh cho từng Node, phân rã vấn đề con thông minh, tăng tính ổn định của chuỗi hành động.</td>
-                <td>Làm giảm sự linh hoạt khi phát sinh thông tin mới (khó đổi hướng chạy), tốn nhiều chi phí token và tăng độ trễ.</td>
+                <td>Các nhiệm vụ quy mô lớn, phức tạp, đòi hỏi nhiều bước xử lý tuần tự (ví dụ: nghiên cứu thị trường
+                  rồi lập báo cáo tài chính).</td>
+                <td>Giảm tải ngữ cảnh cho từng Node, phân rã vấn đề con thông minh, tăng tính ổn định của chuỗi hành
+                  động.</td>
+                <td>Làm giảm sự linh hoạt khi phát sinh thông tin mới (khó đổi hướng chạy), tốn nhiều chi phí token và
+                  tăng độ trễ.</td>
               </tr>
             </tbody>
           </table>
@@ -1213,13 +1310,15 @@ ui.launch(inbrowser=True)
             <tbody>
               <tr>
                 <td><strong>In-Memory (MemorySaver)</strong></td>
-                <td><strong>Không bền vững.</strong> Dữ liệu biến mất khi tiến trình Python kết thúc hoặc ứng dụng reload.</td>
+                <td><strong>Không bền vững.</strong> Dữ liệu biến mất khi tiến trình Python kết thúc hoặc ứng dụng
+                  reload.</td>
                 <td>Cô lập tốt trên RAM của tab người dùng thông qua UUID thread.</td>
                 <td>Thử nghiệm nhanh (prototyping), chạy demo giao diện local ngắn hạn.</td>
               </tr>
               <tr>
                 <td><strong>Persistent DB (SQLiteSaver)</strong></td>
-                <td><strong>Bền vững trung bình.</strong> Dữ liệu lưu trong file <code>memory.db</code> vật lý, an toàn qua restart.</td>
+                <td><strong>Bền vững trung bình.</strong> Dữ liệu lưu trong file <code>memory.db</code> vật lý, an toàn
+                  qua restart.</td>
                 <td>Cô lập an toàn dựa trên định danh người dùng ổn định (ví dụ: login username).</td>
                 <td>Ứng dụng thực tế cá nhân hóa, trợ lý Sidekick ghi nhớ thói quen của người dùng lâu dài.</td>
               </tr>
@@ -1239,17 +1338,28 @@ ui.launch(inbrowser=True)
             <article class="card">
               <h3>Failure modes - Các trường hợp dễ lỗi</h3>
               <ul class="list">
-                <li><strong>Browser leaks do crash tiến trình UI:</strong> Người dùng tắt tab trình duyệt đột ngột hoặc mất kết nối mạng. Hàm dọn dẹp thông thường không được kích hoạt khiến Chromium browser tiếp tục chạy ẩn trên RAM máy chủ, gây cạn kiệt bộ nhớ sau nhiều phiên.</li>
-                <li><strong>Evaluator reject oan các tác vụ tạo file:</strong> Worker thông báo đã tạo file thành công trong sandbox. Tuy nhiên Evaluator không thể truy cập trực tiếp ổ cứng để kiểm tra tệp tin thực tế, dẫn đến việc nghi ngờ và định tuyến Worker chạy lại vô ích.</li>
-                <li><strong>Python REPL trả về kết quả trống:</strong> Worker gửi đoạn mã <code>x = 5 * 3</code> vào Python tool để tính toán nhưng không sử dụng hàm <code>print(x)</code>. Kết quả trả về cho Worker là chuỗi rỗng khiến Worker không có thông tin xử lý tiếp.</li>
+                <li><strong>Browser leaks do crash tiến trình UI:</strong> Người dùng tắt tab trình duyệt đột ngột hoặc
+                  mất kết nối mạng. Hàm dọn dẹp thông thường không được kích hoạt khiến Chromium browser tiếp tục chạy
+                  ẩn trên RAM máy chủ, gây cạn kiệt bộ nhớ sau nhiều phiên.</li>
+                <li><strong>Evaluator reject oan các tác vụ tạo file:</strong> Worker thông báo đã tạo file thành công
+                  trong sandbox. Tuy nhiên Evaluator không thể truy cập trực tiếp ổ cứng để kiểm tra tệp tin thực tế,
+                  dẫn đến việc nghi ngờ và định tuyến Worker chạy lại vô ích.</li>
+                <li><strong>Python REPL trả về kết quả trống:</strong> Worker gửi đoạn mã <code>x = 5 * 3</code> vào
+                  Python tool để tính toán nhưng không sử dụng hàm <code>print(x)</code>. Kết quả trả về cho Worker là
+                  chuỗi rỗng khiến Worker không có thông tin xử lý tiếp.</li>
               </ul>
             </article>
             <article class="card">
               <h3>Fix / prevention - Cách phòng chống</h3>
               <ul class="list">
-                <li><strong>Sử dụng delete_callback của Gradio State:</strong> Luôn đăng ký hàm giải phóng tài nguyên vật lý <code>cleanup()</code> vào tham số <code>delete_callback</code> của <code>gr.State</code> để đảm bảo dọn dẹp Chromium bất kể tab bị tắt theo cách nào.</li>
-                <li><strong>Tuning prompt Evaluator (Benefit of the doubt):</strong> Thêm chỉ dẫn rõ ràng cho Evaluator: nếu Worker tuyên bố đã ghi file và mô tả cấu trúc file hợp lý, hãy chấp nhận tuyên bố đó thay vì kiểm duyệt vật lý, hoặc chỉ cấu hình quét tệp tin sandbox qua công cụ file read.</li>
-                <li><strong>Tuning prompt Worker (Print enforcement):</strong> Chèn quy tắc cứng vào Worker prompt: bắt buộc sử dụng <code>print()</code> cho mọi kết quả tính toán cần hiển thị từ Python REPL tool.</li>
+                <li><strong>Sử dụng delete_callback của Gradio State:</strong> Luôn đăng ký hàm giải phóng tài nguyên
+                  vật lý <code>cleanup()</code> vào tham số <code>delete_callback</code> của <code>gr.State</code> để
+                  đảm bảo dọn dẹp Chromium bất kể tab bị tắt theo cách nào.</li>
+                <li><strong>Tuning prompt Evaluator (Benefit of the doubt):</strong> Thêm chỉ dẫn rõ ràng cho Evaluator:
+                  nếu Worker tuyên bố đã ghi file và mô tả cấu trúc file hợp lý, hãy chấp nhận tuyên bố đó thay vì kiểm
+                  duyệt vật lý, hoặc chỉ cấu hình quét tệp tin sandbox qua công cụ file read.</li>
+                <li><strong>Tuning prompt Worker (Print enforcement):</strong> Chèn quy tắc cứng vào Worker prompt: bắt
+                  buộc sử dụng <code>print()</code> cho mọi kết quả tính toán cần hiển thị từ Python REPL tool.</li>
               </ul>
             </article>
           </div>
@@ -1265,41 +1375,56 @@ ui.launch(inbrowser=True)
           </div>
           <div class="grid-2">
             <article class="card flashcard">
-              <h3>Q: Tại sao phải sử dụng gr.State để lưu trữ Sidekick instance trong Gradio app thay vì khai báo biến toàn cục?</h3>
+              <h3>Q: Tại sao phải sử dụng gr.State để lưu trữ Sidekick instance trong Gradio app thay vì khai báo biến
+                toàn cục?</h3>
               <button class="button primary" type="button" data-reveal>Reveal answer</button>
               <div class="flash-answer">
-                <strong>A:</strong> Khai báo biến toàn cục (global) khiến mọi người dùng truy cập web app đều dùng chung một đối tượng Sidekick. Điều này gây nhiễm chéo dữ liệu hội thoại, lẫn lộn browser sessions và mất an toàn thông tin. <code>gr.State</code> đảm bảo mỗi tab trình duyệt (mỗi user session) sở hữu một Sidekick instance độc lập.
+                <strong>A:</strong> Khai báo biến toàn cục (global) khiến mọi người dùng truy cập web app đều dùng chung
+                một đối tượng Sidekick. Điều này gây nhiễm chéo dữ liệu hội thoại, lẫn lộn browser sessions và mất an
+                toàn thông tin. <code>gr.State</code> đảm bảo mỗi tab trình duyệt (mỗi user session) sở hữu một Sidekick
+                instance độc lập.
               </div>
             </article>
             <article class="card flashcard">
               <h3>Q: Lợi ích và rủi ro lớn nhất của công cụ PythonREPLTool là gì?</h3>
               <button class="button primary" type="button" data-reveal>Reveal answer</button>
               <div class="flash-answer">
-                <strong>A:</strong> <strong>Lợi ích:</strong> Cho phép tác tử tự động hóa tính toán phức tạp, phân tích dữ liệu và chạy thuật toán ngay tại chỗ. <strong>Rủi ro:</strong> Chạy code Python trực tiếp trên máy chủ mà không có môi trường cô lập ảo (Docker sandbox) có thể dẫn đến việc tác tử vô tình thực thi lệnh nguy hại xóa file hoặc chiếm quyền kiểm soát hệ thống.
+                <strong>A:</strong> <strong>Lợi ích:</strong> Cho phép tác tử tự động hóa tính toán phức tạp, phân tích
+                dữ liệu và chạy thuật toán ngay tại chỗ. <strong>Rủi ro:</strong> Chạy code Python trực tiếp trên máy
+                chủ mà không có môi trường cô lập ảo (Docker sandbox) có thể dẫn đến việc tác tử vô tình thực thi lệnh
+                nguy hại xóa file hoặc chiếm quyền kiểm soát hệ thống.
               </div>
             </article>
             <article class="card flashcard">
               <h3>Q: Cơ chế "benefit of the doubt" trong Evaluator Node giải quyết vấn đề gì?</h3>
               <button class="button primary" type="button" data-reveal>Reveal answer</button>
               <div class="flash-answer">
-                <strong>A:</strong> Giải quyết việc Evaluator quá khắt khe khi đánh giá các tác vụ tạo tệp tin vật lý (do Evaluator không thể mở ổ cứng ra đọc trực tiếp). Chỉ dẫn này ép Evaluator tin tưởng nếu Assistant khẳng định đã lưu báo cáo vào sandbox, tránh việc đồ thị rơi vào vòng lặp từ chối vô hạn.
+                <strong>A:</strong> Giải quyết việc Evaluator quá khắt khe khi đánh giá các tác vụ tạo tệp tin vật lý
+                (do Evaluator không thể mở ổ cứng ra đọc trực tiếp). Chỉ dẫn này ép Evaluator tin tưởng nếu Assistant
+                khẳng định đã lưu báo cáo vào sandbox, tránh việc đồ thị rơi vào vòng lặp từ chối vô hạn.
               </div>
             </article>
             <article class="card flashcard">
               <h3>Q: Khi người dùng nhấn nút "Reset", app.py xử lý như thế nào để làm sạch hoàn toàn bộ nhớ?</h3>
               <button class="button primary" type="button" data-reveal>Reveal answer</button>
               <div class="flash-answer">
-                <strong>A:</strong> Trình xử lý sự kiện Reset không chỉ làm trống các ô nhập văn bản trên giao diện UI, mà còn khởi tạo lại một đối tượng <code>Sidekick</code> mới hoàn toàn, chạy hàm setup async mới để cấp một UUID thread mới, xóa sạch vết tích checkpoints cũ trong RAM.
+                <strong>A:</strong> Trình xử lý sự kiện Reset không chỉ làm trống các ô nhập văn bản trên giao diện UI,
+                mà còn khởi tạo lại một đối tượng <code>Sidekick</code> mới hoàn toàn, chạy hàm setup async mới để cấp
+                một UUID thread mới, xóa sạch vết tích checkpoints cũ trong RAM.
               </div>
             </article>
           </div>
 
           <div class="card" style="margin-top: 14px;">
             <h3>Quick quiz - Trắc nghiệm nhanh</h3>
-            <p>Đặc tính kỹ thuật nào giải quyết triệt để nguy cơ rò rỉ tiến trình Chromium chạy ngầm (browser leaks) khi người dùng đóng tab trình duyệt Gradio?</p>
-            <button class="button quiz-option" type="button" data-correct="false">A. Khai báo thư viện nest_asyncio.apply() trong sidekick_tools.py.</button>
-            <button class="button quiz-option" type="button" data-correct="false">B. Sử dụng MemorySaver để lưu checkpoints ngầm trong RAM máy chủ.</button>
-            <button class="button quiz-option" type="button" data-correct="true">C. Đăng ký hàm hủy cleanup() vào tham số delete_callback của gr.State.</button>
+            <p>Đặc tính kỹ thuật nào giải quyết triệt để nguy cơ rò rỉ tiến trình Chromium chạy ngầm (browser leaks) khi
+              người dùng đóng tab trình duyệt Gradio?</p>
+            <button class="button quiz-option" type="button" data-correct="false">A. Khai báo thư viện
+              nest_asyncio.apply() trong sidekick_tools.py.</button>
+            <button class="button quiz-option" type="button" data-correct="false">B. Sử dụng MemorySaver để lưu
+              checkpoints ngầm trong RAM máy chủ.</button>
+            <button class="button quiz-option" type="button" data-correct="true">C. Đăng ký hàm hủy cleanup() vào tham
+              số delete_callback của gr.State.</button>
             <div class="quiz-result" aria-live="polite"></div>
           </div>
         </section>
@@ -1317,10 +1442,12 @@ ui.launch(inbrowser=True)
               <h3>Must remember - Cần phải nhớ</h3>
               <ol class="list">
                 <li>Tách mã nguồn theo nguyên tắc Separation of Concerns để dễ bảo trì dự án lớn.</li>
-                <li>Playwright browser setup cần thực thi async, yêu cầu tách hàm async setup riêng khỏi constructor.</li>
+                <li>Playwright browser setup cần thực thi async, yêu cầu tách hàm async setup riêng khỏi constructor.
+                </li>
                 <li>gr.State cô lập Sidekick instance và SQLite thread cho mỗi phiên kết nối của người dùng.</li>
                 <li>Ghi file vật lý của tác tử bắt buộc phải giới hạn root_dir để tránh phá hỏng hệ thống máy chủ.</li>
-                <li>Python REPL tool cần được grounding chặt chẽ trong prompt bắt buộc sử dụng print() để lấy output.</li>
+                <li>Python REPL tool cần được grounding chặt chẽ trong prompt bắt buộc sử dụng print() để lấy output.
+                </li>
                 <li>delete_callback là lá chắn bảo vệ RAM máy chủ khỏi rò rỉ trình duyệt Chromium ngầm.</li>
               </ol>
             </article>
@@ -1337,7 +1464,8 @@ ui.launch(inbrowser=True)
         </section>
 
         <footer class="footer">
-          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 5. Phân tích chi tiết thiết kế ứng dụng Sidekick đa module, cô lập phiên và quản lý vòng đời tài nguyên trên LangGraph và Gradio.
+          <strong>Study note:</strong> Tài liệu học tập cá nhân ôn tập Day 5. Phân tích chi tiết thiết kế ứng dụng
+          Sidekick đa module, cô lập phiên và quản lý vòng đời tài nguyên trên LangGraph và Gradio.
         </footer>
       </main>
     </div>
