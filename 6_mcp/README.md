@@ -156,8 +156,3 @@ Nếu mở rộng dự án, nên thêm:
 
 - `PROJECT_EXPLORATION.html`
 - `project_exploration_state.json`
-
-Nếu bạn muốn, bước tiếp theo mình có thể:
-
-- rút tiếp README này xuống phiên bản cực ngắn cho public repo
-- hoặc nâng nó thành README “chuẩn mở repo” với badges, prerequisites và troubleshooting section
