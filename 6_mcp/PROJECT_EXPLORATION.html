@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khám phá dự án 6_mcp</title>
+  <style>
+    :root {
+      --primary: #cc785c;
+      --primary-active: #a9583e;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --body-strong: #252523;
+      --muted: #6c6a64;
+      --muted-soft: #8e8b82;
+      --hairline: #e6dfd8;
+      --hairline-soft: #ebe6df;
+      --canvas: #faf9f5;
+      --surface-soft: #f5f0e8;
+      --surface-card: #efe9de;
+      --surface-cream-strong: #e8e0d2;
+      --surface-dark: #181715;
+      --surface-dark-elevated: #252320;
+      --surface-dark-soft: #1f1e1b;
+      --on-primary: #ffffff;
+      --on-dark: #faf9f5;
+      --on-dark-soft: #a09d96;
+      --accent-teal: #5db8a6;
+      --accent-amber: #e8a55a;
+      --success: #5db872;
+      --warning: #d4a017;
+      --error: #c64545;
+      --shadow-soft: 0 18px 40px rgba(20, 20, 19, 0.06);
+      --shadow-strong: 0 30px 70px rgba(20, 20, 19, 0.10);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 24px;
+      --radius-pill: 999px;
+      --container: 1240px;
+      --section-space: 88px;
+      --display-family: "Cormorant Garamond", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+      --body-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif;
+      --code-family: "JetBrains Mono", "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(204, 120, 92, 0.15), transparent 20%),
+        radial-gradient(circle at 100% 0%, rgba(93, 184, 166, 0.12), transparent 24%),
+        linear-gradient(180deg, #fdfbf8 0%, var(--canvas) 28%, #f7f1e8 100%);
+      color: var(--body);
+      font-family: var(--body-family);
+      line-height: 1.65;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(calc(100% - 32px), var(--container));
+      margin: 0 auto;
+      padding-bottom: 80px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(250, 249, 245, 0.86);
+      border-bottom: 1px solid rgba(230, 223, 216, 0.88);
+    }
+
+    .topbar-inner {
+      width: min(calc(100% - 32px), var(--container));
+      margin: 0 auto;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--body-strong);
+      letter-spacing: 0.02em;
+    }
+
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .topnav a {
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      transition: color 180ms ease, background 180ms ease;
+    }
+
+    .topnav a:hover,
+    .topnav a:focus-visible {
+      background: var(--surface-card);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .section {
+      margin-top: var(--section-space);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(204, 120, 92, 0.10);
+      color: var(--primary-active);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--primary);
+      box-shadow: 0 0 0 6px rgba(204, 120, 92, 0.12);
+    }
+
+    .hero {
+      padding-top: 34px;
+    }
+
+    .hero-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(340px, 0.96fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      padding: 18px 0 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display {
+      font-family: var(--display-family);
+      color: var(--ink);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 5.5vw, 5.1rem);
+      line-height: 0.95;
+      margin-top: 18px;
+      max-width: 12ch;
+    }
+
+    .hero-lead {
+      margin: 20px 0 0;
+      font-size: 1.08rem;
+      color: var(--body);
+      max-width: 63ch;
+    }
+
+    .hero-note {
+      margin-top: 18px;
+      color: var(--muted);
+      max-width: 58ch;
+      font-size: 0.96rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .button-primary,
+    .button-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-size: 0.94rem;
+      font-weight: 700;
+      transition: transform 180ms ease, background 180ms ease, color 180ms ease, border-color 180ms ease;
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border: 1px solid var(--primary);
+    }
+
+    .button-primary:hover,
+    .button-primary:focus-visible {
+      background: var(--primary-active);
+      border-color: var(--primary-active);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+    }
+
+    .button-secondary:hover,
+    .button-secondary:focus-visible {
+      background: var(--surface-card);
+      border-color: #d8cfc1;
+      outline: none;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: var(--radius-pill);
+      background: rgba(239, 233, 222, 0.96);
+      border: 1px solid var(--hairline);
+      font-size: 0.86rem;
+      color: var(--body-strong);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .chip .chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent-teal);
+    }
+
+    .hero-stage {
+      position: relative;
+      overflow: hidden;
+      min-height: 590px;
+      padding: 26px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(204, 120, 92, 0.16), transparent 22%),
+        radial-gradient(circle at 83% 82%, rgba(93, 184, 166, 0.18), transparent 28%),
+        linear-gradient(180deg, var(--surface-dark) 0%, #10100f 100%);
+      color: var(--on-dark);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .hero-stage::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+    }
+
+    .hero-card {
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(37, 35, 32, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .hero-card h3 {
+      font-family: var(--body-family);
+      color: var(--on-dark);
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-card p {
+      margin: 0;
+      color: var(--on-dark-soft);
+      font-size: 0.92rem;
+    }
+
+    .hero-terminal {
+      grid-column: 1 / -1;
+      min-height: 230px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .terminal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      color: var(--on-dark-soft);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .terminal-dots {
+      display: inline-flex;
+      gap: 8px;
+    }
+
+    .terminal-dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .terminal-dots span:nth-child(1) { background: var(--error); }
+    .terminal-dots span:nth-child(2) { background: var(--accent-amber); }
+    .terminal-dots span:nth-child(3) { background: var(--success); }
+
+    .terminal-body {
+      padding: 18px 18px 16px;
+      font-family: var(--code-family);
+      font-size: 0.84rem;
+      line-height: 1.75;
+      color: #d9d3ca;
+    }
+
+    .terminal-line {
+      display: flex;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .terminal-prompt {
+      color: var(--accent-teal);
+    }
+
+    .terminal-key {
+      color: #f1bfae;
+    }
+
+    .terminal-note {
+      color: #9daaa7;
+    }
+
+    .terminal-wave {
+      position: absolute;
+      right: -120px;
+      bottom: -120px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(204, 120, 92, 0.22) 0%, rgba(204, 120, 92, 0.04) 45%, transparent 70%);
+      filter: blur(2px);
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(0.92); }
+      to { transform: translate3d(-24px, -18px, 0) scale(1.08); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .stat-card {
+      padding: 18px 18px 16px;
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.56);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 10px;
+      font-size: 1.15rem;
+      color: var(--body-strong);
+      font-weight: 700;
+    }
+
+    .kicker-layout,
+    .split-grid,
+    .triple-grid,
+    .double-dark-grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .split-grid {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    }
+
+    .triple-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .double-dark-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(2rem, 4vw, 3.15rem);
+      line-height: 0.96;
+      max-width: 11ch;
+    }
+
+    .section-intro {
+      max-width: 56ch;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .card,
+    .dark-card,
+    .coral-card,
+    .band {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card h3 {
+      font-family: var(--body-family);
+      font-size: 1rem;
+      color: var(--body-strong);
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .dark-card {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 24px;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .dark-card h3,
+    .dark-card h4 {
+      color: var(--on-dark);
+      font-family: var(--body-family);
+      margin: 0 0 12px;
+    }
+
+    .dark-card p,
+    .dark-card li,
+    .dark-card .muted {
+      color: var(--on-dark-soft);
+    }
+
+    .coral-card {
+      background: linear-gradient(135deg, var(--primary) 0%, #d88868 100%);
+      color: var(--on-primary);
+      padding: 28px;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .coral-card h3,
+    .coral-card h4,
+    .coral-card p,
+    .coral-card li {
+      color: var(--on-primary);
+    }
+
+    .list-tight,
+    .check-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .check-list li + li,
+    .list-tight li + li {
+      margin-top: 8px;
+    }
+
+    .overview-band {
+      padding: 28px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(245, 240, 232, 0.92) 0%, rgba(239, 233, 222, 0.94) 100%);
+      border: 1px solid var(--hairline);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .mini-timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .timeline-tag {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .timeline-copy strong {
+      color: var(--body-strong);
+    }
+
+    .metric-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .metric-pill {
+      padding: 10px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.62);
+      font-size: 0.88rem;
+      color: var(--body-strong);
+    }
+
+    .explorer-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .explorer-tab {
+      appearance: none;
+      border: 1px solid var(--hairline);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+
+    .explorer-tab:hover,
+    .explorer-tab:focus-visible {
+      background: var(--surface-card);
+      color: var(--ink);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .explorer-tab.is-active {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border-color: var(--surface-dark);
+    }
+
+    .diagram-panel {
+      display: none;
+    }
+
+    .diagram-panel.is-active {
+      display: block;
+      animation: fadeUp 320ms ease;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .diagram-shell {
+      padding: 22px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(24, 23, 21, 0.98) 0%, rgba(37, 35, 32, 0.98) 100%);
+      color: var(--on-dark);
+      box-shadow: var(--shadow-strong);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .diagram-shell h3 {
+      color: var(--on-dark);
+      font-family: var(--display-family);
+      font-size: 1.8rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .diagram-shell p {
+      color: var(--on-dark-soft);
+      margin: 0 0 18px;
+      max-width: 68ch;
+    }
+
+    .system-map {
+      position: relative;
+      min-height: 620px;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(204, 120, 92, 0.10), transparent 18%),
+        radial-gradient(circle at 80% 88%, rgba(93, 184, 166, 0.12), transparent 20%),
+        linear-gradient(180deg, rgba(31, 30, 27, 0.95), rgba(24, 23, 21, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .system-map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .map-node {
+      position: absolute;
+      width: 220px;
+      padding: 16px 16px 14px;
+      border-radius: 18px;
+      background: rgba(250, 249, 245, 0.98);
+      color: var(--body);
+      border: 1px solid rgba(230, 223, 216, 0.98);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .map-node.dark {
+      background: rgba(37, 35, 32, 0.96);
+      color: var(--on-dark);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .map-node .node-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .map-node.dark .node-kicker {
+      color: var(--accent-teal);
+    }
+
+    .map-node h4 {
+      margin: 0 0 8px;
+      font-family: var(--display-family);
+      font-size: 1.36rem;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: inherit;
+    }
+
+    .system-map code {
+      font-family: var(--code-family);
+      background: rgba(232, 224, 210, 0.72);
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: var(--body-strong);
+      font-size: 0.85em;
+    }
+
+    .system-map .map-node.dark code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    .map-node ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.88rem;
+    }
+
+    .map-node li + li {
+      margin-top: 5px;
+    }
+
+    .map-node.runtime { left: 50px; top: 60px; }
+    .map-node.prompt { left: 390px; top: 50px; }
+    .map-node.mcp { right: 48px; top: 58px; }
+    .map-node.state { left: 185px; bottom: 78px; }
+    .map-node.ui { right: 178px; bottom: 78px; }
+
+    .dependency-board {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .dep-column {
+      display: grid;
+      gap: 14px;
+    }
+
+    .dep-card {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(250, 249, 245, 0.98);
+      color: var(--body);
+      border: 1px solid rgba(230, 223, 216, 0.98);
+    }
+
+    .dep-card h4 {
+      margin: 0 0 8px;
+      font-family: var(--body-family);
+      color: var(--body-strong);
+      font-size: 0.94rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .dep-card p {
+      margin: 0;
+      color: var(--body);
+      font-size: 0.9rem;
+    }
+
+    .dep-rail {
+      position: relative;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dep-rail::before {
+      content: "";
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(93, 184, 166, 0.18), rgba(204, 120, 92, 0.74), rgba(93, 184, 166, 0.18));
+      border-radius: 999px;
+    }
+
+    .dep-rail::after {
+      content: "dây kết nối";
+      position: absolute;
+      writing-mode: vertical-rl;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--accent-teal);
+    }
+
+    .runtime-flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .runtime-step {
+      position: relative;
+      min-height: 180px;
+      padding: 18px 16px;
+      border-radius: 18px;
+      background: rgba(250, 249, 245, 0.98);
+      color: var(--body);
+      border: 1px solid rgba(230, 223, 216, 0.98);
+      transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+    }
+
+    .runtime-step.is-current {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 28px rgba(204, 120, 92, 0.18);
+      border-color: rgba(204, 120, 92, 0.48);
+    }
+
+    .runtime-step::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      width: 24px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(204, 120, 92, 0.9), rgba(93, 184, 166, 0.35));
+      transform: translateY(-50%);
+    }
+
+    .runtime-step:last-child::after {
+      display: none;
+    }
+
+    .runtime-index {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(204, 120, 92, 0.12);
+      color: var(--primary-active);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .runtime-step h4 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--body-strong);
+    }
+
+    .runtime-step p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .setup-runway {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .setup-card {
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(250, 249, 245, 0.98);
+      border: 1px solid rgba(230, 223, 216, 0.98);
+      color: var(--body);
+    }
+
+    .setup-card h4 {
+      margin: 0 0 10px;
+      color: var(--body-strong);
+      font-family: var(--body-family);
+      font-size: 0.94rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .code-strip {
+      margin-top: 10px;
+      border-radius: 14px;
+      background: var(--surface-dark-soft);
+      padding: 14px 16px;
+      font-family: var(--code-family);
+      font-size: 0.85rem;
+      color: #e4ddd3;
+      overflow: auto;
+    }
+
+    .atlas-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--on-dark-soft);
+      font-size: 0.84rem;
+    }
+
+    .legend-chip .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .table-shell {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    thead {
+      background: rgba(232, 224, 210, 0.9);
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--hairline);
+      font-size: 0.94rem;
+    }
+
+    th {
+      color: var(--body-strong);
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.38);
+    }
+
+    code {
+      font-family: var(--code-family);
+      background: rgba(232, 224, 210, 0.72);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--body-strong);
+      font-size: 0.92em;
+    }
+
+    .dark-card code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--on-dark);
+    }
+
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .evidence-list,
+    .risk-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .footer-band {
+      margin-top: var(--section-space);
+      padding: 28px;
+      border-radius: 22px;
+      background: var(--surface-dark);
+      color: var(--on-dark-soft);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-band strong {
+      color: var(--on-dark);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.92rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1120px) {
+      .hero-shell,
+      .split-grid,
+      .triple-grid,
+      .double-dark-grid,
+      .key-grid,
+      .dependency-board,
+      .setup-runway {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stage {
+        min-height: auto;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .runtime-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .runtime-step::after {
+        display: none;
+      }
+
+      .system-map {
+        min-height: auto;
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .system-map svg {
+        display: none;
+      }
+
+      .map-node {
+        position: relative;
+        width: auto;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page,
+      .topbar-inner {
+        width: min(calc(100% - 20px), var(--container));
+      }
+
+      .topbar-inner {
+        padding: 8px 0;
+        align-items: flex-start;
+      }
+
+      .topnav {
+        justify-content: flex-start;
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+      }
+
+      .section {
+        margin-top: 64px;
+      }
+
+      .stats-grid,
+      .runtime-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions,
+      .hero-chips,
+      .explorer-tabs,
+      .atlas-legend {
+        gap: 10px;
+      }
+
+      .section-head {
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="Điều hướng dự án">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <g fill="none" stroke="#141413" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2v20" />
+            <path d="M2 12h20" />
+            <path d="M4.8 4.8l14.4 14.4" />
+            <path d="M19.2 4.8L4.8 19.2" />
+          </g>
+        </svg>
+        <span class="brand-text">6_mcp Systems atlas - Bản đồ hệ thống</span>
+      </a>
+      <nav class="topnav">
+        <a href="#overview">Tổng quan</a>
+        <a href="#atlas">Architecture (Kiến trúc)</a>
+        <a href="#repository">Repo (Kho chứa)</a>
+        <a href="#evidence">Minh chứng</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page" id="top">
+    <section class="hero section" style="margin-top:0">
+      <div class="hero-shell">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Đánh giá hệ thống biên tập ấm áp</span>
+          <h1>Từ các thực hành khóa học MCP đến một autonomous trading floor - sàn giao dịch tự động trực tiếp.</h1>
+          <p class="hero-lead">
+            Đợt khám phá này tái cấu trúc <code>6_mcp</code> như một systems atlas - bản đồ hệ thống cho việc gia nhập: dự án là gì, các module (mô-đun) liên kết với nhau như thế nào, state (trạng thái) thời gian chạy luân chuyển ở đâu, và cách dự án capstone project - dự án cuối khóa chuyển đổi lý thuyết MCP thành một runnable multi-agent product demo - bản mô tả sản phẩm đa tác tử có thể chạy được.
+          </p>
+          <p class="hero-note">
+            Được căn cứ trực tiếp trên 5 files (tập tin) HTML study guide - Hướng dẫn học tập, 15 modules (mô-đun) Python gốc và 5 notebooks (sổ tay lập trình) gốc. Setup notes remain inference-based - Các ghi chú thiết lập vẫn dựa trên suy luận vì đợt xem xét này tập trung vào việc đọc và thiết kế repo (kho chứa), chứ không phải thực thi thời gian chạy.
+          </p>
+          <div class="hero-actions">
+            <a class="button-primary" href="#atlas">Khám phá architecture (kiến trúc)</a>
+            <a class="button-secondary" href="#repository">Nhảy tới các files (tập tin) quan trọng</a>
+          </div>
+          <div class="hero-chips" aria-label="Các nhãn dự án">
+            <span class="chip"><span class="chip-dot"></span>MCP</span>
+            <span class="chip"><span class="chip-dot"></span>OpenAI Agents SDK - Bộ công cụ phát triển phần mềm tác tử OpenAI</span>
+            <span class="chip"><span class="chip-dot"></span>Mô phỏng giao dịch</span>
+            <span class="chip"><span class="chip-dot"></span>Ghi dấu vết + Gradio</span>
+          </div>
+
+        </div>
+
+        <div class="hero-stage" aria-label="Bản xem trước hệ thống trang trí">
+          <div class="terminal-wave" aria-hidden="true"></div>
+          <div class="hero-grid">
+            <article class="hero-card">
+              <h3>Lộ trình khóa học</h3>
+              <p>Ngày 1 tiêu thụ MCP. Ngày 2 hiển thị logic nghiệp vụ. Ngày 3 mở rộng các bề mặt tính năng. Ngày 4-5 hợp nhất mọi thứ thành một hệ thống giao dịch có thể quan sát được.</p>
+            </article>
+            <article class="hero-card">
+              <h3>Chế độ vận hành</h3>
+              <p>Các stdio MCP servers - máy chủ MCP stdio local-first - ưu tiên cục bộ, SQLite-backed state - trạng thái hỗ trợ bởi SQLite, các external APIs - giao diện lập trình ứng dụng bên ngoài tùy chọn, các quy trình UI (giao diện người dùng) và trading-loop processes - quy trình vòng lặp giao dịch riêng biệt.</p>
+            </article>
+            <article class="hero-card">
+              <h3>Tại sao nó quan trọng</h3>
+              <p>Bài học thực sự không phải là tài chính. Đó là cấu trúc tác tử mô-đun: resources (tài nguyên), prompts (lời nhắc), orchestration - sự điều phối, xem xét trace (dấu vết), và sản phẩm hóa.</p>
+            </article>
+            <article class="hero-card">
+              <h3>Mẫu thiết kế đặc trưng</h3>
+              <p>Researcher-as-tool - nhà nghiên cứu như một công cụ giúp một nhà giao dịch duy trì quyền kiểm soát trong khi vẫn cho phép cắm tính năng nghiên cứu chuyên biệt vào một cách sạch sẽ.</p>
+            </article>
+            <article class="hero-card hero-terminal">
+              <div class="terminal-head">
+                <span>Bản xem trước thời gian chạy</span>
+                <span class="terminal-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+              </div>
+              <div class="terminal-body">
+                <div class="terminal-line"><span class="terminal-prompt">$</span><span>uv run <span class="terminal-key">reset.py</span></span></div>
+                <div class="terminal-line"><span class="terminal-prompt">$</span><span>uv run <span class="terminal-key">app.py</span> <span class="terminal-note"># Gradio dashboard (bảng điều khiển)</span></span></div>
+                <div class="terminal-line"><span class="terminal-prompt">$</span><span>uv run <span class="terminal-key">trading_floor.py</span> <span class="terminal-note"># scheduler entry - đầu vào bộ lập lịch loop (vòng lặp)</span></span></div>
+                <div class="terminal-line"><span class="terminal-prompt">&gt;</span><span>khởi chạy các server (máy chủ) MCP: accounts, push, market, fetch, brave, memory</span></div>
+                <div class="terminal-line"><span class="terminal-prompt">&gt;</span><span>làm đầy các tài nguyên tài khoản + chiến lược vào prompts (lời nhắc) của nhà giao dịch</span></div>
+                <div class="terminal-line"><span class="terminal-prompt">&gt;</span><span>lưu trữ bền vững các giao dịch, logs (nhật ký), cache (bộ nhớ đệm) thị trường và các sự kiện trace (dấu vết) vào SQLite</span></div>
+                <div class="terminal-line"><span class="terminal-prompt">&gt;</span><span>làm mới dashboard (bảng điều khiển) với danh mục nắm giữ, PnL, giao dịch và logs (nhật ký) thời gian chạy</span></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Tổng quan dự án</span>
+          <h2>Một repo (kho chứa), hai nhiệm vụ: dạy về MCP và xây dựng một capstone project - dự án cuối khóa hệ thống đáng tin cậy.</h2>
+        </div>
+        <p class="section-intro">
+          Dự án được hiểu tốt nhất như một phương tiện giảng dạy tiến dần từ các bản demo MCP riêng lẻ đến một hệ thống dùng chung duy nhất: bốn trader agents - tác tử giao dịch, một researcher capability - khả năng nghiên cứu, shared account state - trạng thái tài khoản dùng chung, và một observability layer - lớp quan sát được mà bạn thực sự có thể kiểm tra.
+        </p>
+      </div>
+
+      <div class="split-grid">
+        <div class="overview-band">
+          <h3>Những gì dự án này đang giải quyết</h3>
+          <p>
+            <code>6_mcp</code> giải quyết câu hỏi "làm thế nào để các phần này trở thành một hệ thống thống nhất?" thường vẫn còn mơ hồ sau các bài hướng dẫn về MCP. Thay vì chỉ dừng lại ở các bản demo server (máy chủ), nó chỉ ra cách tools (công cụ), resources (tài nguyên), biểu mẫu prompt (lời nhắc), account state - trạng thái tài khoản, tracing - ghi dấu vết, và UI (giao diện người dùng) có thể được kết hợp thành một runtime loop - vòng lặp thời gian chạy cụ thể.
+          </p>
+          <p>
+            Sản phẩm cuối cùng là một sàn giao dịch mô phỏng, nhưng giá trị lâu dài là khả năng hiểu biết về kiến trúc: hiểu được ranh giới giữa domain state - trạng thái miền, MCP surface - bề mặt MCP, orchestration - sự điều phối, và khả năng quan sát.
+          </p>
+          <div class="metric-bar">
+            <span class="metric-pill">Mục tiêu: component (thành phần) đa tác tử có thể tái sử dụng</span>
+            <span class="metric-pill">Chế độ: sự kết hợp MCP local-first - ưu tiên cục bộ</span>
+            <span class="metric-pill">Đầu ra: dashboard (bảng điều khiển) + loop (vòng lặp) + traces (dấu vết)</span>
+          </div>
+        </div>
+
+        <div class="dark-card">
+          <h3>Tiến trình khóa học được tích hợp trong repo (kho chứa)</h3>
+          <div class="mini-timeline">
+            <div class="timeline-row">
+              <div class="timeline-tag">Ngày 1</div>
+              <div class="timeline-copy"><strong>Mô hình tư duy MCP</strong><br />Host (máy chủ), client (máy khách), server (máy chủ), stdio (đầu vào đầu ra chuẩn), và việc tiêu thụ các bề mặt tính năng bên ngoài.</div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-tag">Ngày 2</div>
+              <div class="timeline-copy"><strong>Tư duy nhà sản xuất</strong><br />Đóng gói logic nghiệp vụ tài khoản dưới dạng một FastMCP server - máy chủ FastMCP tùy chỉnh và cầu nối client (máy khách) viết tay.</div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-tag">Ngày 3</div>
+              <div class="timeline-copy"><strong>Phân loại tính năng</strong><br />Memory (bộ nhớ), search (tìm kiếm), và dữ liệu thị trường, mỗi loại hiển thị các mẫu triển khai MCP khác nhau.</div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-tag">Ngày 4</div>
+              <div class="timeline-copy"><strong>Cấu trúc capstone project - dự án cuối khóa</strong><br />Researcher-as-tool - nhà nghiên cứu như một công cụ, xác thực ưu tiên trace (dấu vết), và trích xuất module (mô-đun) thành code (mã) chạy thực tế.</div>
+            </div>
+            <div class="timeline-row">
+              <div class="timeline-tag">Ngày 5</div>
+              <div class="timeline-copy"><strong>Sản phẩm hóa</strong><br />Vòng lặp bộ lập lịch, dashboard (bảng điều khiển) UI (giao diện người dùng), khả năng quan sát, lời khuyên về mức độ phù hợp của framework (khung công việc), và thói quen vận hành.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="triple-grid" style="margin-top:22px">
+        <article class="card">
+          <h3>Mục tiêu cuối cùng</h3>
+          <ul class="list-tight">
+            <li>Đóng gói nhiều tính năng hỗ trợ bởi MCP vào một bản mô phỏng giao dịch tự động duy nhất.</li>
+            <li>Để các trader agents - tác tử giao dịch nghiên cứu, quyết định, giao dịch và tái cân bằng trong các chu kỳ luân phiên.</li>
+            <li>Làm cho hệ thống có thể quan sát được thông qua logs (nhật ký), traces (dấu vết), biểu đồ và account state - trạng thái tài khoản.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Đầu vào và đầu ra</h3>
+          <ul class="list-tight">
+            <li>Đầu vào: environment variables - biến môi trường, tài nguyên tài khoản, văn bản chiến lược, kết quả tools (công cụ) MCP, prompts (lời nhắc) của notebook (sổ tay lập trình).</li>
+            <li>Đầu ra: <code>accounts.db</code>, cơ sở dữ liệu bộ nhớ, giao dịch, logs (nhật ký), biểu đồ PnL, giao diện dashboard (bảng điều khiển), sự kiện đẩy.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Các tính năng chính</h3>
+          <ul class="list-tight">
+            <li>Máy chủ MCP tài khoản tùy chỉnh và cầu nối client (máy khách).</li>
+            <li>Định tuyến thị trường giữa trình bao bọc và Polygon MCP chính thức.</li>
+            <li>Công cụ nghiên cứu, vòng lặp bộ lập lịch, ghi logs (nhật ký) dấu vết và dashboard (bảng điều khiển) Gradio.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="atlas">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Kiến trúc và luồng công việc</span>
+          <h2>Các bộ phận chuyển động của dự án, được hiển thị như một systems atlas - bản đồ hệ thống trực quan.</h2>
+        </div>
+        <p class="section-intro">
+          Thay vì các khối Mermaid tĩnh, các chế độ xem bên dưới tập trung vào cách repo (kho chứa) thực sự hoạt động: thành phần nào sở hữu state (trạng thái), thành phần nào được khởi tạo, thành phần nào được đưa vào prompts (lời nhắc) và cách traces (dấu vết) được đưa trở lại UI (giao diện người dùng).
+        </p>
+      </div>
+
+      <div class="explorer-tabs" role="tablist" aria-label="Chế độ xem sơ đồ">
+        <button class="explorer-tab is-active" type="button" data-view-target="architecture" role="tab" aria-selected="true">System map - Bản đồ hệ thống</button>
+        <button class="explorer-tab" type="button" data-view-target="dependencies" role="tab" aria-selected="false">Module weave - Sự đan xen các khối</button>
+        <button class="explorer-tab" type="button" data-view-target="runtime" role="tab" aria-selected="false">Runtime loop - Vòng lặp chạy thực tế</button>
+        <button class="explorer-tab" type="button" data-view-target="setup" role="tab" aria-selected="false">Setup path - Đường dẫn thiết lập</button>
+      </div>
+
+      <section class="diagram-panel is-active" id="view-architecture" role="tabpanel">
+        <div class="diagram-shell">
+          <h3>System map - Bản đồ hệ thống</h3>
+          <p>
+            Repo (kho chứa) phân chia rõ ràng thành năm vùng hoạt động: orchestration - sự điều phối, cấu trúc prompt (lời nhắc)/cấu hình, MCP surface - bề mặt MCP, trạng thái bền vững, và trình diễn. Quyết định kiến trúc mạnh mẽ nhất là cả tác tử và UI (giao diện người dùng) đều đọc từ cùng một trạng thái hệ thống đang phát triển thay vì duy trì các chế độ xem rời rạc.
+          </p>
+          <div class="system-map" aria-label="Sơ đồ kiến trúc">
+            <svg viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="flowA" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#5db8a6" stop-opacity="0.25" />
+                  <stop offset="50%" stop-color="#cc785c" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="#5db8a6" stop-opacity="0.25" />
+                </linearGradient>
+              </defs>
+              <path d="M250 118 C330 118, 350 108, 390 108" stroke="url(#flowA)" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M610 110 C690 110, 720 112, 760 115" stroke="url(#flowA)" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M165 208 C165 310, 220 360, 295 430" stroke="url(#flowA)" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M820 206 C820 310, 760 360, 705 430" stroke="url(#flowA)" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M400 485 C500 530, 610 530, 700 485" stroke="url(#flowA)" stroke-width="3" fill="none" stroke-linecap="round" />
+            </svg>
+
+            <article class="map-node dark runtime">
+              <div class="node-kicker">Lõi chạy thực tế</div>
+              <h4>Orchestration - Điều phối</h4>
+              <ul>
+                <li><code>trading_floor.py</code></li>
+                <li><code>traders.py</code></li>
+                <li><code>tracers.py</code></li>
+              </ul>
+            </article>
+
+            <article class="map-node prompt">
+              <div class="node-kicker">Đầu vào quyết định</div>
+              <h4>Cấu hình + prompts (lời nhắc)</h4>
+              <ul>
+                <li><code>mcp_params.py</code></li>
+                <li><code>templates.py</code></li>
+                <li><code>reset.py</code></li>
+              </ul>
+            </article>
+
+            <article class="map-node dark mcp">
+              <div class="node-kicker">Bề mặt tính năng</div>
+              <h4>Lớp MCP</h4>
+              <ul>
+                <li><code>accounts_server.py</code></li>
+                <li><code>market_server.py</code></li>
+                <li><code>push_server.py</code></li>
+                <li>fetch, Brave, memory (bộ nhớ), Polygon official MCP - MCP chính thức của Polygon</li>
+              </ul>
+            </article>
+
+            <article class="map-node state">
+              <div class="node-kicker">Trục xương sống bền vững</div>
+              <h4>Lớp trạng thái</h4>
+              <ul>
+                <li><code>accounts.py</code></li>
+                <li><code>database.py</code></li>
+                <li><code>market.py</code></li>
+              </ul>
+            </article>
+
+            <article class="map-node ui">
+              <div class="node-kicker">Bề mặt quan sát</div>
+              <h4>Trình diễn</h4>
+              <ul>
+                <li><code>app.py</code></li>
+                <li><code>util.py</code></li>
+                <li>Biểu đồ, danh mục nắm giữ, logs (nhật ký), PnL</li>
+              </ul>
+            </article>
+          </div>
+          <div class="atlas-legend" aria-label="Chú giải">
+            <span class="legend-chip"><span class="swatch" style="background:#cc785c"></span>Đường dẫn màu san hô: yêu cầu và luồng kiểm soát</span>
+            <span class="legend-chip"><span class="swatch" style="background:#5db8a6"></span>Các cạnh mòng két: context (ngữ cảnh) dùng chung và làm đầy trạng thái</span>
+            <span class="legend-chip"><span class="swatch" style="background:#faf9f5"></span>Thẻ sáng: các module (mô-đun) repo (kho chứa) bền vững</span>
+            <span class="legend-chip"><span class="swatch" style="background:#252320"></span>Thẻ tối: các bề mặt chạy thực tế và các lớp tính năng hoạt động</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="diagram-panel" id="view-dependencies" role="tabpanel">
+        <div class="diagram-shell">
+          <h3>Module weave - Sự đan xen các khối</h3>
+          <p>
+            Xét về mặt phụ thuộc, dự án không phải là một đống kịch bản phẳng. Nó có một trục chính mạnh mẽ: từ bộ lập lịch đến orchestration - sự điều phối nhà giao dịch, từ nhà giao dịch đến các bản khai báo và prompts (lời nhắc) MCP, sau đó là dịch vụ tài khoản và thị trường bên dưới. UI (giao diện người dùng) nằm riêng một góc và đọc cùng một trạng thái được lưu trữ thay vì triển khai lại logic thời gian chạy.
+          </p>
+          <div class="dependency-board">
+            <div class="dep-column">
+              <article class="dep-card">
+                <h4>Scheduler entry - Đầu vào bộ lập lịch</h4>
+                <p><code>trading_floor.py</code> tạo ra 4 đối tượng nhà giao dịch, đính kèm <code>LogTracer - bộ theo dõi nhật ký</code>, kiểm soát hành vi mở cửa thị trường và chạy vòng lặp vô tận.</p>
+              </article>
+              <article class="dep-card">
+                <h4>Trader orchestration - Điều phối nhà giao dịch</h4>
+                <p><code>traders.py</code> xây dựng tác tử, đóng gói nhà nghiên cứu dưới dạng một công cụ, tìm nạp các resource (tài nguyên) tài khoản và quản lý vòng đời của server (máy chủ) MCP.</p>
+              </article>
+              <article class="dep-card">
+                <h4>Prompt composition - Cấu trúc prompt (lời nhắc)</h4>
+                <p><code>templates.py</code> và <code>mcp_params.py</code> giữ cho văn bản prompts (lời nhắc) và các khai báo máy chủ nằm ngoài logic điều phối.</p>
+              </article>
+            </div>
+
+            <div class="dep-rail" aria-hidden="true"></div>
+
+            <div class="dep-column">
+              <article class="dep-card">
+                <h4>Service bridge - Cầu nối dịch vụ</h4>
+                <p><code>accounts_client.py</code> làm cầu nối giữa các resource (tài nguyên) và tools (công cụ) MCP stdio thành các hàm có thể gọi và các định nghĩa công cụ thân thiện với SDK.</p>
+              </article>
+              <article class="dep-card">
+                <h4>Domain + persistence - Miền + Bền vững</h4>
+                <p><code>accounts.py</code> sở hữu số dư, danh mục nắm giữ, giao dịch và logic PnL; <code>database.py</code> lưu trữ bền vững tài khoản, logs (nhật ký) và cache (bộ nhớ đệm) thị trường.</p>
+              </article>
+              <article class="dep-card">
+                <h4>UI observer - Người quan sát UI (giao diện người dùng)</h4>
+                <p><code>app.py</code> sử dụng cùng dữ liệu tài khoản và log (nhật ký) để kết xuất một dashboard (bảng điều khiển), nhờ đó màn hình hiển thị luôn dựa trên trạng thái thời gian chạy thực tế.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="diagram-panel" id="view-runtime" role="tabpanel">
+        <div class="diagram-shell">
+          <h3>Runtime loop - Vòng lặp chạy thực tế</h3>
+          <p>
+            Vòng lặp này là trái tim hành vi của dự án. Mỗi lượt đi qua sẽ luân phiên giao dịch và tái cân bằng, nhưng mẫu sâu hơn là: làm đầy resource (tài nguyên) trước, sử dụng tool (công cụ) thứ hai, lưu trữ trạng thái bền vững thứ ba, và khả năng quan sát xuyên suốt.
+          </p>
+          <div class="runtime-flow" aria-label="Luồng công việc thời gian chạy">
+            <article class="runtime-step is-current" data-runtime-step>
+              <div class="runtime-index">1</div>
+              <h4>Khởi tạo môi trường chạy</h4>
+              <p>Bộ lập lịch xây dựng các nhà giao dịch và mở các context (ngữ cảnh) MCP stdio bằng <code>AsyncExitStack</code>.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">2</div>
+              <h4>Làm đầy trạng thái</h4>
+              <p>Đọc báo cáo tài khoản và resource (tài nguyên) chiến lược trước khi mô hình bắt đầu đưa ra quyết định.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">3</div>
+              <h4>Cấu trúc prompts (lời nhắc)</h4>
+              <p>Chèn trạng thái chạy thực tế vào các hướng dẫn giao dịch hoặc tái cân bằng từ <code>templates.py</code>.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">4</div>
+              <h4>Nghiên cứu</h4>
+              <p>Nhà giao dịch gọi researcher tool - công cụ nghiên cứu, công cụ này có thể sử dụng fetch, Brave, memory (bộ nhớ) và context (ngữ cảnh) thị trường.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">5</div>
+              <h4>Thực thi</h4>
+              <p>Các công cụ mua, bán, thay đổi chiến lược và thông báo đẩy đều khả dụng thông qua MCP.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">6</div>
+              <h4>Lưu trữ bền vững</h4>
+              <p>Cập nhật tài khoản, logs (nhật ký) và chuỗi thời gian danh mục đầu tư được lưu trữ trong trạng thái hỗ trợ bởi SQLite.</p>
+            </article>
+            <article class="runtime-step" data-runtime-step>
+              <div class="runtime-index">7</div>
+              <h4>Quan sát</h4>
+              <p>Các đoạn trace (dấu vết) được ghi nhật ký, UI (giao diện người dùng) làm mới và chu kỳ tiếp theo bắt đầu sau khoảng thời gian chờ được cấu hình.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="diagram-panel" id="view-setup" role="tabpanel">
+        <div class="diagram-shell">
+          <h3>Setup path - Đường dẫn thiết lập</h3>
+          <p>
+            Mô hình thiết lập là local-first - ưu tiên cục bộ và định hướng giảng dạy. Bạn cấu hình các nhà cung cấp tính năng, tùy chọn đặt lại thông tin nhân vật, sau đó chạy UI (giao diện người dùng) và engine (công cụ thực thi) dưới dạng các quy trình riêng biệt.
+          </p>
+          <div class="setup-runway">
+            <article class="setup-card">
+              <h4>1. Chuẩn bị môi trường</h4>
+              <p>Cài đặt Python bằng <code>uv</code>. Cài đặt Node và <code>npx</code> nếu sử dụng các server (máy chủ) MCP dựa trên JavaScript như Brave Search hoặc Playwright.</p>
+              <div class="code-strip">uv --version
+npx --version</div>
+            </article>
+            <article class="setup-card">
+              <h4>2. Cấu hình nhà cung cấp</h4>
+              <p>Thiết lập các API keys - khóa API và các cờ như <code>BRAVE_API_KEY</code>, <code>POLYGON_API_KEY</code>, <code>POLYGON_PLAN</code>, và các khóa đa mô hình tùy chọn.</p>
+              <div class="code-strip">BRAVE_API_KEY=...
+POLYGON_API_KEY=...
+POLYGON_PLAN=paid|realtime</div>
+            </article>
+            <article class="setup-card">
+              <h4>3. Chạy sàn giao dịch</h4>
+              <p>Tùy chọn đặt lại các nhà giao dịch, sau đó khởi chạy dashboard (bảng điều khiển) và background loop - vòng lặp nền trong các cửa sổ dòng lệnh riêng biệt.</p>
+              <div class="code-strip">uv run reset.py
+uv run app.py
+uv run trading_floor.py</div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="section" id="repository">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Tổ chức kho chứa</span>
+          <h2>Bố cục file (tập tin) đủ nhỏ để đọc, nhưng đủ cấu trúc để dạy về các ranh giới.</h2>
+        </div>
+        <p class="section-intro">
+          Đường dẫn gốc là bề mặt giảng dạy chuẩn tắc. Sự phân biệt rõ ràng nhất là giữa tài liệu học tập, domain state - trạng thái miền, các bộ điều hợp MCP, mã điều phối và lớp quan sát/trình diễn.
+        </p>
+      </div>
+
+      <div class="double-dark-grid">
+        <article class="card">
+          <h3>Tổ chức cấp cao nhất</h3>
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>Đường dẫn</th>
+                  <th>Vai trò</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/</code></td>
+                  <td>Các notebook (sổ tay lập trình) chuẩn tắc, server (máy chủ) MCP, các module (mô-đun) miền, mã thời gian chạy và dashboard (bảng điều khiển).</td>
+                </tr>
+                <tr>
+                  <td><code>tai_lieu/</code></td>
+                  <td>Tài liệu hướng dẫn học tập, tóm tắt và tài liệu khóa học có nguồn gốc từ bản ghi nội dung.</td>
+                </tr>
+                <tr>
+                  <td><code>memory/</code></td>
+                  <td>Các sản phẩm memory (bộ nhớ) được sử dụng bởi các bản demo bộ nhớ MCP và các kho lưu trữ cho từng nhà giao dịch.</td>
+                </tr>
+                <tr>
+                  <td><code>sandbox/</code></td>
+                  <td>Vùng đầu ra cục bộ được sử dụng bởi các thí nghiệm thực hành.</td>
+                </tr>
+                <tr>
+                  <td><code>hieu/</code></td>
+                  <td>Cây con dạng bản sao; không được coi là nguồn chuẩn tắc cho đợt khám phá này.</td>
+                </tr>
+                <tr>
+                  <td><code>code_udemy/</code></td>
+                  <td>Thư mục hỗ trợ nhỏ, không phải đường dẫn chạy thực tế chính cho capstone project - dự án cuối khóa.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="dark-card">
+          <h3>Các lớp chính</h3>
+          <ul class="check-list">
+            <li><strong>Lớp học tập:</strong> từ <code>1_lab1.ipynb</code> đến <code>5_lab5.ipynb</code>, cộng với các tài liệu hướng dẫn học tập theo ngày trong <code>tai_lieu/</code>.</li>
+            <li><strong>Lớp domain state - trạng thái miền:</strong> <code>accounts.py</code>, <code>database.py</code>, <code>reset.py</code>.</li>
+            <li><strong>Lớp MCP surface - bề mặt MCP:</strong> <code>accounts_server.py</code>, <code>accounts_client.py</code>, <code>market_server.py</code>, <code>push_server.py</code>.</li>
+            <li><strong>Lớp tính năng và prompt (lời nhắc):</strong> <code>market.py</code>, <code>mcp_params.py</code>, <code>templates.py</code>.</li>
+            <li><strong>Lớp orchestration - điều phối:</strong> <code>traders.py</code>, <code>trading_floor.py</code>.</li>
+            <li><strong>Khả năng quan sát và UI (giao diện người dùng):</strong> <code>tracers.py</code>, <code>app.py</code>, <code>util.py</code>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Các file (tập tin) quan trọng</span>
+          <h2>Bản đồ hữu ích ngắn nhất về những gì quan trọng nhất trong repo (kho chứa).</h2>
+        </div>
+        <p class="section-intro">
+          Danh sách bên dưới giúp lộ trình tiếp cận trở nên thực tế: bắt đầu với các notebook (sổ tay lập trình) và tài liệu hướng dẫn để xây dựng mô hình tư duy, sau đó nghiên cứu phần chạy thực tế và khung trạng thái.
+        </p>
+      </div>
+
+      <div class="table-shell">
+        <table>
+          <thead>
+            <tr>
+              <th>Tập tin</th>
+              <th>Trách nhiệm</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>1_lab1.ipynb</code></td><td>Giới thiệu việc tiêu thụ MCP thông qua fetch, Playwright, file system - hệ thống tập tin và các tác tử đa máy chủ.</td></tr>
+            <tr><td><code>2_lab2.ipynb</code></td><td>Xây dựng máy chủ MCP tài khoản tùy chỉnh và cầu nối client (máy khách) viết tay.</td></tr>
+            <tr><td><code>3_lab3.ipynb</code></td><td>Mở rộng các danh mục tính năng với memory (bộ nhớ), Brave Search và dữ liệu thị trường.</td></tr>
+            <tr><td><code>4_lab4.ipynb</code></td><td>Tạo nguyên mẫu capstone project - dự án cuối khóa nhà giao dịch + nhà nghiên cứu trước khi trích xuất module (mô-đun).</td></tr>
+            <tr><td><code>5_lab5.ipynb</code></td><td>Lần hoàn thiện sản phẩm cuối cùng: đặt lại, tracing - ghi dấu vết, dashboard (bảng điều khiển), runtime loop - vòng lặp thời gian chạy.</td></tr>
+            <tr><td><code>accounts.py</code></td><td>Sở hữu account state - trạng thái tài khoản, danh mục nắm giữ, giao dịch, logic PnL và báo cáo tài khoản.</td></tr>
+            <tr><td><code>database.py</code></td><td>Tạo và quản lý các bảng SQLite cho tài khoản, logs (nhật ký) và cache (bộ nhớ đệm) thị trường.</td></tr>
+            <tr><td><code>accounts_server.py</code></td><td>Cung cấp các công cụ và resource (tài nguyên) tài khoản thông qua FastMCP.</td></tr>
+            <tr><td><code>accounts_client.py</code></td><td>Liên kết các cuộc gọi/resource (tài nguyên) MCP thành các hàm tiện ích và công cụ thân thiện với SDK.</td></tr>
+            <tr><td><code>market.py</code></td><td>Xử lý truy cập Polygon, tra cứu thị trường theo gói tài khoản, lưu trữ cache (bộ nhớ đệm) và hành vi dự phòng cho bản demo.</td></tr>
+            <tr><td><code>market_server.py</code></td><td>Đóng gói việc tra cứu giá cổ phiếu như một công cụ MCP.</td></tr>
+            <tr><td><code>push_server.py</code></td><td>Cung cấp công cụ push notification - thông báo đẩy MCP được hỗ trợ bởi Pushover.</td></tr>
+            <tr><td><code>mcp_params.py</code></td><td>Định nghĩa các khai báo máy chủ cho các nhóm tính năng của nhà giao dịch và nhà nghiên cứu.</td></tr>
+            <tr><td><code>templates.py</code></td><td>Chứa hướng dẫn của nhà nghiên cứu và các biểu mẫu prompt (lời nhắc) giao dịch/tái cân bằng của nhà giao dịch.</td></tr>
+            <tr><td><code>traders.py</code></td><td>Lõi chạy thực tế cho một tác tử nhà giao dịch đơn lẻ, bao gồm định tuyến mô hình và quản lý vòng đời MCP.</td></tr>
+            <tr><td><code>trading_floor.py</code></td><td>Vòng lặp vô tận chạy nhóm giao dịch theo lịch trình đã cấu hình.</td></tr>
+            <tr><td><code>tracers.py</code></td><td>Bộ xử lý trace (dấu vết) tùy chỉnh giúp chuyển đổi các span thành logs (nhật ký) được lưu trữ.</td></tr>
+            <tr><td><code>app.py</code></td><td>UI (giao diện người dùng) Gradio cho danh mục nắm giữ, giao dịch, biểu đồ PnL và logs (nhật ký) thời gian chạy.</td></tr>
+            <tr><td><code>reset.py</code></td><td>Thiết lập ban đầu cho bốn nhân vật nhà giao dịch và chiến lược của họ.</td></tr>
+            <tr><td><code>util.py</code></td><td>Các tiện ích CSS cho dashboard (bảng điều khiển), trình hỗ trợ JS và ánh xạ màu sắc.</td></tr>
+            <tr><td><code>tai_lieu/day1_study_guide.html</code></td><td>Giao thức MCP, host/client/server - máy chủ/máy khách/máy chủ, thị trường và khung bảo mật.</td></tr>
+            <tr><td><code>tai_lieu/day2_study_guide.html</code></td><td>Lý do và cách đóng gói logic nghiệp vụ dưới dạng một custom MCP server - máy chủ MCP tùy chỉnh.</td></tr>
+            <tr><td><code>tai_lieu/day3_study_guide.html</code></td><td>Phân loại tính năng cho bộ nhớ, tìm kiếm và các kiểu triển khai dữ liệu thị trường.</td></tr>
+            <tr><td><code>tai_lieu/day4_study_guide.html</code></td><td>Cấu trúc capstone project - dự án cuối khóa, researcher-as-tool - nhà nghiên cứu như một công cụ, xác thực ưu tiên trace (dấu vết), trích xuất module (mô-đun).</td></tr>
+            <tr><td><code>tai_lieu/day5_study_guide.html</code></td><td>Khả năng quan sát, dashboard (bảng điều khiển), khởi chạy loop (vòng lặp), hướng dẫn về mức độ phù hợp của framework (khung công việc) và thói quen bước tiếp theo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Vận hành</span>
+          <h2>Cách chạy, các thành phần phụ thuộc và cách xác thực.</h2>
+        </div>
+        <p class="section-intro">
+          Không có bản khai báo phụ thuộc chính thức nào trong phạm vi được khám phá, vì vậy bức tranh vận hành đến từ các import (nhập khẩu) và các lệnh trong notebook (sổ tay lập trình) thay vì các tệp khóa phiên bản (lockfiles).
+        </p>
+      </div>
+
+      <div class="triple-grid">
+        <article class="card">
+          <h3>Hướng dẫn thiết lập và chạy</h3>
+          <ul class="list-tight">
+            <li>Cài đặt Python bằng <code>uv</code>.</li>
+            <li>Cài đặt Node và <code>npx</code> cho các server (máy chủ) MCP dựa trên JavaScript khi cần thiết.</li>
+            <li>Cấu hình các khóa như <code>BRAVE_API_KEY</code>, <code>POLYGON_API_KEY</code>, <code>PUSHOVER_*</code>, và các khóa nhà cung cấp mô hình tùy chọn.</li>
+            <li>Tùy chọn chạy <code>uv run reset.py</code>.</li>
+            <li>Khởi chạy <code>uv run app.py</code> và <code>uv run trading_floor.py</code> trong các cửa sổ dòng lệnh riêng biệt.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Ngăn xếp công nghệ và các thành phần phụ thuộc</h3>
+          <ul class="list-tight">
+            <li>Python + <code>uv</code> / <code>uvx</code></li>
+            <li>OpenAI Agents SDK - Bộ công cụ phát triển phần mềm tác tử OpenAI</li>
+            <li>MCP Python SDK - Bộ công cụ phát triển phần mềm Python MCP / FastMCP</li>
+            <li><code>sqlite3</code>, <code>pydantic</code>, <code>python-dotenv</code>, <code>requests</code></li>
+            <li><code>polygon</code>, <code>gradio</code>, <code>pandas</code>, <code>plotly</code></li>
+            <li>Các server (máy chủ) MCP dựa trên Node cho Brave Search, memory (bộ nhớ), fetch và Playwright tùy chọn</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Chiến lược thử nghiệm</h3>
+          <ul class="list-tight">
+            <li>Không tìm thấy bộ thử nghiệm chuyên dụng nào trong phạm vi được khám phá.</li>
+            <li>Phong cách xác thực hiện tại dựa trên notebook (sổ tay lập trình) và tập trung nhiều vào trace (dấu vết)/dashboard (bảng điều khiển).</li>
+            <li>Các thử nghiệm tiếp theo tốt nhất: unit tests - thử nghiệm đơn vị cho domain/state (miền/trạng thái), thử nghiệm hợp đồng MCP, và integration tests - thử nghiệm tích hợp cho <code>Trader.run()</code>.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="evidence">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Minh chứng và khuyến cáo</span>
+          <h2>Nơi báo cáo được căn cứ và nơi sự không chắc chắn vẫn còn tồn tại.</h2>
+        </div>
+        <p class="section-intro">
+          Kiến trúc và trách nhiệm của file (tập tin) được căn cứ mạnh mẽ. Các lĩnh vực yếu hơn là phiên bản phụ thuộc chính xác và hành vi thời gian chạy chưa được xác minh.
+        </p>
+      </div>
+
+      <div class="key-grid">
+        <article class="dark-card">
+          <h3>Các nguồn minh chứng</h3>
+          <ul class="evidence-list">
+            <li>Từ <code>tai_lieu/day1_study_guide.html</code> đến <code>tai_lieu/day5_study_guide.html</code></li>
+            <li>Từ <code>1_lab1.ipynb</code> đến <code>5_lab5.ipynb</code></li>
+            <li><code>accounts.py</code>, <code>accounts_client.py</code>, <code>accounts_server.py</code>, <code>app.py</code></li>
+            <li><code>database.py</code>, <code>market.py</code>, <code>market_server.py</code>, <code>mcp_params.py</code></li>
+            <li><code>push_server.py</code>, <code>reset.py</code>, <code>templates.py</code>, <code>tracers.py</code>, <code>traders.py</code>, <code>trading_floor.py</code>, <code>util.py</code></li>
+            <li>Quét repo (kho chứa) để tìm mã băm commit, các thư mục cấp cao nhất và các tín hiệu hiện diện của cấu hình/thử nghiệm/triển khai.</li>
+          </ul>
+        </article>
+
+        <article class="coral-card">
+          <h3>Rủi ro và câu hỏi mở</h3>
+          <ul class="risk-list">
+            <li>Không tìm thấy bản khai báo phụ thuộc chính thức nào trong phạm vi được khám phá, vì vậy các phiên bản gói chính xác vẫn chưa được xác nhận.</li>
+            <li><code>market.py</code> tự động chuyển về giá ngẫu nhiên khi không có Polygon, điều này hữu ích cho các bản demo nhưng yếu đối với một bản mô phỏng đáng tin cậy.</li>
+            <li><code>push_server.py</code> thực hiện một yêu cầu mạng trực tiếp với xử lý lỗi rất sơ sài.</li>
+            <li>Cây con <code>hieu/</code> trông giống như một bản sao hoặc bản đối chiếu, nhưng quyền sở hữu chính thức không được tài liệu hóa rõ ràng.</li>
+            <li>Các lưu ý về MCP trên Windows xuất hiện trong tài liệu khóa học, nhưng việc xác minh thời gian chạy cho lộ trình đó đã không được thực hiện ở đây.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer-band">
+      <strong>Hướng thiết kế:</strong> systems atlas - bản đồ hệ thống biên tập ấm áp. Trang này tránh kiểu dáng báo cáo repo (kho chứa) chung chung bằng cách sử dụng nhịp điệu kem/san hô/bề mặt tối, phong cách dòng tiêu đề dẫn dắt bằng phông chữ có chân, và các chế độ xem kiến trúc tương tác thay vì các khối mã tĩnh. Các phông chữ vẫn dựa trên các lựa chọn dự phòng vì các phông chữ độc quyền kiểu Anthropic không có sẵn cục bộ.
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      const tabs = Array.from(document.querySelectorAll("[data-view-target]"));
+      const panels = {
+        architecture: document.getElementById("view-architecture"),
+        dependencies: document.getElementById("view-dependencies"),
+        runtime: document.getElementById("view-runtime"),
+        setup: document.getElementById("view-setup")
+      };
+
+      function activateView(name) {
+        tabs.forEach((tab) => {
+          const isActive = tab.getAttribute("data-view-target") === name;
+          tab.classList.toggle("is-active", isActive);
+          tab.setAttribute("aria-selected", String(isActive));
+        });
+
+        Object.entries(panels).forEach(([key, panel]) => {
+          panel.classList.toggle("is-active", key === name);
+        });
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", function () {
+          activateView(this.getAttribute("data-view-target"));
+        });
+      });
+
+      const runtimeSteps = Array.from(document.querySelectorAll("[data-runtime-step]"));
+      let activeStep = 0;
+
+      function pulseRuntime() {
+        runtimeSteps.forEach((step, index) => {
+          step.classList.toggle("is-current", index === activeStep);
+        });
+        activeStep = (activeStep + 1) % runtimeSteps.length;
+      }
+
+      pulseRuntime();
+      window.setInterval(pulseRuntime, 1800);
+    })();
+  </script>
+</body>
+</html>
