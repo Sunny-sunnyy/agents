@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Khám phá dự án 6_mcp</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
       --primary: #cc785c;
@@ -1173,6 +1174,7 @@
       <nav class="topnav">
         <a href="#overview">Tổng quan</a>
         <a href="#atlas">Architecture (Kiến trúc)</a>
+        <a href="#pipeline-architecture">Pipeline &amp; Hàm</a>
         <a href="#repository">Repo (Kho chứa)</a>
         <a href="#evidence">Minh chứng</a>
       </nav>
@@ -1544,6 +1546,459 @@ uv run trading_floor.py</div>
       </section>
     </section>
 
+    <section class="section" id="pipeline-architecture">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Quy trình &amp; Kiến trúc (Pipeline &amp; Architecture)</span>
+          <h2>End-to-End Workflow &amp; API chi tiết cấp Hàm</h2>
+        </div>
+        <p class="section-intro">
+          Chi tiết luồng hoạt động đầu-cuối từ bộ lập lịch, nạp prompt qua MCP, gọi agent, bộ nhớ đồ thị tri thức LibSQL và mô tả chi tiết chức năng của từng hàm trong hệ thống.
+        </p>
+      </div>
+
+      <div class="triple-grid" style="margin-bottom: 24px;">
+        <article class="card" style="grid-column: span 3; background: #ffffff;">
+          <h3 style="color: var(--primary); font-family: var(--serif); font-size: 1.4rem; margin-bottom: 15px;">1. Control Flow &amp; Sequence Diagram (Sơ đồ chạy tuần tự)</h3>
+          <p style="font-size: 0.92rem; color: var(--muted); margin-bottom: 15px;">
+            Sơ đồ tuần tự dưới đây thể hiện quy trình chạy thực tế từ lúc khởi động engine lập lịch, mở các MCP servers qua stdio, nạp tài nguyên sống, kích hoạt agent và đồng bộ kết quả.
+          </p>
+          <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px; overflow: auto;">
+            <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant TF as trading_floor.py (Scheduler)
+  participant TR as traders.py (Trader class)
+  participant AC as accounts_client.py (Resource Reader)
+  participant AS as accounts_server.py (FastMCP)
+  participant AG as agents (OpenAI Agents SDK)
+  participant MT as tracers.py (LogTracer)
+  participant DB as database.py (SQLite DB)
+  participant UI as app.py (Gradio UI)
+
+  Note over TF,UI: KHỞI CHẠY HỆ THỐNG
+  TF->>MT: add_trace_processor Lắng nghe trace log
+  TF->>TF: create_traders Khởi tạo 4 Trader
+  
+  Note over TF,UI: VÒNG LẶP ĐỊNH KỲ
+  loop Chạy định kỳ (asyncio.gather)
+    TF->>TR: Run Kích hoạt các Trader
+    TR->>TR: run_with_trace Tạo trace context
+    TR->>MT: on_trace_start Bắt đầu trace
+    MT->>DB: write_log Ghi trace log
+    
+    TR->>TR: run_with_mcp_servers Khởi chạy MCP servers qua stdio
+    
+    TR->>AC: read_accounts_resource Đọc tài khoản
+    AC->>AS: read_resource accounts_server
+    AS->>DB: read_account Lấy JSON tài khoản
+    DB-->>TR: Trả về JSON tài khoản
+    
+    TR->>AC: read_strategy_resource Đọc chiến lược
+    AC->>AS: read_resource strategy
+    AS->>DB: read_account Lấy chiến lược
+    DB-->>TR: Trả về Strategy
+    
+    TR->>AG: Runner.run Chạy Trader Agent
+    
+    Note over AG,AS: TRONG KHI AGENT SUY NGHĨ (MAX TURNS = 30)
+    rect rgb(240,240,240)
+      Note right of AG: Agent gọi tool qua MCP
+      AG->>AS: call_tool (buy/sell/balance)
+      AS->>DB: write_account Cập nhật tài sản
+      AS->>DB: write_log Ghi log giao dịch
+      
+      Note right of AG: Agent gọi Researcher tool
+      AG->>AG: Gọi Researcher Agent
+      AG->>AS: call_tool (push) Gửi thông báo
+    end
+
+    AG-->>TR: Hoàn thành lượt (Appraisal)
+    TR->>TR: Đảo trạng thái do_trade
+    TR->>MT: on_trace_end Kết thúc trace
+    MT->>DB: write_log Ghi trace log
+  end
+
+  Note over UI,DB: TIẾN TRÌNH UI (CHẠY SONG SONG)
+  loop Cập nhật UI
+    UI->>DB: read_account Lấy holdings & transactions
+    UI->>DB: read_log Đọc trace logs
+    UI-->>UI: Render Gradio UI
+  end
+            </pre>
+          </div>
+        </article>
+      </div>
+
+      <div class="triple-grid" style="margin-bottom: 24px;">
+        <article class="card" style="grid-column: span 3; background: #ffffff;">
+          <h3 style="color: var(--primary); font-family: var(--serif); font-size: 1.4rem; margin-bottom: 15px;">2. Quy trình hoạt động chi tiết đầu-cuối bằng văn bản (End-to-End Detailed Workflow Walkthrough)</h3>
+          <div style="font-size: 0.92rem; line-height: 1.75; color: var(--body);">
+            <p style="margin-bottom: 20px;">
+              Hệ thống mô phỏng sàn giao dịch thông minh này được cấu trúc xoay quanh <strong>hai tiến trình chạy độc lập, bất đồng bộ và giao tiếp phi tập trung</strong> qua cơ sở dữ liệu SQLite chung (tệp <code>accounts.db</code>). Điều này giúp cô lập logic xử lý giao dịch của các Agent với logic hiển thị giao diện người dùng Gradio. Dưới đây là mô tả chi tiết, tường tận từng bước của toàn bộ vòng đời chạy:
+            </p>
+
+            <div style="background: var(--surface-soft); border-left: 4px solid var(--primary); padding: 15px; border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-bottom: 24px;">
+              <h4 style="margin: 0 0 8px 0; color: var(--ink); font-family: var(--serif); font-size: 1.1rem;">Khái quát hai nhánh tiến trình song song:</h4>
+              <ul style="margin: 0; padding-left: 20px;">
+                <li><strong>Tiến trình Trading Floor Engine / Scheduler:</strong> Khởi chạy từ <a href="file:///G:/Agent2026Win/agents/6_mcp/trading_floor.py" style="color: var(--primary); text-decoration: underline;">trading_floor.py</a>, chịu trách nhiệm quản lý vòng đời chạy định kỳ của các Agent và cập nhật tài sản xuống CSDL SQLite.</li>
+                <li><strong>Tiến trình Dashboard UI:</strong> Khởi chạy từ <a href="file:///G:/Agent2026Win/agents/6_mcp/app.py" style="color: var(--primary); text-decoration: underline;">app.py</a>, định kỳ truy vấn (polling) CSDL SQLite để cập nhật các bảng holdings, transactions và hiển thị nhật ký giao dịch.</li>
+              </ul>
+            </div>
+
+            <!-- GIAI ĐOẠN 1 -->
+            <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-soft);">
+              <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">Giai đoạn 1</span>
+              <h4 style="color: var(--ink); font-family: var(--serif); font-size: 1.25rem; margin: 0 0 15px 0; border-bottom: 1px dashed var(--hairline); padding-bottom: 10px;">Khởi chạy hệ thống &amp; Thiết lập Tracing (System Startup &amp; Tracing Configuration)</h4>
+              <ol style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 12px;">
+                  <strong>Kích hoạt Engine:</strong> Người dùng chạy lệnh khởi động <code>uv run trading_floor.py</code>. Hàm chính <code>asyncio.run(run_every_n_minutes())</code> tại <a href="file:///G:/Agent2026Win/agents/6_mcp/trading_floor.py" style="color: var(--primary); font-weight: 600;">trading_floor.py</a> được kích hoạt để quản lý vòng lặp bất đồng bộ.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Đăng ký Log Tracing:</strong> Hàm <code>run_every_n_minutes()</code> gọi <code>add_trace_processor(LogTracer())</code> từ OpenAI Agents SDK, liên kết với lớp <code>LogTracer</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/tracers.py" style="color: var(--primary); font-weight: 600;">tracers.py</a>. Khi bất kỳ Agent nào hoạt động và phát sinh sự kiện trace/span, <code>LogTracer</code> sẽ chặn và gọi <code>write_log(name, type, message)</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/database.py" style="color: var(--primary); font-weight: 600;">database.py</a> để ghi nhận nhật ký tức thời vào bảng <code>logs</code> của cơ sở dữ liệu SQLite (<code>accounts.db</code>).
+                </li>
+                <li style="margin-bottom: 0;">
+                  <strong>Khởi tạo các đối tượng Trader:</strong> Hàm <code>create_traders()</code> được gọi để lặp qua danh sách 4 nhân vật <code>["Warren", "George", "Ray", "Cathie"]</code> và khởi tạo các đối tượng <code>Trader</code> từ <a href="file:///G:/Agent2026Win/agents/6_mcp/traders.py" style="color: var(--primary); font-weight: 600;">traders.py</a>.
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;">Nếu cấu hình <code>USE_MANY_MODELS=true</code>, hàm <code>get_model(model_name)</code> sẽ gán các LLM khác nhau: Warren dùng <code>gpt-4.1-mini</code>, George dùng <code>deepseek-chat</code> qua OpenRouter, Ray dùng <code>gemini-2.5-flash</code>, và Cathie dùng <code>grok-3-mini-beta</code>.</li>
+                    <li>Nếu <code>USE_MANY_MODELS=false</code>, cả 4 trader dùng chung mô hình mặc định <code>gpt-4o-mini</code>.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+
+            <!-- GIAI ĐOẠN 2 -->
+            <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-soft);">
+              <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">Giai đoạn 2</span>
+              <h4 style="color: var(--ink); font-family: var(--serif); font-size: 1.25rem; margin: 0 0 15px 0; border-bottom: 1px dashed var(--hairline); padding-bottom: 10px;">Lập lịch chạy định kỳ (Periodic Scheduler Runtime Loop)</h4>
+              <ol style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 12px;">
+                  <strong>Vòng lặp định kỳ bất tận:</strong> Hàm <code>run_every_n_minutes()</code> đi vào cấu trúc lặp <code>while True</code>. Mỗi chu kỳ, nó thực hiện kiểm tra trạng thái mở/đóng của sàn chứng khoán bằng cách gọi hàm <code>is_market_open()</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/market.py" style="color: var(--primary); font-weight: 600;">market.py</a> (sử dụng thư viện <code>polygon.RESTClient</code> kết nối với Polygon API).
+                </li>
+                <li style="margin-bottom: 0;">
+                  <strong>Thực thi song song:</strong> Nếu thị trường mở (hoặc biến override <code>RUN_EVEN_WHEN_MARKET_IS_CLOSED=true</code>), hàm lập lịch kích hoạt đồng thời 4 phiên chạy của các Trader bằng cú pháp bất đồng bộ: <code>asyncio.gather(*[trader.run() for trader in traders])</code>. Điểm kích hoạt là phương thức <code>run()</code> của lớp <code>Trader</code>.
+                </li>
+              </ol>
+            </div>
+
+            <!-- GIAI ĐOẠN 3 -->
+            <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-soft);">
+              <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">Giai đoạn 3</span>
+              <h4 style="color: var(--ink); font-family: var(--serif); font-size: 1.25rem; margin: 0 0 15px 0; border-bottom: 1px dashed var(--hairline); padding-bottom: 10px;">Chu kỳ sống của Trader &amp; Kết nối MCP Stdio (Trader Runtime &amp; MCP Lifecycle)</h4>
+              <ol style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 12px;">
+                  <strong>Khởi tạo Trace Context:</strong> Hàm <code>Trader.run()</code> gọi <code>Trader.run_with_trace()</code>. Hàm này tạo một mã định danh <code>trace_id</code> duy nhất thông qua hàm <code>make_trace_id(self.name.lower())</code> trong <code>tracers.py</code> và bọc tiến trình chạy trong khối <code>with trace(trace_name, trace_id=trace_id):</code> để kích hoạt trình lắng nghe <code>LogTracer</code> ghi log bắt đầu vào SQLite.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Kết nối các tiến trình con MCP (Subprocesses):</strong> Hàm <code>Trader.run_with_mcp_servers()</code> sử dụng cấu trúc <code>AsyncExitStack</code> để đồng thời khởi chạy và thiết lập kết nối stdio với các MCP servers cục bộ:
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;"><strong>Trader MCP Servers:</strong> Khởi chạy <a href="file:///G:/Agent2026Win/agents/6_mcp/accounts_server.py" style="color: var(--primary); font-weight: 600;">accounts_server.py</a> và <a href="file:///G:/Agent2026Win/agents/6_mcp/push_server.py" style="color: var(--primary); font-weight: 600;">push_server.py</a> (chứa tool push thông báo qua Pushover API) và tệp mô phỏng dữ liệu thị trường <a href="file:///G:/Agent2026Win/agents/6_mcp/market_server.py" style="color: var(--primary); font-weight: 600;">market_server.py</a> (đọc thông tin giá cổ phiếu bằng hàm <code>get_share_price</code> trong <code>market.py</code>).</li>
+                    <li><strong>Researcher MCP Servers:</strong> Khởi chạy các máy chủ MCP ngoài: <code>mcp-server-fetch</code> (cào web), <code>@modelcontextprotocol/server-brave-search</code> (tìm tin tức) và <code>mcp-memory-libsql</code> với cờ <code>LIBSQL_URL=file:./memory/{name}.db</code> nhằm quản lý cơ sở dữ liệu đồ thị tri thức dài hạn của từng Trader.</li>
+                  </ul>
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Nạp tài nguyên Ngữ cảnh (Resource Grounding):</strong> Hàm <code>Trader.run_agent()</code> được kích hoạt. Nó đọc chiến lược sống hiện thời của trader bằng cách gọi <code>read_strategy_resource(name)</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/accounts_client.py" style="color: var(--primary); font-weight: 600;">accounts_client.py</a>, và đọc chi tiết tài sản hiện thời bằng cách gọi <code>Trader.get_account_report()</code>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Lọc dữ liệu rác (Scrubbing portfolio_value_time_series):</strong> Để giữ cho kích thước prompt tối ưu và không làm LLM bị nhầm lẫn bởi chuỗi thời gian biểu thị lịch sử PnL dài hạn, hàm <code>Trader.get_account_report()</code> gọi lệnh <code>account_json.pop("portfolio_value_time_series", None)</code> để loại bỏ toàn bộ dữ liệu lịch sử tài sản trước khi gửi JSON tài khoản vào prompt của Agent.
+                </li>
+                <li style="margin-bottom: 0;">
+                  <strong>Lựa chọn prompt Giao dịch hay Tái cân bằng:</strong> Dựa trên cờ <code>self.do_trade</code>:
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;">Nếu <code>self.do_trade = True</code> (mặc định lượt đầu): Tạo message bằng hàm <code>trade_message()</code> từ <a href="file:///G:/Agent2026Win/agents/6_mcp/templates.py" style="color: var(--primary); font-weight: 600;">templates.py</a> yêu cầu tìm kiếm cơ hội giao dịch mới dựa trên chiến lược.</li>
+                    <li>Nếu <code>self.do_trade = False</code>: Tạo message bằng hàm <code>rebalance_message()</code> yêu cầu đánh giá và tái cơ cấu lại danh mục cổ phiếu hiện nắm giữ.</li>
+                  </ul>
+                  Cờ <code>self.do_trade</code> được đảo trạng thái sau mỗi lượt chạy (<code>self.do_trade = not self.do_trade</code>) ở cuối hàm <code>Trader.run()</code>.
+                </li>
+              </ol>
+            </div>
+
+            <!-- GIAI ĐOẠN 4 -->
+            <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-soft);">
+              <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">Giai đoạn 4</span>
+              <h4 style="color: var(--ink); font-family: var(--serif); font-size: 1.25rem; margin: 0 0 15px 0; border-bottom: 1px dashed var(--hairline); padding-bottom: 10px;">Agent Suy luận &amp; Gọi Công cụ MCP (Agent Execution &amp; Tool Calling Loop)</h4>
+              <ol style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 12px;">
+                  <strong>Vòng lặp suy nghĩ của Agent:</strong> Hàm <code>Runner.run(self.agent, message, max_turns=30)</code> khởi động OpenAI Agents SDK. Agent có quyền đưa ra tối đa 30 lượt suy nghĩ/gọi công cụ.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Thực thi các nghiệp vụ Mua/Bán:</strong> Khi Agent quyết định giao dịch, nó gọi công cụ MCP tương ứng:
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;"><strong>Mua:</strong> Gọi <code>buy_shares(name, symbol, quantity, rationale)</code> trên <code>accounts_server.py</code>. Server này chuyển tiếp yêu cầu đến phương thức <code>buy_shares</code> của đối tượng <code>Account</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/accounts.py" style="color: var(--primary); font-weight: 600;">accounts.py</a>. Phương thức này sẽ tính toán giá kèm chênh lệch spread, kiểm tra số dư, trừ tiền, cộng holdings, lưu vết giao dịch vào danh sách transactions, gọi <code>write_log</code> của <code>database.py</code> và lưu tài khoản.</li>
+                    <li><strong>Bán:</strong> Gọi <code>sell_shares(name, symbol, quantity, rationale)</code> trên <code>accounts_server.py</code>, chuyển tiếp đến phương thức <code>sell_shares</code> trong <code>accounts.py</code>. Nó kiểm tra holdings có đủ cổ phiếu hay không, tính giá bán kèm spread, cộng tiền mặt, trừ holdings, lưu vết giao dịch (với số lượng âm để ký hiệu lệnh bán), gọi <code>write_log</code> và lưu tài khoản.</li>
+                  </ul>
+                  Cả hai hành vi trên đều ghi đè trạng thái tài khoản cập nhật nhất vào bảng <code>accounts</code> trong SQLite qua hàm <code>write_account(name, account_dict)</code> tại <code>database.py</code>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Kích hoạt Researcher Agent &amp; Đồ thị tri thức LibSQL:</strong>
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;">Nếu Trader Agent cần nghiên cứu sâu hơn, nó gọi công cụ <code>Researcher</code> (được tạo bằng hàm <code>get_researcher_tool()</code> từ <code>traders.py</code>).</li>
+                    <li style="margin-bottom: 6px;">Researcher Agent sẽ sử dụng các API/Servers được gán riêng cho nó như Brave Search (tìm kiếm tin tức vĩ mô mới nhất) và Fetch (cào chi tiết nội dung trang web).</li>
+                    <li>Nó sử dụng <strong>mcp-memory-libsql</strong> để đọc hoặc lưu các thực thể, mối quan hệ mới thu hoạch được vào cơ sở dữ liệu đồ thị tri thức cục bộ <code>memory/{name}.db</code>. Sau đó, nó tổng hợp kết quả và trả về một văn bản báo cáo cho Trader Agent.</li>
+                  </ul>
+                </li>
+                <li style="margin-bottom: 0;">
+                  <strong>Đẩy thông báo &amp; Kết thúc:</strong>
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;">Ở cuối phiên, Trader Agent gọi công cụ <code>push</code> của <code>push_server.py</code> để gửi tóm tắt hoạt động qua Pushover API.</li>
+                    <li>Hệ thống đóng khối <code>AsyncExitStack</code> để kết thúc và giải phóng toàn bộ tiến trình con MCP Server stdio.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+
+            <!-- GIAI ĐOẠN 5 -->
+            <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-soft);">
+              <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">Giai đoạn 5</span>
+              <h4 style="color: var(--ink); font-family: var(--serif); font-size: 1.25rem; margin: 0 0 15px 0; border-bottom: 1px dashed var(--hairline); padding-bottom: 10px;">Cập nhật Giao diện Độc lập (Independent UI Polling Loop)</h4>
+              <ol style="padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 12px;">
+                  <strong>Khởi chạy Dashboard:</strong> Người dùng chạy lệnh song song <code>uv run app.py</code>. Hàm <code>create_ui()</code> trong <a href="file:///G:/Agent2026Win/agents/6_mcp/app.py" style="color: var(--primary); font-weight: 600;">app.py</a> sẽ xây dựng giao diện Gradio Blocks, khởi tạo các đối tượng hiển thị <code>TraderView</code> cho 4 trader.
+                </li>
+                <li style="margin-bottom: 12px;">
+                  <strong>Cập nhật Nhật ký thời gian thực (Mỗi 0.5 giây):</strong> Bộ lập lịch <code>gr.Timer(value=0.5)</code> liên tục gọi hàm <code>Trader.get_logs()</code> trong <code>app.py</code>. Hàm này thực hiện truy vấn bảng <code>logs</code> thông qua <code>read_log(name, last_n=13)</code> của <code>database.py</code> và cập nhật trực tiếp Panel hiển thị log trên UI theo các mã màu định nghĩa trước (agent: cyan, function: green, response: magenta, account: red...).
+                </li>
+                <li style="margin-bottom: 0;">
+                  <strong>Cập nhật Tài sản &amp; Holdings (Mỗi 120 giây):</strong> Bộ lập lịch <code>gr.Timer(value=120)</code> gọi hàm <code>refresh()</code> của lớp <code>TraderView</code>.
+                  <ul style="padding-left: 20px; margin-top: 8px;">
+                    <li style="margin-bottom: 6px;">Nó gọi <code>trader.reload()</code>, thực hiện đọc lại trạng thái tài khoản JSON mới nhất từ bảng <code>accounts</code> trong SQLite qua <code>Account.get(name)</code>.</li>
+                    <li>Nó tính toán lại tổng tài sản và PnL, vẽ lại đồ thị Plotly bằng hàm <code>get_portfolio_value_chart()</code>, và cập nhật lại dữ liệu của bảng Holdings (danh mục nắm giữ) cùng Transactions (lịch sử giao dịch) trên giao diện.</li>
+                  </ul>
+                </li>
+              </ol>
+            </div>
+
+            <!-- BẢNG TỔNG HỢP GIAO TIẾP VÀ LIÊN KẾT PHỤ THUỘC FILE -->
+            <h4 style="color: var(--primary-active); font-family: var(--serif); font-size: 1.15rem; margin-top: 25px; margin-bottom: 15px;">Bảng tổng hợp tương tác các tệp tin &amp; luồng gọi hàm (File Interaction &amp; Call Map)</h4>
+            <div class="table-shell" style="margin-bottom: 15px; border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem; background: #ffffff;">
+                <thead>
+                  <tr style="background: var(--surface-cream-strong); border-bottom: 2px solid var(--hairline); text-align: left; color: var(--ink);">
+                    <th style="padding: 10px 12px; font-weight: 600;">Tệp khởi chạy</th>
+                    <th style="padding: 10px 12px; font-weight: 600;">Tệp được gọi</th>
+                    <th style="padding: 10px 12px; font-weight: 600;">Hàm/Phương thức chính</th>
+                    <th style="padding: 10px 12px; font-weight: 600;">Mục đích cốt lõi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">trading_floor.py</td>
+                    <td style="padding: 10px 12px;">tracers.py</td>
+                    <td style="padding: 10px 12px;"><code>add_trace_processor(LogTracer())</code></td>
+                    <td style="padding: 10px 12px;">Đăng ký bộ nghe sự kiện để tự động lưu vết trace/span vào CSDL SQLite.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">trading_floor.py</td>
+                    <td style="padding: 10px 12px;">traders.py</td>
+                    <td style="padding: 10px 12px;"><code>create_traders()</code>, <code>Trader.run()</code></td>
+                    <td style="padding: 10px 12px;">Khởi tạo 4 đối tượng giao dịch ứng với các LLM và kích hoạt chạy song song.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">traders.py</td>
+                    <td style="padding: 10px 12px;">accounts_client.py</td>
+                    <td style="padding: 10px 12px;"><code>read_accounts_resource()</code>, <code>read_strategy_resource()</code></td>
+                    <td style="padding: 10px 12px;">Gọi MCP client để nạp thông tin số dư tài khoản và chiến lược đầu tư.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">traders.py</td>
+                    <td style="padding: 10px 12px;">mcp_params.py</td>
+                    <td style="padding: 10px 12px;"><code>trader_mcp_server_params</code>, <code>researcher_mcp_server_params</code></td>
+                    <td style="padding: 10px 12px;">Lấy thông tin tham số khởi tạo các tiến trình con MCP stdio.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">accounts_client.py</td>
+                    <td style="padding: 10px 12px;">accounts_server.py</td>
+                    <td style="padding: 10px 12px;"><code>stdio_client(params)</code>, <code>read_resource()</code></td>
+                    <td style="padding: 10px 12px;">Kết nối trực tiếp tới Stdout/Stdin của tiến trình accounts_server.py để lấy tài nguyên.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">accounts_server.py</td>
+                    <td style="padding: 10px 12px;">accounts.py</td>
+                    <td style="padding: 10px 12px;"><code>Account.get()</code>, <code>Account.buy_shares()</code>, <code>Account.sell_shares()</code></td>
+                    <td style="padding: 10px 12px;">Chuyển tiếp yêu cầu gọi công cụ từ Agent sang lớp Account xử lý logic nghiệp vụ.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">accounts.py</td>
+                    <td style="padding: 10px 12px;">database.py</td>
+                    <td style="padding: 10px 12px;"><code>write_account()</code>, <code>read_account()</code>, <code>write_log()</code></td>
+                    <td style="padding: 10px 12px;">Ghi dữ liệu JSON tài khoản và vết log sự kiện trực tiếp vào bảng SQLite.</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--hairline-soft);">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">app.py</td>
+                    <td style="padding: 10px 12px;">database.py</td>
+                    <td style="padding: 10px 12px;"><code>read_account()</code>, <code>read_log()</code></td>
+                    <td style="padding: 10px 12px;">Giao diện Gradio gọi đọc thông tin tài khoản và nhật ký từ SQLite để cập nhật đồ thị/bảng biểu.</td>
+                  </tr>
+                  <tr style="border-bottom: none;">
+                    <td style="padding: 10px 12px; font-weight: 600; color: var(--ink);">app.py</td>
+                    <td style="padding: 10px 12px;">accounts.py</td>
+                    <td style="padding: 10px 12px;"><code>Account.get()</code>, <code>Account.calculate_portfolio_value()</code></td>
+                    <td style="padding: 10px 12px;">Truy vấn giá chứng khoán hiện thời để tính toán tổng giá trị danh mục hiển thị trên UI.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </article>
+      </div>
+
+      <div class="triple-grid" style="margin-bottom: 24px;">
+        <article class="card" style="grid-column: span 3; background: #ffffff;">
+          <h3 style="color: var(--primary); font-family: var(--serif); font-size: 1.4rem; margin-bottom: 15px;">3. Long-term Memory &amp; Knowledge Graph (Bộ nhớ đồ thị tri thức)</h3>
+          <p style="font-size: 0.92rem; color: var(--muted); margin-bottom: 15px;">
+            Quy trình liên kết giữa tác nhân Trader, Researcher Agent và máy chủ bộ nhớ <code>mcp-memory-libsql</code> lưu tại <code>./memory/{name}.db</code> cho từng trader.
+          </p>
+          <div style="background: #ffffff; border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px; overflow: auto;">
+            <pre class="mermaid">
+flowchart TB
+  subgraph TR_Process["Tiến trình Trader (traders.py)"]
+    TraderAgent["Trader Agent (Warren/George...)"]
+    ResearcherTool["Researcher Agent (Bọc dưới dạng Tool)"]
+  end
+
+  subgraph MCP_Memory["mcp-memory-libsql (sub-process qua stdio)"]
+    MemoryServer["LibSQL Memory Server"]
+    MemoryDB[(SQLite DB: ./memory/name.db)]
+  end
+
+  subgraph KnowledgeGraph["Đồ thị tri thức (Knowledge Graph Schema)"]
+    NodeEntity["Entity (Thực thể)<br/>- name (tên mã cổ phiếu, tên công ty...)<br/>- type (STOCK, COMPANY, URL, MARKET)<br/>- description (mô tả)"]
+    NodeRelation["Relation (Mối quan hệ)<br/>- source (thực thể gốc)<br/>- target (thực thể đích)<br/>- relationType (ví dụ: COMPETITOR_OF)"]
+  end
+
+  TraderAgent --> ResearcherTool
+  ResearcherTool --> MemoryServer
+  MemoryServer --> MemoryDB
+  MemoryDB --> MemoryServer
+  MemoryServer --> ResearcherTool
+
+  ResearcherTool --> Web[(Brave Search / Fetch Web)]
+  Web --> ResearcherTool
+  
+  ResearcherTool --> MemoryServer
+  MemoryServer --> MemoryDB
+  MemoryDB --> KnowledgeGraph
+  
+  ResearcherTool --> TraderAgent
+            </pre>
+          </div>
+        </article>
+      </div>
+
+      <div class="triple-grid">
+        <article class="card" style="grid-column: span 3; background: var(--surface-dark); color: #faf9f5; border: 1px solid rgba(250,249,245,0.1);">
+          <h3 style="color: #cc785c; font-family: var(--serif); font-size: 1.4rem; margin-bottom: 15px;">4. Detailed Function API (Bản tả chi tiết cấp Hàm)</h3>
+          
+          <div style="font-family: var(--sans); font-size: 0.88rem; line-height: 1.7;">
+            <h5 style="color:#cc785c; font-family:var(--serif); font-size:1.15rem; margin-bottom:10px; margin-top:20px;">• trading_floor.py (Scheduler Engine)</h5>
+            <ul style="list-style:none; padding-left:15px; margin-bottom:20px;">
+              <li style="margin-bottom:12px;"><strong><code>create_traders()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: List[Trader]</span><br/>
+                Khởi tạo 4 đối tượng <code>Trader</code> từ <code>traders.py</code>. Nếu <code>USE_MANY_MODELS</code> bật, gán các mô hình khác nhau (GPT 4.1 Mini, DeepSeek, Gemini, Grok) cho từng người, ngược lại dùng chung <code>gpt-4o-mini</code>.
+              </li>
+              <li><strong><code>run_every_n_minutes()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: Coroutine</span><br/>
+                Hàm bất đồng bộ chạy lặp vô hạn. Gọi <code>add_trace_processor(LogTracer())</code>, khởi tạo danh sách các trader và chạy vòng lặp <code>while True</code>. Mỗi chu kỳ, nếu thị trường mở hoặc có cờ override, nó kích hoạt song song <code>trader.run()</code> bằng <code>asyncio.gather</code> rồi ngủ N phút.
+              </li>
+            </ul>
+
+            <h5 style="color:#cc785c; font-family:var(--serif); font-size:1.15rem; margin-bottom:10px; margin-top:20px;">• traders.py (Agent Builder &amp; Runtime Lifecycle)</h5>
+            <ul style="list-style:none; padding-left:15px; margin-bottom:20px;">
+              <li style="margin-bottom:12px;"><strong><code>get_model(model_name)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: model_name: str | Đầu ra: OpenAIChatCompletionsModel | str</span><br/>
+                Định tuyến API. Trả về đối tượng <code>OpenAIChatCompletionsModel</code> trỏ đến OpenRouter, DeepSeek, Grok, Gemini, hoặc trả về chính chuỗi <code>model_name</code> nếu dùng OpenAI mặc định.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>get_researcher(mcp_servers, model_name)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: mcp_servers: List, model_name: str | Đầu ra: Agent</span><br/>
+                Khởi tạo đối tượng <code>Agent</code> (Researcher), cấu hình prompt hệ thống <code>researcher_instructions()</code> và liên kết các MCP servers nghiên cứu (fetch, search, memory).
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>get_researcher_tool(mcp_servers, model_name)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: mcp_servers: List, model_name: str | Đầu ra: Tool</span><br/>
+                Tạo một Researcher agent và bọc nó thành một công cụ gọi được qua phương thức <code>researcher.as_tool()</code> để Trader có thể sử dụng.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Trader.create_agent(trader_mcp_servers, researcher_mcp_servers)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: t_mcp: List, r_mcp: List | Đầu ra: Agent</span><br/>
+                Khởi tạo đối tượng <code>Agent</code> cho Trader. Đấu nối Researcher tool (lấy từ <code>get_researcher_tool</code>) và danh sách <code>t_mcp</code> (trader MCP servers) vào Agent này.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Trader.get_account_report()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: str (JSON)</span><br/>
+                Đọc thông tin chi tiết tài khoản hiện thời từ resource <code>read_accounts_resource</code> và loại bỏ trường dữ liệu chuỗi thời gian <code>portfolio_value_time_series</code> để làm sạch prompt trước khi đưa vào LLM.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Trader.run_agent(trader_mcp_servers, researcher_mcp_servers)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: t_mcp: List, r_mcp: List | Đầu ra: Coroutine</span><br/>
+                Tạo agent bằng <code>create_agent()</code>. Đọc strategy sống và account report. Dựa vào cờ <code>self.do_trade</code> để chọn prompt user (giao dịch hay tái cơ cấu danh mục). Chạy agent bằng <code>Runner.run()</code> với <code>max_turns=30</code>.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Trader.run_with_mcp_servers()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: Coroutine</span><br/>
+                Sử dụng <code>AsyncExitStack</code> để mở và khởi chạy các tiến trình con MCP stdio cho cả Trader và Researcher, sau đó chạy <code>run_agent()</code>. Các tiến trình con này được đảm bảo đóng hoàn toàn sau khi khối lệnh kết thúc.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Trader.run_with_trace()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: Coroutine</span><br/>
+                Tạo một <code>trace_id</code> duy nhất định dạng <code>trace_{name}0{random}</code>. Bọc việc thực thi <code>run_with_mcp_servers()</code> trong context manager <code>trace()</code> của OpenAI SDK để tracers bắt sự kiện ghi log.
+              </li>
+              <li><strong><code>Trader.run()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: Coroutine</span><br/>
+                Điểm kích hoạt chạy. Thực thi <code>run_with_trace()</code> và đảo trạng thái cờ <code>self.do_trade = not self.do_trade</code> (lật trạng thái Mua bán / Tái cân bằng).
+              </li>
+            </ul>
+
+            <h5 style="color:#cc785c; font-family:var(--serif); font-size:1.15rem; margin-bottom:10px; margin-top:20px;">• accounts.py (Core Domain Business Logic)</h5>
+            <ul style="list-style:none; padding-left:15px; margin-bottom:20px;">
+              <li style="margin-bottom:12px;"><strong><code>Account.get(name)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: name: str | Đầu ra: Account</span><br/>
+                Đọc dữ liệu tài khoản từ SQLite. Nếu chưa tồn tại tài khoản nào có tên này, khởi tạo một thực thể mới với số dư mặc định 10,000 USD, lưu vào CSDL và trả về đối tượng <code>Account</code>.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Account.buy_shares(symbol, quantity, rationale)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: symbol: str, quantity: int, rationale: str | Đầu ra: str (JSON)</span><br/>
+                Lấy giá chứng khoán hiện thời qua <code>get_share_price()</code>. Tính giá mua thực tế (bao gồm spread). Nếu đủ tiền mặt trong tài khoản, trừ tiền số dư, cộng holdings, lưu giao dịch vào list transactions, gọi <code>write_log()</code> và lưu tài khoản. Trả về báo cáo tài khoản mới nhất.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Account.sell_shares(symbol, quantity, rationale)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: symbol: str, quantity: int, rationale: str | Đầu ra: str (JSON)</span><br/>
+                Kiểm tra xem có đủ số lượng cổ phiếu để bán hay không. Tính giá bán thực tế (trừ spread). Cộng tiền bán vào số dư, trừ holdings (xóa khỏi holdings nếu số lượng về 0), lưu giao dịch (số lượng âm để ký hiệu lệnh bán), ghi log SQLite và lưu tài khoản.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Account.calculate_portfolio_value()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: float</span><br/>
+                Tính tổng giá trị tài sản ròng hiện thời = số dư tiền mặt + (số lượng từng cổ phiếu đang nắm giữ * giá thị trường hiện thời của cổ phiếu đó).
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Account.calculate_profit_loss(portfolio_value)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: portfolio_value: float | Đầu ra: float</span><br/>
+                Tính tổng lợi nhuận hoặc thua lỗ ròng từ đầu phiên (dựa trên tổng giá trị tài sản hiện tại và chi phí ban đầu).
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>Account.report()</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: None | Đầu ra: str (JSON)</span><br/>
+                Tính giá trị tài sản, chèn snapshot (datetime, value) vào chuỗi thời gian <code>portfolio_value_time_series</code>, lưu tài khoản vào CSDL và trả về chuỗi JSON chứa toàn bộ thông tin tài khoản (gồm holdings, transactions, PnL).
+              </li>
+              <li><strong><code>Account.change_strategy(strategy)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: strategy: str | Đầu ra: str</span><br/>
+                Cập nhật chiến lược đầu tư mới của trader này vào CSDL và ghi log SQLite.
+              </li>
+            </ul>
+
+            <h5 style="color:#cc785c; font-family:var(--serif); font-size:1.15rem; margin-bottom:10px; margin-top:20px;">• database.py (SQLite DB Operations)</h5>
+            <ul style="list-style:none; padding-left:15px; margin-bottom:20px;">
+              <li style="margin-bottom:12px;"><strong><code>write_account(name, account_dict)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: name: str, account_dict: dict | Đầu ra: None</span><br/>
+                Lưu trữ trạng thái tài khoản dưới dạng chuỗi JSON vào bảng <code>accounts</code>. Sử dụng cú pháp <code>INSERT ... ON CONFLICT(name) DO UPDATE</code> để cập nhật nếu tài khoản đã tồn tại.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>read_account(name)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: name: str | Đầu ra: dict | None</span><br/>
+                Truy vấn và phân tích chuỗi JSON lưu trữ của tài khoản có tên <code>name</code> từ bảng <code>accounts</code>. Trả về dict hoặc None.
+              </li>
+              <li style="margin-bottom:12px;"><strong><code>write_log(name, type, message)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: name: str, type: str, message: str | Đầu ra: None</span><br/>
+                Ghi một bản ghi nhật ký (chứa tên, thời gian, loại log, và nội dung tin nhắn) vào bảng <code>logs</code>. Loại log có thể là trace, agent, function, generation, response, account.
+              </li>
+              <li><strong><code>read_log(name, last_n)</code></strong><br/>
+                <span style="color:#a09d96; font-size:0.8rem; font-family:var(--mono);">Đầu vào: name: str, last_n: int | Đầu ra: List[tuple]</span><br/>
+                Truy vấn danh sách <code>last_n</code> bản ghi nhật ký gần nhất của <code>name</code> từ bảng <code>logs</code>, sắp xếp theo thời gian tăng dần để UI hiển thị.
+              </li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section class="section" id="repository">
       <div class="section-head">
         <div>
@@ -1786,6 +2241,21 @@ uv run trading_floor.py</div>
 
       pulseRuntime();
       window.setInterval(pulseRuntime, 1800);
+
+      if (window.mermaid) {
+        mermaid.initialize({
+          startOnLoad: true,
+          theme: 'base',
+          themeVariables: {
+            primaryColor: '#ffffff',
+            primaryTextColor: '#141413',
+            primaryBorderColor: '#e6dfd8',
+            lineColor: '#cc785c',
+            secondaryColor: '#f5f0e8',
+            tertiaryColor: '#efe9de'
+          }
+        });
+      }
     })();
   </script>
 </body>

@@ -1,42 +1,143 @@
 {
   "repo_summary": {
     "name": "6_mcp",
-    "overview": "Week 6 MCP capstone project demonstrating a simulated autonomous trading floor built with OpenAI Agents SDK, multiple MCP servers, SQLite-backed state, tracing, and a Gradio dashboard.",
-    "final_goal": "Teach how to move from MCP labs and notebooks into a reusable multi-agent system with modular orchestration, shared state, observability, and a runnable UI/runtime loop.",
-    "scope_note": "This exploration was grounded directly in the five HTML study guides under tai_lieu plus the root-level .py and .ipynb files requested by the user."
+    "path": "G:\\Agent2026Win\\agents\\6_mcp",
+    "type": "AI Engineering course capstone and local multi-agent simulation",
+    "summary": "Week 6 MCP capstone that demonstrates how to compose OpenAI Agents SDK with multiple MCP servers to build an autonomous trading floor simulation with 4 trader agents, a researcher capability, account and market tools, persistent SQLite state, tracing, push notifications, and a Gradio dashboard.",
+    "final_goal": "Run a split local runtime where `uv run app.py` launches the Gradio dashboard and `uv run trading_floor.py` launches a scheduler that periodically runs four trader agents against MCP tools/resources.",
+    "scope_exclusions": [
+      "hieu/...",
+      "hieu/code/...",
+      "code_udemy/run_automation.py"
+    ],
+    "important_note": "This is a learning simulation for agent architecture and MCP composition, not a real trading system."
   },
-  "analyzed_commit_hash": "3db8162e89702bbe640d7e5f06731baedcfbc75a",
-  "generated_at": "2026-06-17T14:45:49.6421795+07:00",
+  "analyzed_commit": "4d9d9ff8417270c02a57c1fd756728106378a54d",
+  "generated_at": "2026-06-18T15:46:00.3736881+07:00",
+  "analysis_status": {
+    "docs_html_read": 5,
+    "root_python_files_read": 15,
+    "root_notebooks_read": 5,
+    "additional_config_docs_read": [
+      "README.md",
+      "G:\\Agent2026Win\\agents\\pyproject.toml",
+      "G:\\Agent2026Win\\agents\\requirements.txt",
+      "G:\\harness_template\\DESIGN-claude.md"
+    ],
+    "setup_commands_were_run": false,
+    "runtime_was_launched": false,
+    "setup_guide_basis": "Inferred from notebooks, README, imports, pyproject.toml, requirements.txt and runtime code. Commands were not executed."
+  },
   "key_files": [
-    "1_lab1.ipynb",
-    "2_lab2.ipynb",
-    "3_lab3.ipynb",
-    "4_lab4.ipynb",
-    "5_lab5.ipynb",
-    "accounts.py",
-    "accounts_client.py",
-    "accounts_server.py",
-    "app.py",
-    "database.py",
-    "market.py",
-    "market_server.py",
-    "mcp_params.py",
-    "push_server.py",
-    "reset.py",
-    "templates.py",
-    "tracers.py",
-    "traders.py",
-    "trading_floor.py",
-    "util.py",
-    "tai_lieu/day1_study_guide.html",
-    "tai_lieu/day2_study_guide.html",
-    "tai_lieu/day3_study_guide.html",
-    "tai_lieu/day4_study_guide.html",
-    "tai_lieu/day5_study_guide.html"
+    {
+      "path": "README.md",
+      "kind": "docs",
+      "responsibility": "Existing concise project summary, architecture notes, setup/run guide, dependencies and risk notes."
+    },
+    {
+      "path": "1_lab1.ipynb",
+      "kind": "notebook",
+      "responsibility": "Introduces MCP basics, MCPServerStdio, Python and Node MCP servers, and multi-server agent usage."
+    },
+    {
+      "path": "2_lab2.ipynb",
+      "kind": "notebook",
+      "responsibility": "Builds custom accounts MCP server and client, demonstrates tools/resources and FunctionTool bridge."
+    },
+    {
+      "path": "3_lab3.ipynb",
+      "kind": "notebook",
+      "responsibility": "Adds memory server, Brave Search, Polygon API, local market wrapper and paid/realtime Polygon MCP option."
+    },
+    {
+      "path": "4_lab4.ipynb",
+      "kind": "notebook",
+      "responsibility": "Assembles one autonomous trader with researcher-as-tool and migrates lab logic into modules."
+    },
+    {
+      "path": "5_lab5.ipynb",
+      "kind": "notebook",
+      "responsibility": "Final capstone with four traders, dashboard, trace logging, scheduler and runtime settings."
+    },
+    {
+      "path": "accounts.py",
+      "kind": "domain",
+      "responsibility": "Pydantic Account and Transaction models, account state mutations, portfolio valuation, strategy changes and persistence calls."
+    },
+    {
+      "path": "database.py",
+      "kind": "persistence",
+      "responsibility": "SQLite table creation and read/write functions for accounts, logs and market cache."
+    },
+    {
+      "path": "market.py",
+      "kind": "domain",
+      "responsibility": "Market price lookup using Polygon REST client when configured, EOD cache, plan branching and random fallback."
+    },
+    {
+      "path": "accounts_server.py",
+      "kind": "mcp_server",
+      "responsibility": "FastMCP account tools and resources for balance, holdings, buy/sell, strategy and account reports."
+    },
+    {
+      "path": "accounts_client.py",
+      "kind": "mcp_client",
+      "responsibility": "Handwritten MCP client that lists/calls account tools, reads resources and converts MCP tools to OpenAI FunctionTool."
+    },
+    {
+      "path": "market_server.py",
+      "kind": "mcp_server",
+      "responsibility": "Thin FastMCP wrapper for share price lookup."
+    },
+    {
+      "path": "push_server.py",
+      "kind": "mcp_server",
+      "responsibility": "FastMCP tool for sending Pushover notifications."
+    },
+    {
+      "path": "mcp_params.py",
+      "kind": "configuration",
+      "responsibility": "Role-based MCP server parameter bundles for trader and researcher, including Polygon plan branch and per-trader memory DB."
+    },
+    {
+      "path": "templates.py",
+      "kind": "prompting",
+      "responsibility": "Researcher and trader instructions plus trade/rebalance message templates."
+    },
+    {
+      "path": "traders.py",
+      "kind": "agent_orchestration",
+      "responsibility": "Single Trader orchestration: model routing, researcher tool creation, account context pruning, MCP lifecycle and trace wrapper."
+    },
+    {
+      "path": "trading_floor.py",
+      "kind": "entrypoint",
+      "responsibility": "Scheduler loop, trader roster, model lineup, market-hours guard and periodic parallel trader execution."
+    },
+    {
+      "path": "tracers.py",
+      "kind": "observability",
+      "responsibility": "OpenAI Agents tracing processor that writes trace/span events into SQLite logs."
+    },
+    {
+      "path": "app.py",
+      "kind": "entrypoint",
+      "responsibility": "Gradio dashboard showing portfolio values, charts, logs, holdings and transactions."
+    },
+    {
+      "path": "reset.py",
+      "kind": "utility",
+      "responsibility": "Initial strategies and reset routine for Warren, George, Ray and Cathie."
+    },
+    {
+      "path": "util.py",
+      "kind": "ui_helper",
+      "responsibility": "Dashboard CSS, JS theme helper and log color enum."
+    }
   ],
   "modules_layers": [
     {
-      "name": "Learning Layer",
+      "layer": "Learning progression",
       "files": [
         "1_lab1.ipynb",
         "2_lab2.ipynb",
@@ -49,69 +150,127 @@
         "tai_lieu/day4_study_guide.html",
         "tai_lieu/day5_study_guide.html"
       ],
-      "responsibility": "Explain the course progression from MCP basics to the final autonomous traders capstone."
+      "purpose": "Course narrative and experiments that explain the evolution from MCP basics to capstone runtime."
     },
     {
-      "name": "Domain State Layer",
+      "layer": "Entrypoints",
       "files": [
-        "accounts.py",
-        "database.py",
+        "app.py",
+        "trading_floor.py",
         "reset.py"
       ],
-      "responsibility": "Store account state, transaction history, logs, market cache, and seeded trader strategies."
+      "purpose": "Launch dashboard, launch scheduler and reset baseline account strategies."
     },
     {
-      "name": "MCP Surface Layer",
+      "layer": "Agent orchestration",
+      "files": [
+        "traders.py",
+        "templates.py",
+        "mcp_params.py"
+      ],
+      "purpose": "Build trader and researcher agents, route models, compose MCP server bundles and drive trade/rebalance cycles."
+    },
+    {
+      "layer": "MCP boundary",
       "files": [
         "accounts_server.py",
         "accounts_client.py",
         "market_server.py",
         "push_server.py"
       ],
-      "responsibility": "Expose and consume capabilities and resources through MCP stdio servers and clients."
+      "purpose": "Expose or consume MCP tools/resources over stdio and bridge domain operations into agent-callable capabilities."
     },
     {
-      "name": "Capability And Prompt Layer",
+      "layer": "Domain and persistence",
       "files": [
+        "accounts.py",
         "market.py",
-        "mcp_params.py",
-        "templates.py"
+        "database.py"
       ],
-      "responsibility": "Configure tool surfaces, market data routing, and prompt templates."
+      "purpose": "Maintain account state, transactions, market lookup/cache, logs and SQLite persistence."
     },
     {
-      "name": "Agent Orchestration Layer",
-      "files": [
-        "traders.py",
-        "trading_floor.py"
-      ],
-      "responsibility": "Build trader agents, wire researcher-as-tool, and schedule repeated autonomous runs."
-    },
-    {
-      "name": "Observability And UI Layer",
+      "layer": "Observability and UI",
       "files": [
         "tracers.py",
         "app.py",
         "util.py"
       ],
-      "responsibility": "Capture traces into logs and display runtime state in a Gradio dashboard."
+      "purpose": "Convert trace events to database logs and render state in Gradio."
     }
   ],
   "diagrams_source": {
-    "architecture": "flowchart LR\n  subgraph UI[\"Presentation\"]\n    APP[\"app.py<br/>Gradio dashboard\"]\n    UTIL[\"util.py\"]\n  end\n\n  subgraph Orchestration[\"Runtime orchestration\"]\n    FLOOR[\"trading_floor.py\"]\n    TRADER[\"traders.py::Trader\"]\n    TRACEPROC[\"tracers.py::LogTracer\"]\n  end\n\n  subgraph Config[\"Config and prompts\"]\n    PARAMS[\"mcp_params.py\"]\n    TPL[\"templates.py\"]\n    RESET[\"reset.py\"]\n  end\n\n  subgraph MCP[\"MCP surface\"]\n    ACCSRV[\"accounts_server.py\"]\n    MKTSRV[\"market_server.py\"]\n    PUSHSRV[\"push_server.py\"]\n    EXT[\"fetch / Brave / memory / Polygon official MCP\"]\n    ACCCLI[\"accounts_client.py\"]\n  end\n\n  subgraph State[\"State and persistence\"]\n    ACC[\"accounts.py\"]\n    MKT[\"market.py\"]\n    DB[\"database.py / accounts.db\"]\n  end\n\n  FLOOR --> TRADER\n  FLOOR --> TRACEPROC\n  TRADER --> PARAMS\n  TRADER --> TPL\n  TRADER --> ACCCLI\n  ACCCLI --> ACCSRV\n  TRADER --> MKTSRV\n  TRADER --> PUSHSRV\n  TRADER --> EXT\n  ACCSRV --> ACC\n  MKTSRV --> MKT\n  ACC --> DB\n  ACC --> MKT\n  MKT --> DB\n  TRACEPROC --> DB\n  APP --> ACC\n  APP --> DB\n  APP --> UTIL\n  RESET --> ACC",
-    "module_dependency": "flowchart TD\n  trading_floor_py[\"trading_floor.py\"] --> traders_py[\"traders.py\"]\n  trading_floor_py --> tracers_py[\"tracers.py\"]\n  traders_py --> accounts_client_py[\"accounts_client.py\"]\n  traders_py --> templates_py[\"templates.py\"]\n  traders_py --> mcp_params_py[\"mcp_params.py\"]\n  accounts_client_py --> accounts_server_py[\"accounts_server.py\"]\n  accounts_server_py --> accounts_py[\"accounts.py\"]\n  accounts_py --> database_py[\"database.py\"]\n  accounts_py --> market_py[\"market.py\"]\n  market_server_py[\"market_server.py\"] --> market_py\n  app_py[\"app.py\"] --> trading_floor_py\n  app_py --> accounts_py\n  app_py --> database_py\n  reset_py[\"reset.py\"] --> accounts_py\n  mcp_params_py --> market_py",
-    "runtime_data_flow": "sequenceDiagram\n  participant Scheduler as trading_floor.py\n  participant Trader as traders.py\n  participant AccountsClient as accounts_client.py\n  participant AccountsServer as accounts_server.py\n  participant Tools as MCP tools\n  participant DB as accounts.db\n  participant UI as app.py\n\n  Scheduler->>Trader: run()\n  Trader->>AccountsClient: read account + strategy resources\n  AccountsClient->>AccountsServer: MCP stdio request\n  AccountsServer->>DB: read/write account state\n  Trader->>Tools: research, market lookup, buy/sell, push\n  Tools->>DB: write logs / state / market cache\n  Trader->>DB: trace events via LogTracer\n  UI->>DB: periodic refresh\n  UI->>UI: render chart, holdings, transactions, logs",
-    "setup_flow": "flowchart TD\n  A[\"Install Python + uv\"] --> B[\"Install Node/npx if using JS MCP servers\"]\n  B --> C[\"Set .env variables\"]\n  C --> D[\"Optional: uv run reset.py\"]\n  D --> E[\"uv run app.py\"]\n  D --> F[\"uv run trading_floor.py\"]\n  E --> G[\"Observe dashboard\"]\n  F --> G"
+    "architecture": "flowchart LR with Dashboard process, Trading engine process, MCP servers over stdio, and Domain/persistence blocks.",
+    "module_dependency": "flowchart TB linking app.py, trading_floor.py, traders.py, MCP servers, account/domain modules and database.",
+    "runtime_control_flow": "sequenceDiagram from trading_floor.py scheduler through Trader.run, MCP servers, account resources, Runner.run and UI polling.",
+    "data_lifecycle": "flowchart LR from .env, reset strategies, market data, agent decisions and trace events into SQLite and dashboard.",
+    "setup_flow": "flowchart TB from cd 6_mcp to uv setup, .env, reset, app.py, trading_floor.py and manual shutdown."
   },
+  "tech_stack_key_dependencies": {
+    "language": "Python >= 3.12",
+    "package_manager": "uv",
+    "agent_framework": "OpenAI Agents SDK / openai-agents",
+    "protocol": "MCP over stdio via mcp and FastMCP",
+    "ui": "Gradio, pandas, Plotly",
+    "persistence": "SQLite via sqlite3",
+    "models_and_clients": [
+      "OpenAI model names directly",
+      "OpenRouter via OpenAI-compatible AsyncOpenAI client",
+      "DeepSeek via OpenAI-compatible AsyncOpenAI client",
+      "xAI Grok via OpenAI-compatible AsyncOpenAI client",
+      "Google Gemini OpenAI-compatible endpoint"
+    ],
+    "external_services": [
+      "Polygon.io",
+      "Brave Search MCP server",
+      "Pushover",
+      "mcp-server-fetch",
+      "mcp-memory-libsql",
+      "Playwright MCP in Day 1 notebook"
+    ],
+    "dependencies_observed": [
+      "openai-agents",
+      "openai",
+      "mcp[cli]",
+      "mcp-server-fetch",
+      "gradio",
+      "pydantic",
+      "python-dotenv",
+      "polygon-api-client",
+      "pandas",
+      "plotly",
+      "requests",
+      "playwright"
+    ]
+  },
+  "end_to_end_workflow": [
+    "Optionally run reset.py to create baseline trader strategies and account state.",
+    "Run app.py to launch Gradio dashboard.",
+    "Run trading_floor.py in another terminal to start scheduler.",
+    "Scheduler creates four Trader objects and attaches LogTracer.",
+    "Each Trader opens trader MCP servers and researcher MCP servers via AsyncExitStack.",
+    "Trader reads account and strategy resources through accounts_client.py/accounts_server.py.",
+    "Trader builds trade or rebalance prompt from templates.py and calls Runner.run.",
+    "Trader agent can call Researcher as a tool, market tools, account tools and push notification tool.",
+    "Account and trace mutations are written to accounts.db.",
+    "Dashboard polls SQLite-backed state and logs to update charts, dataframes and log panels."
+  ],
   "evidence_sources": {
-    "directly_read_docs": [
+    "html_docs": [
       "tai_lieu/day1_study_guide.html",
       "tai_lieu/day2_study_guide.html",
       "tai_lieu/day3_study_guide.html",
       "tai_lieu/day4_study_guide.html",
       "tai_lieu/day5_study_guide.html"
     ],
-    "directly_read_code": [
+    "root_notebooks": [
+      "1_lab1.ipynb",
+      "2_lab2.ipynb",
+      "3_lab3.ipynb",
+      "4_lab4.ipynb",
+      "5_lab5.ipynb"
+    ],
+    "root_python": [
       "accounts.py",
       "accounts_client.py",
       "accounts_server.py",
@@ -128,60 +287,63 @@
       "trading_floor.py",
       "util.py"
     ],
-    "directly_read_notebooks": [
-      "1_lab1.ipynb",
-      "2_lab2.ipynb",
-      "3_lab3.ipynb",
-      "4_lab4.ipynb",
-      "5_lab5.ipynb"
-    ],
-    "repo_scan_evidence": [
-      "git rev-parse HEAD",
-      "top-level directory listing",
-      "presence scan for config/test/deployment files"
+    "supporting_docs_config": [
+      "README.md",
+      "G:\\Agent2026Win\\agents\\pyproject.toml",
+      "G:\\Agent2026Win\\agents\\requirements.txt",
+      "G:\\harness_template\\DESIGN-claude.md"
     ]
   },
   "open_questions": [
-    "Where is the authoritative dependency manifest for exact package versions?",
-    "Is the root directory the canonical source, or is hieu/ intended as a maintained mirror or student workspace?",
-    "What is the expected behavior when required credentials for push notifications or market data are missing?",
-    "Should random price fallback in market.py be treated as a teaching convenience only, or is it expected in normal local runs?",
-    "What runtime path is recommended today for Windows users beyond the WSL note in the Day 1 materials?"
+    "Should README.md be synchronized with the new deep project exploration report?",
+    "Should the repo add a .env.example with variable names and safe defaults?",
+    "Should account/database/market modules get a real unit test suite?",
+    "Should random market fallback become an explicit simulation mode rather than silent fallback?",
+    "Should there be a process manager or helper script to launch dashboard and trading engine together?",
+    "Should database path and external clients be injected to improve testability?"
   ],
   "files_read": [
-    "tai_lieu/day1_study_guide.html",
-    "tai_lieu/day2_study_guide.html",
-    "tai_lieu/day3_study_guide.html",
-    "tai_lieu/day4_study_guide.html",
-    "tai_lieu/day5_study_guide.html",
-    "1_lab1.ipynb",
-    "2_lab2.ipynb",
-    "3_lab3.ipynb",
-    "4_lab4.ipynb",
-    "5_lab5.ipynb",
-    "accounts.py",
-    "accounts_client.py",
-    "accounts_server.py",
-    "app.py",
-    "database.py",
-    "market.py",
-    "market_server.py",
-    "mcp_params.py",
-    "push_server.py",
-    "reset.py",
-    "templates.py",
-    "tracers.py",
-    "traders.py",
-    "trading_floor.py",
-    "util.py"
+    "G:\\Agent2026Win\\agents\\6_mcp\\accounts.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\accounts_client.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\accounts_server.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\app.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\database.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\market.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\market_server.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\mcp_params.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\push_server.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\reset.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\templates.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tracers.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\traders.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\trading_floor.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\util.py",
+    "G:\\Agent2026Win\\agents\\6_mcp\\1_lab1.ipynb",
+    "G:\\Agent2026Win\\agents\\6_mcp\\2_lab2.ipynb",
+    "G:\\Agent2026Win\\agents\\6_mcp\\3_lab3.ipynb",
+    "G:\\Agent2026Win\\agents\\6_mcp\\4_lab4.ipynb",
+    "G:\\Agent2026Win\\agents\\6_mcp\\5_lab5.ipynb",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tai_lieu\\day1_study_guide.html",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tai_lieu\\day2_study_guide.html",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tai_lieu\\day3_study_guide.html",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tai_lieu\\day4_study_guide.html",
+    "G:\\Agent2026Win\\agents\\6_mcp\\tai_lieu\\day5_study_guide.html",
+    "G:\\Agent2026Win\\agents\\6_mcp\\README.md",
+    "G:\\Agent2026Win\\agents\\pyproject.toml",
+    "G:\\Agent2026Win\\agents\\requirements.txt",
+    "G:\\harness_template\\DESIGN-claude.md"
   ],
   "confidence_risk_notes": {
-    "confidence": "medium-high",
-    "notes": [
-      "Architecture, workflow, and module responsibilities are strongly grounded in the read HTML study guides, notebooks, and root Python files.",
-      "Setup steps are inference-based because no commands were executed to install dependencies or run the project.",
-      "No automated tests or dependency manifest were found in the scoped read, which limits certainty around exact runtime expectations.",
-      "Some top-level folders outside the requested read scope were only inspected at presence level, not content level."
+    "confidence": "High for repository structure, module responsibilities and architecture flow because the report is grounded in root Python files, notebooks and HTML guides.",
+    "setup_confidence": "Medium because setup/run commands were inferred but not executed.",
+    "runtime_confidence": "Medium because external services, secrets, Node/npx availability and Windows/WSL behavior were not validated in this run.",
+    "security_note": "Secret values were not read or printed. The report only references environment variable names observed in code/docs.",
+    "main_risks": [
+      "External API dependence: Polygon, Brave, Pushover and model providers.",
+      "Silent random market fallback can hide market data failures.",
+      "Infinite scheduler can consume API budget if left running.",
+      "Fixed SQLite DB path makes testing and parallel runs harder.",
+      "No official test suite found in scoped files."
     ]
   }
 }
